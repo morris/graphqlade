@@ -1,0 +1,18 @@
+{
+  "include": ["src"],
+  "exclude": ["dist", "node_modules"],
+  "compilerOptions": {
+    "outFile": "public/bundle.js",
+    "target": "ES6",
+    "module": "AMD",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true
+  }
+}

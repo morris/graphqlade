@@ -1,0 +1,18 @@
+{
+  "name": "graphqlade-example-client",
+  "version": "0.1.0",
+  "description": "GraphQLade Example Client",
+  "private": true,
+  "license": "ISC",
+  "scripts": {
+    "build": "tsc",
+    "gql2ts": "node gql2ts.js"
+  },
+  "dependencies": {
+    "graphqlade": "../.."
+  },
+  "devDependencies": {
+    "prettier": "^2",
+    "typescript": "^4"
+  }
+}

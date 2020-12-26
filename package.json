@@ -1,0 +1,108 @@
+{
+  "name": "graphqlade",
+  "version": "0.1.0",
+  "description": "Opinionated, type-safe and complete toolset for GraphQL + TypeScript development",
+  "keywords": [
+    "graphql",
+    "typescript",
+    "code-generation",
+    "server",
+    "client",
+    "websockets"
+  ],
+  "contributors": [
+    "Morris Brodersen <mb@morrisbrodersen.de> (https://morrisbrodersen.de)"
+  ],
+  "license": "ISC",
+  "module": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "build:watch": "tsc --watch",
+    "build:all": "npm run build && npm run example:gql2ts && tsc && npm run example:client:build",
+    "lint": "eslint .",
+    "format": "prettier --write './**/*.ts' './**/*.js' './**/*.json'",
+    "test": "nyc mocha test",
+    "clean": "rm -rf dist",
+    "prepare": "npm run clean && npm run build",
+    "example:gql2ts": "concurrently npm:example:server:gql2ts npm:example:client:gql2ts",
+    "example:gql2ts:watch": "concurrently npm:server:gql2ts:watch npm:client:gql2ts:watch",
+    "example:server:gql2ts": "node examples/server/gql2ts.js",
+    "example:server:gql2ts:watch": "node examples/server/gql2ts.js --watch",
+    "example:server": "ts-node examples/server/src/server.ts",
+    "example:server:watch": "nodemon --watch 'examples/server/**/*' --exec 'ts-node' examples/server/src/server.ts",
+    "example:client:gql2ts": "node examples/client/gql2ts.js",
+    "example:client:gql2ts:watch": "node examples/client/gql2ts.js --watch",
+    "example:client:build": "tsc --project examples/client/tsconfig.json",
+    "example:client:build:watch": "tsc --project examples/client/tsconfig.json --watch"
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "cache": true
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint",
+      "git add"
+    ]
+  },
+  "peerDependencies": {
+    "graphql": "^15"
+  },
+  "optionalDependencies": {
+    "prettier": "^2",
+    "typescript": "^4",
+    "ws": "^7"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.9",
+    "@types/express": "^4",
+    "@types/got": "^9",
+    "@types/graphql-iso-date": "^3",
+    "@types/mocha": "^8",
+    "@types/node": "^14",
+    "@types/prettier": "^2",
+    "@types/ws": "^7.4.0",
+    "@typescript-eslint/eslint-plugin": "^4.11.0",
+    "@typescript-eslint/parser": "^4.11.0",
+    "body-parser": "^1.19.0",
+    "concurrently": "^5.3.0",
+    "cors": "^2.8.5",
+    "eslint": "^7.15.0",
+    "express": "^4",
+    "got": "^11.8.1",
+    "graphql": "^15",
+    "graphql-iso-date": "^3.6.1",
+    "husky": "^4",
+    "lint-staged": "^10",
+    "mocha": "^8",
+    "nodemon": "^2.0.6",
+    "nyc": "^15",
+    "prettier": "^2",
+    "source-map-support": "^0.5",
+    "ts-node": "^9.1.1",
+    "typescript": "^4",
+    "ws": "^7.4.1"
+  }
+}

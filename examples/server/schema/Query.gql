@@ -1,0 +1,70 @@
+type Query {
+  praise: String!
+  bosses: [Boss!]
+  boss(id: ID!): Boss
+  locations: [Location!]
+  location(id: ID!): Location
+  reviews(after: DateTime, before: DateTime): [Review!]
+  search(q: String!, types: [SearchType!]): [SearchResult!]
+}
+
+type Boss @ts(type: "BossData", from: "../types") {
+  id: ID!
+  name: String!
+  optional: Boolean!
+  location: Location!
+  reviews: [BossReview!]
+}
+
+type Location @ts(type: "LocationData", from: "../types") {
+  id: ID!
+  name: String!
+  bosses: [Boss!]
+  reviews: [LocationReview!]
+}
+
+interface Review @ts(type: "ReviewData", from: "../types") {
+  id: UUID!
+  author: String
+  createdAt: DateTime!
+}
+
+type BossReview implements Review @ts(type: "ReviewData", from: "../types") {
+  id: UUID!
+  author: String
+  createdAt: DateTime!
+  boss: Boss!
+  difficulty: Difficulty!
+  theme: Rating!
+}
+
+type LocationReview implements Review
+  @ts(type: "ReviewData", from: "../types") {
+  id: UUID!
+  author: String
+  createdAt: DateTime!
+  location: Location!
+  difficulty: Difficulty!
+  design: Rating!
+}
+
+enum Rating @ts(type: "number") {
+  TERRIBLE
+  MEH
+  ALRIGHT
+  AMAZING
+  STELLAR
+}
+
+enum Difficulty @ts(type: "string") {
+  OKAYISH
+  HARD
+  IMPOSSIBLE
+}
+
+enum SearchType {
+  BOSSES
+  LOCATIONS
+}
+
+union SearchResult = Boss | Location

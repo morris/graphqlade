@@ -1,0 +1,19 @@
+type Mutation {
+  youDied: Boolean
+  createBossReview(input: CreateBossReviewInput!): BossReview
+  createLocationReview(input: CreateLocationReviewInput!): LocationReview
+}
+
+input CreateBossReviewInput {
+  author: String
+  bossId: ID!
+  difficulty: Difficulty!
+  theme: Rating!
+}
+
+input CreateLocationReviewInput {
+  author: String
+  locationId: ID!
+  difficulty: Difficulty!
+  design: Rating!
+}
