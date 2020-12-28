@@ -81,6 +81,80 @@ describe("The SubscriptionIterator", () => {
     assert.ok(cleared);
   });
 
+  it("should handle chaotic iteration", async () => {
+    let cleared = false;
+
+    const iterator = new SubscriptionIterator<number>((push) => {
+      let i = 0;
+      const intervalId = setInterval(() => {
+        push(++i);
+        push(++i);
+        push(++i);
+      }, 100);
+
+      return () => {
+        cleared = true;
+        clearInterval(intervalId);
+      };
+    });
+
+    const results: number[] = [];
+
+    async function next() {
+      const { value } = await iterator.next();
+      if (typeof value === "number") results.push(value);
+    }
+
+    for (let i = 0; i < 30; ++i) {
+      setTimeout(next, Math.random() * 100);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1100));
+
+    await iterator.return();
+
+    assert.strictEqual(results.length, 30);
+    assert.ok(cleared);
+  });
+
+  it("should handle chaotic iteration (2)", async () => {
+    let cleared = false;
+
+    const iterator = new SubscriptionIterator<number>((push, stop) => {
+      let i = 0;
+      const intervalId = setInterval(() => {
+        if (i >= 30) return stop();
+        push(++i);
+        push(++i);
+        push(++i);
+      }, 100);
+
+      return () => {
+        cleared = true;
+        clearInterval(intervalId);
+      };
+    });
+
+    const results: number[] = [];
+    let _done: boolean | undefined;
+
+    async function next() {
+      const { done, value } = await iterator.next();
+      if (typeof value === "number") results.push(value);
+      _done = _done || done;
+    }
+
+    for (let i = 0; i < 50; ++i) {
+      setTimeout(next, Math.random() * 100);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    assert.strictEqual(results.length, 30);
+    assert.ok(_done, "not done");
+    assert.ok(cleared, "not cleared");
+  });
+
   // TODO why is this failing :(
   it.skip("should be cancelable with an error", async () => {
     let cleared = false;

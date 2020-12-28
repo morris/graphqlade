@@ -43,6 +43,7 @@ export class SubscriptionIterator<T> implements AsyncIterator<T> {
       try {
         await this.yield();
       } catch (err) {
+        // only caused by cancel
         this.stopped = true;
         this.unsubscribe();
 
@@ -51,7 +52,10 @@ export class SubscriptionIterator<T> implements AsyncIterator<T> {
     }
 
     if (this.queue.length > 0) {
-      return { done: false, value: this.queue.shift() as T };
+      const value = this.queue.shift() as T;
+      const done = this.stopped && this.queue.length === 1;
+
+      return { done, value };
     } else {
       return this.next();
     }
