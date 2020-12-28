@@ -1,13 +1,3 @@
-export async function canImportModule(name: string) {
-  try {
-    await import(name);
-
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
-
 export function isAsyncIterator<T>(
   result: unknown
 ): result is AsyncIterator<T> {

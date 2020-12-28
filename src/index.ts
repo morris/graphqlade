@@ -1,4 +1,3 @@
-export * from "./client";
 export * from "./codegen";
 export * from "./introspect";
 export * from "./read";

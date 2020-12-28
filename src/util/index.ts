@@ -4,6 +4,5 @@ export * from "./cleanOperations";
 export * from "./DeferredPromise";
 export * from "./directives";
 export * from "./misc";
-export * from "./types";
 export * from "./watchRecursive";
 export * from "./writeTypeScript";

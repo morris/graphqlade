@@ -31,8 +31,8 @@ import {
   assertCompositeType,
 } from "graphql";
 import { ImportCodeGenerator } from "./ImportCodeGenerator";
-import { TsDirective, getDirective, assertDefined } from "../util";
-import { CommonCodeGenerator } from "./CommonCodeGenerator";
+import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
+import { getDirective, assertDefined } from "../util";
 
 export interface ClientCodeGeneratorOptions {
   schema: GraphQLSchema;
@@ -615,9 +615,10 @@ export class ClientCodeGenerator {
   assertNamedOperationDefinition(
     node: OperationDefinitionNode
   ): asserts node is NamedOperationDefinitionNode {
-    if (!node.name) {
-      throw new Error("Cannot generate client code for unnamed operations");
-    }
+    assertDefined(
+      node.name,
+      "Cannot generate client code for unnamed operations"
+    );
   }
 
   join(parts: (string | undefined)[], separator = "\n\n", braces?: string) {

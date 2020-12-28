@@ -16,9 +16,9 @@ import {
   GraphQLNamedType,
   isCompositeType,
 } from "graphql";
-import { CommonCodeGenerator } from "./CommonCodeGenerator";
-import { TsDirective, getDirective } from "../util";
+import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
 import { ImportCodeGenerator } from "./ImportCodeGenerator";
+import { getDirective } from "../util";
 
 export interface ServerCodeGeneratorOptions {
   schema: GraphQLSchema;
