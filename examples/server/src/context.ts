@@ -1,7 +1,14 @@
+import { EventEmitter } from "events";
 import { bosses, locations, reviews } from "./data";
 import { ReviewData } from "./types";
 
 export class MyContext {
+  pubsub: EventEmitter;
+
+  constructor(options: { pubsub: EventEmitter }) {
+    this.pubsub = options.pubsub;
+  }
+
   getBosses() {
     return bosses;
   }
@@ -34,6 +41,8 @@ export class MyContext {
     const reviewWithId = { ...review, id: this.uuid(), time: new Date() };
     reviews.push(reviewWithId);
 
+    this.publishReview(reviewWithId);
+
     return reviewWithId;
   }
 
@@ -42,6 +51,16 @@ export class MyContext {
       ...locations.filter((it) => it.name.match(q)),
       ...bosses.filter((it) => it.name.match(q)),
     ];
+  }
+
+  publishReview(review: ReviewData) {
+    this.pubsub.emit("review", review);
+  }
+
+  subscribeReviews(listener: (review: ReviewData) => void) {
+    this.pubsub.on("review", listener);
+
+    return () => this.pubsub.removeListener("review", listener);
   }
 
   uuid() {

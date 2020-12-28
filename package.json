@@ -27,10 +27,10 @@
     "lint": "eslint .",
     "format": "prettier --write './**/*.ts' './**/*.js' './**/*.json'",
     "test": "nyc mocha test",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf .nyc_output coverage dist",
     "prepare": "npm run clean && npm run build",
     "example:gql2ts": "concurrently npm:example:server:gql2ts npm:example:client:gql2ts",
-    "example:gql2ts:watch": "concurrently npm:server:gql2ts:watch npm:client:gql2ts:watch",
+    "example:gql2ts:watch": "concurrently npm:example:server:gql2ts:watch npm:example:client:gql2ts:watch",
     "example:server:gql2ts": "node examples/server/gql2ts.js",
     "example:server:gql2ts:watch": "node examples/server/gql2ts.js --watch",
     "example:server": "ts-node examples/server/src/server.ts",
@@ -45,7 +45,8 @@
       ".ts"
     ],
     "include": [
-      "src"
+      "src",
+      "examples/server/src"
     ],
     "exclude": [
       "**/*.d.ts"

@@ -11,7 +11,8 @@ export type AsyncResult<T> = T | Promise<T>;
 export type Maybe<T> = T | null | undefined;
 
 export interface ResolverMap<TContext> {
-  __isGenerateResolverMap?: TContext;
+  __isGeneratedResolverMap?: TContext;
+
   Mutation?: RMutation<TContext>;
 
   Boolean?: GraphQLScalarType;
@@ -45,6 +46,8 @@ export interface ResolverMap<TContext> {
   SearchResult?: RSearchResult<TContext>;
 
   Subscription?: RSubscription<TContext>;
+
+  Int?: GraphQLScalarType;
 
   Date?: GraphQLScalarType;
 
@@ -478,7 +481,7 @@ export interface RSubscription<TContext> {
    */
   newReviews?: (
     source: TSubscription,
-    args: Record<string, never>,
+    args: SubscriptionNewReviewsArgs,
     context: TContext,
     info: GraphQLResolveInfo
   ) => AsyncResult<ReviewData>;
@@ -1030,15 +1033,17 @@ export interface E__DirectiveLocation {
 }
 
 export interface SSubscription<TContext> {
+  __isGeneratedSubscriptionResolver?: TContext;
+
   /**
    * (Review)
    */
   newReviews?: (
     source: TSubscription,
-    args: Record<string, never>,
+    args: SubscriptionNewReviewsArgs,
     context: TContext,
     info: GraphQLResolveInfo
-  ) => AsyncIterator<{ newReviews: ReviewData }>;
+  ) => AsyncResult<AsyncIterableIterator<{ newReviews: ReviewData }>>;
 }
 
 export interface TMutation {
@@ -1455,6 +1460,13 @@ export interface QuerySearchArgs {
   q: string;
 
   types?: Array<TSearchType>;
+}
+
+export interface SubscriptionNewReviewsArgs {
+  /**
+   * (Int)
+   */
+  limit?: number;
 }
 
 export interface __TypeFieldsArgs {

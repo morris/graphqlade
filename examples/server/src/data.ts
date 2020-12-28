@@ -22,4 +22,13 @@ export const reviews: ReviewData[] = [
     difficulty: "okayish",
     theme: 5,
   },
+  {
+    id: "b237b0b4-e514-4aad-ad9a-322aea966e74",
+    subjectId: 13,
+    subjectType: 2,
+    time: new Date(),
+    author: "undead42",
+    difficulty: "hard",
+    design: 4,
+  },
 ];

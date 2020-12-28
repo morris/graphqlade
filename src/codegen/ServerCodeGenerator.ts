@@ -132,7 +132,8 @@ export class ServerCodeGenerator {
     const types = Object.values(this.schema.getTypeMap());
 
     return `export interface ResolverMap<TContext> {
-      __isGenerateResolverMap?: TContext,
+      __isGeneratedResolverMap?: TContext,
+
       ${this.join(types.map((it) => this.generateResolverMapEntry(it)))}
     }`;
   }
@@ -242,6 +243,8 @@ export class ServerCodeGenerator {
 
       return `${this.commonCodeGenerator.generateDescription(node)}
         export interface S${node.name}<TContext> {
+          __isGeneratedSubscriptionResolver?: TContext,
+
           ${this.join(
             fields.map((it) => this.generateSubscriptionField(it, node))
           )}
@@ -261,7 +264,7 @@ export class ServerCodeGenerator {
         args: ${this.generateArgsRef(field, parent)},
         context: TContext,
         info: GraphQLResolveInfo
-      ) => AsyncIterator<{ ${field.name}: ${tResult} }>`;
+      ) => AsyncResult<AsyncIterableIterator<{ ${field.name}: ${tResult} }>>`;
   }
 
   // resolver interfaces

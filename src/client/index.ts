@@ -1,1 +1,1 @@
-export * from "./GraphQLClientWebSocket";
+export * from "../ws/GraphQLClientWebSocket";

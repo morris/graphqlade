@@ -1,11 +1,11 @@
 import * as path from "path";
 import { ClientCodeGenerator } from "./ClientCodeGenerator";
 import { ServerCodeGenerator } from "./ServerCodeGenerator";
-import { GraphQLReader } from "../util/GraphQLReader";
+import { GraphQLReader } from "../read/GraphQLReader";
 import {
   GraphQLIntrospector,
   IntrospectionRequestFn,
-} from "../util/GraphQLIntrospector";
+} from "../introspect/GraphQLIntrospector";
 import { watchRecursive, writeTypeScript } from "../util";
 import { validate } from "graphql";
 import { cleanOperations } from "../util/cleanOperations";

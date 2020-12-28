@@ -2,7 +2,7 @@ import { readdir, readFile, stat } from "fs/promises";
 import { Stats } from "fs";
 import { join } from "path";
 import { buildSchema, GraphQLError, parse } from "graphql";
-import { compare } from "./misc";
+import { compare } from "../util/misc";
 
 export interface GraphQLReaderOptions {
   disableParseCheck?: boolean;

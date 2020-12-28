@@ -2,21 +2,33 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import * as path from "path";
-import { Server } from "http";
+import { createServer, Server } from "http";
+import * as ws from "ws";
 import { resolvers } from "./resolvers";
 import { MyContext } from "./context";
-import { buildExecutableSchema, GraphQLServer } from "../../.."; // graphqlade/server in your app
+import {
+  buildExecutableSchema,
+  GraphQLServer,
+  GraphQLServerWebSocket,
+  GraphQLWebSocketServer,
+} from "../../../src"; // graphqlade/server in your app
 import { AddressInfo } from "net";
+import { Subscription } from "./resolvers/Subscription";
+import { EventEmitter } from "events";
 
 export async function bootstrap(env: NodeJS.ProcessEnv) {
   // build executable schema
   const schema = await buildExecutableSchema<MyContext>({
     root: __dirname + "/..",
     resolvers,
+    subscriptionResolver: Subscription,
   });
 
   // build graphql server
   const gqlServer = new GraphQLServer<MyContext>({ schema });
+
+  // basic pubsub
+  const pubsub = new EventEmitter();
 
   // backend framework-dependent logic
   async function serveGraphQL(
@@ -29,7 +41,7 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
     }
 
     try {
-      const response = await gqlServer.execute(req, new MyContext());
+      const response = await gqlServer.execute(req, new MyContext({ pubsub }));
 
       res.status(response.status).set(response.headers).json(response.body);
     } catch (err) {
@@ -43,8 +55,28 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
   app.get("/graphql", serveGraphQL);
   app.post("/graphql", bodyParser.json(), serveGraphQL);
 
+  const server = createServer(app);
+
+  const gqlWsServer = new GraphQLWebSocketServer({ schema });
+
+  const wsServer = new ws.Server({
+    server,
+    path: "/graphql",
+  });
+
+  wsServer.on("connection", (socket, req) => {
+    new GraphQLServerWebSocket({
+      socket,
+      req,
+      subscribe: (args) =>
+        gqlWsServer.subscribe(args, new MyContext({ pubsub })),
+    });
+  });
+
+  server.listen(env.PORT ? parseInt(env.PORT, 10) : 4000);
+
   return new Promise<Server>((resolve, reject) => {
-    const server = app.listen(env.PORT ? parseInt(env.PORT, 10) : 4000, () => {
+    server.on("listening", () => {
       const port = (server.address() as AddressInfo).port;
       // eslint-disable-next-line no-console
       console.log(`http://localhost:${port}/graphql`);

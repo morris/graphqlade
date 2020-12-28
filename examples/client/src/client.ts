@@ -19,4 +19,12 @@ export class MyClient extends AbstractClient {
       }),
     }).then((r) => r.json());
   }
+
+  /*subscribe<TVariables, TExecutionResult>(
+    query: string,
+    operationName: string,
+    variables: TVariables
+  ) {
+    //
+  }*/
 }

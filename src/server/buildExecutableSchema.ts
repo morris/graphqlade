@@ -1,6 +1,6 @@
 import { GraphQLFieldResolver, GraphQLSchema, isSchema } from "graphql";
 import { join } from "path";
-import { GraphQLReader } from "../util/GraphQLReader";
+import { GraphQLReader } from "../read";
 import {
   GraphQLSchemaManager,
   SubscriptionResolver,
@@ -10,8 +10,10 @@ import {
 export interface BuildExecutableSchemaOptions<TContext> {
   root?: string;
   schema?: string | GraphQLSchema;
-  resolvers: ResolverMap<TContext> | { __isGenerateResolverMap?: TContext };
-  subscriptionResolver?: SubscriptionResolver<TContext>;
+  resolvers: ResolverMap<TContext> | { __isGeneratedResolverMap?: TContext };
+  subscriptionResolver?:
+    | SubscriptionResolver<TContext>
+    | { __isGeneratedSubscriptionResolver?: TContext };
   defaultResolver?: GraphQLFieldResolver<unknown, TContext>;
   reader?: GraphQLReader;
 }
@@ -35,7 +37,9 @@ export async function buildExecutableSchema<TContext>(
   );
 
   if (options.subscriptionResolver) {
-    schemaManager.addSubscriptionResolverToSchema(options.subscriptionResolver);
+    schemaManager.addSubscriptionResolverToSchema(
+      options.subscriptionResolver as SubscriptionResolver<TContext>
+    );
   }
 
   if (options.defaultResolver) {

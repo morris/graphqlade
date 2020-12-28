@@ -8,15 +8,6 @@ export async function canImportModule(name: string) {
   }
 }
 
-export function assertDefined<T>(
-  input: T | null | undefined,
-  message?: string
-): asserts input is T {
-  if (input === null || typeof input === "undefined") {
-    throw new Error(message ?? "Unexpected undefined value");
-  }
-}
-
 export function isAsyncIterator<T>(
   result: unknown
 ): result is AsyncIterator<T> {

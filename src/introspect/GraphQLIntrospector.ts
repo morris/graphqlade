@@ -5,6 +5,7 @@ import {
   IntrospectionOptions,
   IntrospectionQuery,
 } from "graphql";
+import { assertType, assertRecord } from "../util";
 
 export interface GraphQLIntrospectorOptions {
   request: IntrospectionRequestFn;
@@ -63,13 +64,8 @@ export class GraphQLIntrospector {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   validateIntrospectionQueryResult(body: any): IntrospectionQuery {
-    if (!body) {
-      throw new Error("Introspection failed: Empty response body");
-    }
-
-    if (typeof body !== "object") {
-      throw new Error("Introspection failed: Invalid response body");
-    }
+    assertType(!!body, "Introspection failed: Empty response body");
+    assertRecord(body, "Introspection failed: Invalid response body");
 
     if (Array.isArray(body.errors) && body.errors.length > 0) {
       const errors = body.errors as GraphQLError[];
@@ -80,15 +76,10 @@ export class GraphQLIntrospector {
       );
     }
 
-    if (!body.data) {
-      throw new Error("Introspection failed: No data");
-    }
+    assertType(!!body.data, "Introspection failed: No data");
+    assertRecord(body.data, "Introspection failed: Invalid data");
 
-    if (typeof body.data !== "object") {
-      throw new Error("Introspection failed: Invalid data");
-    }
-
-    return body.data;
+    return (body.data as unknown) as IntrospectionQuery;
   }
 
   getHeaders(headers?: Record<string, string>): Record<string, string> {

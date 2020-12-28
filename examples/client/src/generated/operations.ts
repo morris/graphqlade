@@ -76,6 +76,18 @@ export abstract class AbstractClient<
     );
   }
 
+  async mutateCreateLocationReview(
+    variables: VCreateLocationReview,
+    extra?: TOperationExtra
+  ): Promise<XCreateLocationReview<TExtensions> & TExecutionResultExtra> {
+    return this.mutate(
+      "mutation CreateLocationReview($input: CreateLocationReviewInput!) {\n  createLocationReview(input: $input) {\n    id\n  }\n}",
+      "CreateLocationReview",
+      variables,
+      extra
+    );
+  }
+
   async queryLocations(
     variables?: undefined,
     extra?: TOperationExtra
@@ -101,11 +113,11 @@ export abstract class AbstractClient<
   }
 
   subscribeNewReviews(
-    variables?: undefined,
+    variables: VNewReviews,
     extra?: TOperationExtra
   ): AsyncIterator<XNewReviews<TExtensions> & TExecutionResultExtra> {
     return this.subscribe(
-      "subscription NewReviews {\n  newReviews {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}",
+      "subscription NewReviews($limit: Int) {\n  newReviews(limit: $limit) {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}",
       "NewReviews",
       variables,
       extra
@@ -174,6 +186,21 @@ export type DCreateBossReview = {
   }>;
 };
 
+export interface VCreateLocationReview {
+  input: TCreateLocationReviewInput;
+}
+
+export type XCreateLocationReview<TExtensions> = ExecutionResult<
+  DCreateLocationReview,
+  TExtensions
+>;
+
+export type DCreateLocationReview = {
+  createLocationReview: Maybe<{
+    id: string;
+  }>;
+};
+
 export type XLocations<TExtensions> = ExecutionResult<DLocations, TExtensions>;
 
 export type DLocations = {
@@ -199,6 +226,10 @@ export type XReviews<TExtensions> = ExecutionResult<DReviews, TExtensions>;
 export type DReviews = {
   reviews: Maybe<Array<({} & FReviewData) | ({} & FReviewData)>>;
 };
+
+export interface VNewReviews {
+  limit?: number;
+}
 
 export type XNewReviews<TExtensions> = ExecutionResult<
   DNewReviews,

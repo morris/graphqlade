@@ -1,26 +1,29 @@
-export class DeferredPromise<T> extends Promise<T> {
-  protected _resolve: (value: T | PromiseLike<T>) => void;
-  protected _reject: (reason?: unknown) => void;
+export class DeferredPromise<T> implements Promise<T> {
+  readonly then: Promise<T>["then"];
+  readonly catch: Promise<T>["catch"];
+  readonly finally: Promise<T>["finally"];
+  readonly [Symbol.toStringTag]: string;
+
+  protected promise: Promise<T>;
+  protected resolvePromise!: (value: T | PromiseLike<T>) => void;
+  protected rejectPromise!: (reason?: unknown) => void;
 
   constructor() {
-    super((resolve, reject) => {
-      this._resolve = resolve;
-      this._reject = reject;
+    this.promise = new Promise((resolve, reject) => {
+      this.resolvePromise = resolve;
+      this.rejectPromise = reject;
     });
 
-    this._resolve = () => {
-      throw new Error("Resolved a deferred promise too early");
-    };
-    this._reject = () => {
-      throw new Error("Rejected a deferred promise too early");
-    };
+    this.then = (...args) => this.promise.then(...args);
+    this.catch = (...args) => this.promise.catch(...args);
+    this.finally = (...args) => this.promise.finally(...args);
   }
 
   resolve(value: T | PromiseLike<T>) {
-    this._resolve(value);
+    this.resolvePromise(value);
   }
 
   reject(reason?: unknown) {
-    this._reject(reason);
+    this.rejectPromise(reason);
   }
 }
