@@ -1,10 +1,10 @@
 import { MyContext } from "../context";
 import { SSubscription } from "../generated/schema";
-import { SubscriptionIterator } from "../../../../src";
+import { AsyncPushIterator } from "../../../../src";
 
 export const Subscription: SSubscription<MyContext> = {
   async newReviews(_, args, context) {
-    return new SubscriptionIterator((push, stop) => {
+    return new AsyncPushIterator((push, stop) => {
       let i = 0;
 
       return context.subscribeReviews((review) => {

@@ -1,11 +1,11 @@
 import * as assert from "assert";
-import { SubscriptionIterator } from "../../src";
+import { AsyncPushIterator } from "../../src";
 
-describe("The SubscriptionIterator", () => {
-  it("should iterate over subscriptions", async () => {
+describe("The AsyncPushIterator", () => {
+  it("should iterate over asynchronously pushed data", async () => {
     let cleared = false;
 
-    const iterator = new SubscriptionIterator<number>((push, stop) => {
+    const iterator = new AsyncPushIterator<number>((push, stop) => {
       let i = 0;
       const intervalId = setInterval(() => push(++i), 100);
       const timeoutId = setTimeout(() => stop(), 1050);
@@ -30,7 +30,7 @@ describe("The SubscriptionIterator", () => {
   it("should be cancelable", async () => {
     let cleared = false;
 
-    const iterator = new SubscriptionIterator<number>((push) => {
+    const iterator = new AsyncPushIterator<number>((push) => {
       let i = 0;
       const intervalId = setInterval(() => push(++i), 100);
 
@@ -55,7 +55,7 @@ describe("The SubscriptionIterator", () => {
   it("should allow pushing multiple values", async () => {
     let cleared = false;
 
-    const iterator = new SubscriptionIterator<number>((push, stop) => {
+    const iterator = new AsyncPushIterator<number>((push, stop) => {
       let i = 0;
       const intervalId = setInterval(() => {
         push(++i);
@@ -84,7 +84,7 @@ describe("The SubscriptionIterator", () => {
   it("should handle chaotic iteration", async () => {
     let cleared = false;
 
-    const iterator = new SubscriptionIterator<number>((push) => {
+    const iterator = new AsyncPushIterator<number>((push) => {
       let i = 0;
       const intervalId = setInterval(() => {
         push(++i);
@@ -120,7 +120,7 @@ describe("The SubscriptionIterator", () => {
   it("should handle chaotic iteration (2)", async () => {
     let cleared = false;
 
-    const iterator = new SubscriptionIterator<number>((push, stop) => {
+    const iterator = new AsyncPushIterator<number>((push, stop) => {
       let i = 0;
       const intervalId = setInterval(() => {
         if (i >= 30) return stop();
@@ -141,7 +141,7 @@ describe("The SubscriptionIterator", () => {
     async function next() {
       const { done, value } = await iterator.next();
       if (typeof value === "number") results.push(value);
-      _done = _done || done;
+      _done = done;
     }
 
     for (let i = 0; i < 50; ++i) {
@@ -159,7 +159,7 @@ describe("The SubscriptionIterator", () => {
   it.skip("should be cancelable with an error", async () => {
     let cleared = false;
 
-    const iterator = new SubscriptionIterator<number>((push, _, fail) => {
+    const iterator = new AsyncPushIterator<number>((push, _, fail) => {
       let i = 0;
       const intervalId = setInterval(() => push(++i), 100);
       const timeoutId = setTimeout(() => fail(new Error("test")), 550);
