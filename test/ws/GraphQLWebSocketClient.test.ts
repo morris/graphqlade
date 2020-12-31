@@ -3,10 +3,12 @@ import * as assert from "assert";
 import got from "got";
 import { ExecutionResult } from "graphql";
 import WebSocket from "ws";
-import { GraphQLClientWebSocket, GraphQLReader } from "../../src";
+import { GraphQLClientWebSocket } from "../../src";
+import { GraphQLReader } from "../../src/read/GraphQLReader";
+import { GraphQLWebSocketClient } from "../../src/ws/GraphQLWebSocketClient";
 import { requireExampleServer } from "../util";
 
-describe("The example", () => {
+describe("A GraphQLWebSocketClient object", () => {
   let operations: string;
 
   requireExampleServer();
@@ -18,25 +20,20 @@ describe("The example", () => {
     );
   });
 
-  it("should serve GraphQL subscriptions over (unmanaged) web sockets", async () => {
-    const socket = new WebSocket(
-      "ws://localhost:4999/graphql",
-      "graphql-transport-ws"
-    );
-
-    const closed = new Promise((resolve) => {
-      socket.on("close", (code, reason) => {
-        resolve([code, reason]);
-      });
-    });
-
-    const gqlSocket = new GraphQLClientWebSocket({
-      socket,
+  it("should be able to subscribe to the example server", async () => {
+    const client = new GraphQLWebSocketClient({
+      url: "ws://localhost:4999/graphql",
+      protocol: "graphql-transport-ws",
+      connect(url, protocol) {
+        return new GraphQLClientWebSocket({
+          socket: new WebSocket(url, protocol),
+        });
+      },
     });
 
     const results: ExecutionResult<any, any>[] = [];
 
-    const iterator = await gqlSocket.subscribe<ExecutionResult>({
+    const iterator = await client.subscribe<ExecutionResult>({
       query: operations,
       operationName: "NewReviews",
       variables: {
@@ -49,6 +46,8 @@ describe("The example", () => {
         results.push(result);
       }
     })();
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     await got("http://localhost:4999/graphql", {
       method: "POST",
@@ -90,9 +89,7 @@ describe("The example", () => {
 
     await complete;
 
-    gqlSocket.close(1000, "Normal Closure");
-
-    assert.deepStrictEqual(await closed, [1000, "Normal Closure"]);
+    client.close();
 
     assert.strictEqual(results.length, 2);
     assert.deepStrictEqual(

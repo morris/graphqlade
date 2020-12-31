@@ -22,13 +22,14 @@
   ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
+    "build:browser": "sh scripts/build-browser.sh",
     "build:watch": "tsc --watch",
-    "build:all": "npm run build && npm run example:gql2ts && tsc && npm run example:client:build",
+    "build:all": "npm run build && npm run build:browser && npm run example:gql2ts && tsc && npm run example:client:build",
     "lint": "eslint .",
     "format": "prettier --write './**/*.ts' './**/*.js' './**/*.json'",
     "test": "nyc mocha test",
-    "clean": "rm -rf .nyc_output coverage dist",
-    "prepare": "npm run clean && npm run build",
+    "clean": "rm -rf .nyc_output build coverage dist",
+    "prepare": "npm run clean && npm run build && npm run build:browser",
     "example:gql2ts": "concurrently npm:example:server:gql2ts npm:example:client:gql2ts",
     "example:gql2ts:watch": "concurrently npm:example:server:gql2ts:watch npm:example:client:gql2ts:watch",
     "example:server:gql2ts": "node examples/server/gql2ts.js",
@@ -37,7 +38,7 @@
     "example:server:watch": "nodemon --watch 'examples/server/**/*' --exec 'ts-node' examples/server/src/server.ts",
     "example:client:gql2ts": "node examples/client/gql2ts.js",
     "example:client:gql2ts:watch": "node examples/client/gql2ts.js --watch",
-    "example:client:build": "tsc --project examples/client/tsconfig.json",
+    "example:client:build": "npm run build:browser && tsc --project examples/client/tsconfig.json && cp dist/*.umd.* examples/client/public",
     "example:client:build:watch": "tsc --project examples/client/tsconfig.json --watch"
   },
   "nyc": {
@@ -58,8 +59,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm test"
+      "pre-commit": "lint-staged && npm test && npm build",
+      "pre-push": "npm test && npm build"
     }
   },
   "lint-staged": {
@@ -102,6 +103,7 @@
     "nyc": "^15",
     "prettier": "^2",
     "source-map-support": "^0.5",
+    "terser": "^5.5.1",
     "ts-node": "^9.1.1",
     "typescript": "^4",
     "ws": "^7.4.1"

@@ -1,6 +1,11 @@
-import { Maybe } from "graphql/jsutils/Maybe";
 import { MyClient } from "./client";
-import { DBosses, DLocations, DReviews, certain } from "./generated/operations";
+import {
+  DBosses,
+  DLocations,
+  DReviews,
+  Maybe,
+  certain,
+} from "./generated/operations";
 
 export interface AppState {
   bossData?: Maybe<DBosses>;
@@ -28,10 +33,9 @@ export function App(el: Element) {
   client.queryReviews().then((x) => update({ reviewData: x.data }));
 
   setTimeout(async () => {
-    /*for await (const review of client.subscribeNewReviews()) {
-      state.reviewData?.reviews?.unshift(review);
-      update({});
-    }*/
+    for await (const review of client.subscribeNewReviews({}) as any) {
+      console.log(review);
+    }
   }, 100);
 
   function update(next: Partial<AppState>) {

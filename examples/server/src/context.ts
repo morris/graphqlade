@@ -60,7 +60,9 @@ export class MyContext {
   subscribeReviews(listener: (review: ReviewData) => void) {
     this.pubsub.on("review", listener);
 
-    return () => this.pubsub.removeListener("review", listener);
+    return () => {
+      this.pubsub.removeListener("review", listener);
+    };
   }
 
   uuid() {

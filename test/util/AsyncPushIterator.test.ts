@@ -1,14 +1,14 @@
 import * as assert from "assert";
 import { AsyncPushIterator } from "../../src";
 
-describe("The AsyncPushIterator", () => {
+describe("An AsyncPushIterator", () => {
   it("should iterate over asynchronously pushed data", async () => {
     let cleared = false;
 
-    const iterator = new AsyncPushIterator<number>((push, stop) => {
+    const iterator = new AsyncPushIterator<number>((it) => {
       let i = 0;
-      const intervalId = setInterval(() => push(++i), 100);
-      const timeoutId = setTimeout(() => stop(), 1050);
+      const intervalId = setInterval(() => it.push(++i), 100);
+      const timeoutId = setTimeout(() => it.return(), 1050);
 
       return () => {
         cleared = true;
@@ -24,15 +24,43 @@ describe("The AsyncPushIterator", () => {
     }
 
     assert.deepStrictEqual(results, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    assert.ok(cleared);
+    assert.ok(cleared, "not cleared");
+  });
+
+  it("should be finishable", async () => {
+    let cleared = false;
+
+    const iterator = new AsyncPushIterator<number>((it) => {
+      let i = 0;
+      const intervalId = setInterval(() => it.push(++i), 100);
+      const timeoutId = setTimeout(() => {
+        it.push(++i);
+        it.finish();
+      }, 1050);
+
+      return () => {
+        cleared = true;
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
+      };
+    });
+
+    const results: number[] = [];
+
+    for await (const i of iterator) {
+      results.push(i);
+    }
+
+    assert.deepStrictEqual(results, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    assert.ok(cleared, "not cleared");
   });
 
   it("should be cancelable", async () => {
     let cleared = false;
 
-    const iterator = new AsyncPushIterator<number>((push) => {
+    const iterator = new AsyncPushIterator<number>((it) => {
       let i = 0;
-      const intervalId = setInterval(() => push(++i), 100);
+      const intervalId = setInterval(() => it.push(++i), 100);
 
       return () => {
         cleared = true;
@@ -49,20 +77,20 @@ describe("The AsyncPushIterator", () => {
     }
 
     assert.deepStrictEqual(results, [1, 2, 3, 4, 5]);
-    assert.ok(cleared);
+    assert.ok(cleared, "not cleared");
   });
 
   it("should allow pushing multiple values", async () => {
     let cleared = false;
 
-    const iterator = new AsyncPushIterator<number>((push, stop) => {
+    const iterator = new AsyncPushIterator<number>((it) => {
       let i = 0;
       const intervalId = setInterval(() => {
-        push(++i);
-        push(++i);
-        push(++i);
+        it.push(++i);
+        it.push(++i);
+        it.push(++i);
       }, 100);
-      const timeoutId = setTimeout(() => stop(), 1050);
+      const timeoutId = setTimeout(() => it.return(), 1050);
 
       return () => {
         cleared = true;
@@ -78,18 +106,18 @@ describe("The AsyncPushIterator", () => {
     }
 
     assert.strictEqual(results.length, 30);
-    assert.ok(cleared);
+    assert.ok(cleared, "not cleared");
   });
 
   it("should handle chaotic iteration", async () => {
     let cleared = false;
 
-    const iterator = new AsyncPushIterator<number>((push) => {
+    const iterator = new AsyncPushIterator<number>((it) => {
       let i = 0;
       const intervalId = setInterval(() => {
-        push(++i);
-        push(++i);
-        push(++i);
+        it.push(++i);
+        it.push(++i);
+        it.push(++i);
       }, 100);
 
       return () => {
@@ -111,22 +139,24 @@ describe("The AsyncPushIterator", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 1100));
 
-    await iterator.return();
+    iterator.return();
+
+    await new Promise((resolve) => setTimeout(resolve, 10));
 
     assert.strictEqual(results.length, 30);
-    assert.ok(cleared);
+    assert.ok(cleared, "not cleared");
   });
 
   it("should handle chaotic iteration (2)", async () => {
     let cleared = false;
 
-    const iterator = new AsyncPushIterator<number>((push, stop) => {
+    const iterator = new AsyncPushIterator<number>((it) => {
       let i = 0;
       const intervalId = setInterval(() => {
-        if (i >= 30) return stop();
-        push(++i);
-        push(++i);
-        push(++i);
+        if (i >= 30) return it.return();
+        it.push(++i);
+        it.push(++i);
+        it.push(++i);
       }, 100);
 
       return () => {
@@ -155,14 +185,13 @@ describe("The AsyncPushIterator", () => {
     assert.ok(cleared, "not cleared");
   });
 
-  // TODO why is this failing :(
-  it.skip("should be cancelable with an error", async () => {
+  it("should be cancelable with an error", async () => {
     let cleared = false;
 
-    const iterator = new AsyncPushIterator<number>((push, _, fail) => {
+    const iterator = new AsyncPushIterator<number>((it) => {
       let i = 0;
-      const intervalId = setInterval(() => push(++i), 100);
-      const timeoutId = setTimeout(() => fail(new Error("test")), 550);
+      const intervalId = setInterval(() => it.push(++i), 100);
+      const timeoutId = setTimeout(() => it.throw(new Error("test")), 550);
 
       return () => {
         cleared = true;
@@ -177,7 +206,7 @@ describe("The AsyncPushIterator", () => {
       for await (const i of iterator) {
         results.push(i);
       }
-      // TODO apparently AsyncIterator.throw doesn't throw?
+
       assert.ok(false, "should have thrown");
     } catch (err) {
       assert.strictEqual(err.message, "test");

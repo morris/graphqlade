@@ -1,115 +1,119 @@
 type AsyncPushIteratorSetup<T> = (
-  push: (value: T) => void,
-  stop: () => void,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fail: (err: any) => void
-) => Promise<() => unknown> | (() => unknown);
+  iterator: AsyncPushIterator<T>
+) => Promise<(() => unknown) | undefined> | (() => unknown) | undefined;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class AsyncPushIterator<T> implements AsyncIterator<T> {
   protected setup: AsyncPushIteratorSetup<T>;
   protected initialized = false;
+  protected finished = false;
   protected done = false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected error?: any;
   protected queue: T[] = [];
-  protected yielding?: Promise<void>;
-  protected continue?: () => void;
-  protected cancel?: () => void;
+  protected waiting?: Promise<void>;
+  protected resolveWait?: () => void;
   protected teardown?: () => void;
 
   constructor(setup: AsyncPushIteratorSetup<T>) {
     this.setup = setup;
   }
 
-  protected async initialize() {
-    if (this.initialized) return;
-    this.initialized = true;
-
-    this.teardown = await this.setup(
-      (value) => {
-        if (!this.done) this.queue.push(value);
-
-        this.maybeContinue();
-      },
-      () => this.return(),
-      (err) => this.throw(err)
-    );
-  }
-
   async next(): Promise<IteratorResult<T>> {
-    if (this.done) return { done: true, value: undefined };
-
-    await this.initialize();
-
-    if (this.queue.length === 0) {
-      try {
-        await this.yield();
-      } catch (err) {
-        // only caused by cancel
-        this.done = true;
-        this.maybeTeardown();
-
-        return { done: true, value: undefined };
-      }
+    if (!this.initialized) {
+      this.initialized = true;
+      this.teardown = await this.setup(this);
     }
+
+    if (this.error) throw this.error;
+    if (this.done) return { done: true, value: undefined };
 
     if (this.queue.length > 0) {
       const value = this.queue.shift() as T;
-      const done = this.done && this.queue.length === 1;
 
-      return { done, value };
-    } else {
-      return this.next();
+      return { done: false, value };
+    } else if (this.finished) {
+      return this.return();
     }
-  }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  throw(err: any): Promise<IteratorResult<T>> {
-    this.done = true;
-    this.maybeTeardown();
-    this.maybeCancel();
+    await this.wait(); // never throws
 
-    return Promise.reject(err);
+    return this.next();
   }
 
   async return(): Promise<IteratorResult<T>> {
-    this.done = true;
-    this.maybeTeardown();
-    this.maybeCancel();
+    if (!this.done) {
+      this.done = true;
+      this.finished = true;
+      this.teardownOnce();
+      this.continue();
+    }
 
     return { done: true, value: undefined };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async throw(err: any): Promise<IteratorResult<T>> {
+    if (!this.done) {
+      this.done = true;
+      this.error = err;
+      this.teardownOnce();
+      this.continue();
+    }
+
+    throw err;
   }
 
   [Symbol.asyncIterator]() {
     return this;
   }
 
-  protected yield() {
-    if (!this.yielding) {
-      this.yielding = new Promise<void>((resolve, reject) => {
-        this.continue = resolve;
-        this.cancel = reject;
+  //
+
+  push(value: T) {
+    if (this.finished) return;
+
+    this.queue.push(value);
+    this.continue();
+  }
+
+  finish() {
+    if (!this.finished) {
+      this.finished = true;
+      this.continue();
+    }
+  }
+
+  //
+
+  protected wait() {
+    if (!this.waiting) {
+      this.waiting = new Promise<void>((resolve) => {
+        this.resolveWait = resolve;
       });
     }
 
-    return this.yielding;
+    return this.waiting;
   }
 
-  protected maybeContinue() {
-    if (this.continue) this.continue();
-    this.continue = undefined;
-    this.cancel = undefined;
-    this.yielding = undefined;
+  protected continue() {
+    if (!this.resolveWait) return;
+
+    this.resolveWait();
+    this.resolveWait = undefined;
+    this.waiting = undefined;
   }
 
-  protected maybeCancel() {
-    if (this.cancel) this.cancel();
-    this.continue = undefined;
-    this.cancel = undefined;
-    this.yielding = undefined;
-  }
+  protected teardownOnce() {
+    if (!this.teardown) return;
 
-  protected maybeTeardown() {
-    if (this.teardown) this.teardown();
-    this.teardown = undefined;
+    try {
+      this.teardown();
+    } catch (err) {
+      // may hide original error, but errors during teardown
+      // are more critical and need to be fixed first
+      this.error = err;
+    } finally {
+      this.teardown = undefined;
+    }
   }
 }

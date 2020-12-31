@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import { GraphQLReader } from "../../src";
 
-describe("The GraphQLReader", () => {
+describe("A GraphQLReader object", () => {
   it("should be able to build the example schema", async () => {
     const reader = new GraphQLReader();
 

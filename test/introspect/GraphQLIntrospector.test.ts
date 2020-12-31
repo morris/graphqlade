@@ -3,7 +3,7 @@ import got from "got";
 import { GraphQLIntrospector } from "../../src";
 import { requireExampleServer } from "../util";
 
-describe("The GraphQLIntrospector", () => {
+describe("A GraphQLIntrospector object", () => {
   requireExampleServer();
 
   it("should be able to build a client schema from an introspection result", async () => {

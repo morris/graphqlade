@@ -1,4 +1,3 @@
-import type { ExecutionResult, GraphQLError } from "graphql";
 import type {
   CompleteMessage,
   ConnectionAckMessage,
@@ -9,79 +8,114 @@ import type {
 } from "./GraphQLWebSocketMessage";
 import { DeferredPromise } from "../util/DeferredPromise";
 import { assertType, assertRecord } from "../util/assert";
+import { AsyncPushIterator } from "../util/AsyncPushIterator";
 
 export interface GraphQLClientWebSocketOptions {
-  socket: WebSocket;
+  socket: WebSocketLike;
   connectionInitPayload?: Record<string, unknown>;
+  connectionAckTimeout?: number;
 }
 
-export interface ClientSubscriptionRef {
-  complete(): void;
-}
+export type WebSocketLike = Pick<
+  WebSocket,
+  "addEventListener" | "send" | "close" | "readyState" | "OPEN"
+>;
 
-export interface ClientSubscription<TData, TExtensions> {
-  next(value: ExecutionResult<TData, TExtensions>): void;
-  error(error: readonly GraphQLError[]): void;
-  complete(): void;
-}
+export type SubscribePayload = SubscribeMessage["payload"];
 
-export class GraphQLClientWebSocket<TExtensions> {
-  public readonly socket: WebSocket;
+export class GraphQLClientWebSocket {
+  public readonly socket: WebSocketLike;
   protected connectionInitPayload?: Record<string, unknown>;
-  protected initialized = false;
-  protected acknowledged = new DeferredPromise<
+  protected connectionAckWaitTimeout: number;
+  protected connectionAckWaitTimeoutId?: NodeJS.Timeout;
+  protected connectionAckPayload = new DeferredPromise<
     Record<string, unknown> | null | undefined
   >();
-  protected subscriptions = new Map<
-    string,
-    ClientSubscription<unknown, TExtensions>
-  >();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected subscriptions = new Map<string, AsyncPushIterator<any>>();
   protected nextSubscriptionId = 1;
 
   constructor(options: GraphQLClientWebSocketOptions) {
     this.socket = options.socket;
     this.connectionInitPayload = options.connectionInitPayload;
+    this.connectionAckWaitTimeout = options.connectionAckTimeout ?? 3000;
 
     this.setup();
   }
 
   protected setup() {
-    this.socket.addEventListener("open", () => {
-      this.socket.addEventListener("message", (e) => this.onMessage(e));
+    this.socket.addEventListener("close", (e) => this.handleClose(e));
+    this.socket.addEventListener("error", (e) => this.handleError(e));
+    this.socket.addEventListener("message", (e) => this.handleMessage(e));
+
+    this.connectionAckWaitTimeoutId = setTimeout(() => {
+      this.close(4408, "Connection acknowledgement timeout");
+    }, this.connectionAckWaitTimeout);
+
+    if (this.isOpen()) {
       this.send({
         type: "connection_init",
         payload: this.connectionInitPayload,
       });
-    });
+    } else {
+      this.socket.addEventListener("open", () => {
+        this.send({
+          type: "connection_init",
+          payload: this.connectionInitPayload,
+        });
+      });
+    }
   }
 
-  // actions
+  // public
 
-  async subscribe<TData>(
-    payload: SubscribeMessage["payload"],
-    sink: ClientSubscription<TData, TExtensions>
-  ): Promise<ClientSubscriptionRef> {
-    await this.acknowledged;
+  async subscribe<TExecutionResult>(payload: SubscribePayload) {
+    await this.requireAck();
 
-    const id = (this.nextSubscriptionId++).toString();
+    return new AsyncPushIterator<TExecutionResult>(async (it) => {
+      const id = (this.nextSubscriptionId++).toString();
+      this.subscriptions.set(id, it);
 
-    this.subscriptions.set(id, sink);
+      this.send({
+        type: "subscribe",
+        id,
+        payload,
+      });
 
-    this.send({
-      type: "subscribe",
-      id,
-      payload,
-    });
-
-    return {
-      complete: () => {
+      return () => {
         this.send({ type: "complete", id });
-        this.stopSubscription(id);
-      },
-    };
+      };
+    });
   }
 
-  protected async onMessage(event: MessageEvent) {
+  // event handlers
+
+  async handleClose(event: CloseEvent) {
+    if (this.connectionAckWaitTimeoutId) {
+      clearTimeout(this.connectionAckWaitTimeoutId);
+    }
+
+    this.connectionAckPayload.reject(new Error("CLOSED"));
+
+    for (const [, subscription] of this.subscriptions) {
+      subscription.throw(this.makeProtocolError(event.code, event.reason));
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async handleError(event: Event) {
+    if (this.connectionAckWaitTimeoutId) {
+      clearTimeout(this.connectionAckWaitTimeoutId);
+    }
+
+    this.connectionAckPayload.reject(new Error("CLOSED"));
+
+    for (const [, subscription] of this.subscriptions) {
+      subscription.throw(new Error("WebSocket error"));
+    }
+  }
+
+  async handleMessage(event: MessageEvent) {
     try {
       const message = JSON.parse(event.data.toString());
 
@@ -89,30 +123,62 @@ export class GraphQLClientWebSocket<TExtensions> {
 
       switch (message.type) {
         case "connection_ack":
-          this.onConnectionAck(this.parseConnectionAck(message));
+          this.handleConnectionAckMessage(
+            this.parseConnectionAckMessage(message)
+          );
           break;
         case "next":
         case "data": // legacy
-          this.onNext(this.parseNext(message));
+          this.handleNextMessage(this.parseNextMessage(message));
           break;
         case "error":
-          this.onError(this.parseError(message));
+          this.handleErrorMessage(this.parseErrorMessage(message));
           break;
         case "complete":
         case "stop": // legacy
-          this.onComplete(this.parseComplete(message));
+          this.handleCompleteMessage(this.parseCompleteMessage(message));
           break;
         default:
-          this.invalidMessage(`Invalid message type ${message.type}`);
+          throw new TypeError(`Invalid message type ${message.type}`);
       }
     } catch (err) {
-      this.handleError(err);
+      this.closeByError(err);
     }
   }
 
-  // parsers
+  // message handlers
 
-  parseConnectionAck(message: Record<string, unknown>): ConnectionAckMessage {
+  handleConnectionAckMessage(message: ConnectionAckMessage) {
+    if (this.connectionAckWaitTimeoutId) {
+      clearTimeout(this.connectionAckWaitTimeoutId);
+    }
+
+    this.connectionAckPayload.resolve(message.payload);
+  }
+
+  handleNextMessage(message: NextMessage) {
+    this.requireSubscription(message.id).push(message.payload);
+  }
+
+  handleErrorMessage(message: ErrorMessage) {
+    this.requireSubscription(message.id).throw(
+      new Error(
+        `Subscription error: ${message.payload
+          .map((it) => it.message)
+          .join(" / ")}`
+      )
+    );
+  }
+
+  handleCompleteMessage(message: CompleteMessage) {
+    this.requireSubscription(message.id).finish();
+  }
+
+  // message parsers
+
+  parseConnectionAckMessage(
+    message: Record<string, unknown>
+  ): ConnectionAckMessage {
     if (typeof message.payload !== "undefined" && message.payload !== null) {
       assertRecord(message.payload);
     }
@@ -123,7 +189,7 @@ export class GraphQLClientWebSocket<TExtensions> {
     };
   }
 
-  parseNext(message: Record<string, unknown>): NextMessage {
+  parseNextMessage(message: Record<string, unknown>): NextMessage {
     assertType(typeof message.id === "string");
     assertRecord(message.payload);
 
@@ -134,7 +200,7 @@ export class GraphQLClientWebSocket<TExtensions> {
     };
   }
 
-  parseError(message: Record<string, unknown>): ErrorMessage {
+  parseErrorMessage(message: Record<string, unknown>): ErrorMessage {
     assertType(typeof message.id === "string");
     assertType(Array.isArray(message.payload));
 
@@ -149,7 +215,7 @@ export class GraphQLClientWebSocket<TExtensions> {
     };
   }
 
-  parseComplete(message: Record<string, unknown>): CompleteMessage {
+  parseCompleteMessage(message: Record<string, unknown>): CompleteMessage {
     assertType(typeof message.id === "string");
 
     return {
@@ -158,82 +224,51 @@ export class GraphQLClientWebSocket<TExtensions> {
     };
   }
 
-  // handlers
+  // helpers
 
-  protected onConnectionAck(message: ConnectionAckMessage) {
-    this.acknowledged.resolve(message.payload);
+  async requireAck() {
+    const payload = await this.connectionAckPayload;
+
+    return payload ?? undefined;
   }
 
-  protected onNext(message: NextMessage) {
-    const subscription = this.subscriptions.get(message.id);
-
-    if (!subscription) {
-      return this.close(4409, `Subscriber for ${message.id} does not exist`);
-    }
-
-    subscription.next(message.payload as ExecutionResult<unknown, TExtensions>);
-  }
-
-  protected onError(message: ErrorMessage) {
-    const subscription = this.subscriptions.get(message.id);
-
-    if (!subscription) {
-      return this.close(4409, `Subscriber for ${message.id} does not exist`);
-    }
-
-    subscription.error(message.payload);
-    this.stopSubscription(message.id);
-  }
-
-  protected onComplete(message: CompleteMessage) {
-    this.stopSubscription(message.id);
-  }
-
-  protected send(message: GraphQLWebSocketClientMessage) {
-    if (!this.isOpen()) return;
-
-    const data = JSON.stringify(message);
-
-    this.socket.send(data);
-  }
-
-  protected handleError(err: Error) {
-    if (err instanceof TypeError) {
-      this.invalidMessage(`Invalid message: ${err.message}`);
-    } else {
-      this.close(1011, `Unexpected error: ${err.message}`);
-    }
-  }
-
-  protected invalidMessage(reason: string) {
-    this.close(4400, reason);
-  }
-
-  close(code?: number, reason?: string) {
-    if (this.isOpen()) {
-      this.socket.close(code ?? 1000, reason ?? "Normal Closure");
-    }
-
-    for (const [id] of this.subscriptions) {
-      try {
-        this.stopSubscription(id);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn(err.stack);
-      }
-    }
-  }
-
-  protected stopSubscription(id: string) {
+  requireSubscription(id: string) {
     const subscription = this.subscriptions.get(id);
 
-    if (subscription) {
-      subscription.complete();
-      this.subscriptions.delete(id);
+    if (!subscription) {
+      throw this.makeProtocolError(4409, `Subscriber for ${id} does not exist`);
     }
+
+    return subscription;
+  }
+
+  // low-level
+
+  send(message: GraphQLWebSocketClientMessage) {
+    if (this.isOpen()) this.socket.send(JSON.stringify(message));
+  }
+
+  closeByError(err: Error & { code?: number }) {
+    if (err.message === "CLOSED") {
+      // we're good
+    } else if (typeof err.code === "number") {
+      this.close(err.code, err.message);
+    } else if (err instanceof TypeError) {
+      this.close(4400, `Invalid message: ${err.message}`);
+    } else {
+      this.close(1011, `Internal server error: ${err.message}`);
+    }
+  }
+
+  close(code: number, reason: string) {
+    if (this.isOpen()) this.socket.close(code, reason);
   }
 
   isOpen() {
     return this.socket.readyState === this.socket.OPEN;
+  }
+
+  makeProtocolError(code: number, reason: string) {
+    return Object.assign(new Error(reason), { code });
   }
 }

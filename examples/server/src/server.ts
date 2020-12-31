@@ -52,6 +52,7 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
   const app = express();
 
   app.use(cors());
+  app.use("/", express.static(`${__dirname}/../../client/public`));
   app.get("/graphql", serveGraphQL);
   app.post("/graphql", bodyParser.json(), serveGraphQL);
 

@@ -4,7 +4,7 @@ import { buildExecutableSchema, GraphQLServer } from "../../src";
 import { cleanJson } from "../util";
 import { resolvers } from "../../examples/server/src/resolvers";
 
-describe("The GraphQLServer class", () => {
+describe("A GraphQLServer object", () => {
   let schema: GraphQLSchema;
   let operations: string;
 

@@ -1,7 +1,17 @@
-<div class="app"></div>
-<script src="https://unpkg.com/samd@0/dist/samd.js" crossorigin></script>
-<script src="bundle.js"></script>
-<script>
-  const { App } = require("app");
-  document.querySelectorAll(".app").forEach(App);
-</script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Dark Souls Reviews</title>
+  </head>
+  <body>
+    <div class="app"></div>
+
+    <script src="https://unpkg.com/samd@0/dist/samd.js" crossorigin></script>
+    <script src="graphqlade.umd.js"></script>
+    <script src="bundle.js"></script>
+    <script>
+      const { App } = require("app");
+      document.querySelectorAll(".app").forEach(App);
+    </script>
+  </body>
+</html>
