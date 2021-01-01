@@ -209,67 +209,35 @@ export class ClientCodeGenerator {
 
   generateQuery(node: NamedOperationDefinitionNode) {
     const name = node.name.value;
-    const document = this.generateOperationDocument(node);
     const safeName = JSON.stringify(name);
-    const safeDocument = JSON.stringify(document);
     const variablesArg = this.generateVariablesArg(node);
 
     return `async query${name}(${variablesArg}, extra?: TOperationExtra):
         Promise<X${name}<TExtensions> & TExecutionResultExtra> {
-      return this.query(${safeDocument}, ${safeName}, variables, extra);
+      return this.query(${name}Document, ${safeName}, variables, extra);
     }`;
   }
 
   generateMutation(node: NamedOperationDefinitionNode) {
     const name = node.name.value;
-    const document = this.generateOperationDocument(node);
     const safeName = JSON.stringify(name);
-    const safeDocument = JSON.stringify(document);
     const variablesArg = this.generateVariablesArg(node);
 
     return `async mutate${name}(${variablesArg}, extra?: TOperationExtra):
         Promise<X${name}<TExtensions> & TExecutionResultExtra> {
-      return this.mutate(${safeDocument}, ${safeName}, variables, extra);
+      return this.mutate(${name}Document, ${safeName}, variables, extra);
     }`;
   }
 
   generateSubscription(node: NamedOperationDefinitionNode) {
     const name = node.name.value;
-    const document = this.generateOperationDocument(node);
     const safeName = JSON.stringify(name);
-    const safeDocument = JSON.stringify(document);
     const variablesArg = this.generateVariablesArg(node);
 
     return `subscribe${name}(${variablesArg}, extra?: TOperationExtra):
         AsyncIterableIterator<X${name}<TExtensions> & TExecutionResultExtra> {
-      return this.subscribe(${safeDocument}, ${safeName}, variables, extra);
+      return this.subscribe(${name}Document, ${safeName}, variables, extra);
     }`;
-  }
-
-  generateOperationDocument(node: NamedOperationDefinitionNode) {
-    return this.join([print(node), this.generateOperationFragments(node)]);
-  }
-
-  generateOperationFragments(node: NamedOperationDefinitionNode) {
-    const names = new Set<string>();
-    const collect = (name: string) => {
-      const entry = this.requireFragment(name);
-      names.add(name);
-
-      for (const dependency of entry.dependencies) {
-        if (!names.has(dependency)) collect(dependency);
-      }
-    };
-
-    visit(node, {
-      FragmentSpread: (node) => {
-        collect(node.name.value);
-      },
-    });
-
-    return this.join(
-      Array.from(names).map((name) => print(this.requireFragment(name).node))
-    );
   }
 
   generateVariablesArg(node: NamedOperationDefinitionNode) {
@@ -297,6 +265,7 @@ export class ClientCodeGenerator {
       OperationDefinition: (node) => {
         this.assertNamedOperationDefinition(node);
 
+        parts.push(this.generateOperationDocument(node));
         parts.push(this.generateVariablesType(node));
         parts.push(this.generateExecutionResult(node));
         parts.push(this.generateOperationDataType(node));
@@ -304,6 +273,37 @@ export class ClientCodeGenerator {
     });
 
     return this.join(parts);
+  }
+
+  // operation document
+
+  generateOperationDocument(node: NamedOperationDefinitionNode) {
+    return `export const ${node.name.value}Document =
+      ${JSON.stringify(
+        this.join([print(node), this.generateOperationFragments(node)])
+      )}`;
+  }
+
+  generateOperationFragments(node: NamedOperationDefinitionNode) {
+    const names = new Set<string>();
+    const collect = (name: string) => {
+      const entry = this.requireFragment(name);
+      names.add(name);
+
+      for (const dependency of entry.dependencies) {
+        if (!names.has(dependency)) collect(dependency);
+      }
+    };
+
+    visit(node, {
+      FragmentSpread: (node) => {
+        collect(node.name.value);
+      },
+    });
+
+    return this.join(
+      Array.from(names).map((name) => print(this.requireFragment(name).node))
+    );
   }
 
   // variable types

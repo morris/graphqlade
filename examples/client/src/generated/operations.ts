@@ -44,12 +44,7 @@ export abstract class AbstractClient<
     variables?: undefined,
     extra?: TOperationExtra
   ): Promise<XBosses<TExtensions> & TExecutionResultExtra> {
-    return this.query(
-      "query Bosses {\n  bosses {\n    id\n    name\n    location {\n      id\n      name\n    }\n  }\n}",
-      "Bosses",
-      variables,
-      extra
-    );
+    return this.query(BossesDocument, "Bosses", variables, extra);
   }
 
   async queryCompareBossDifficulty(
@@ -57,7 +52,7 @@ export abstract class AbstractClient<
     extra?: TOperationExtra
   ): Promise<XCompareBossDifficulty<TExtensions> & TExecutionResultExtra> {
     return this.query(
-      "query CompareBossDifficulty($left: ID!, $right: ID!) {\n  left: boss(id: $left) {\n    ...compareBossDifficultyData\n  }\n  right: boss(id: $right) {\n    ...compareBossDifficultyData\n  }\n}\n\nfragment compareBossDifficultyData on Boss {\n  id\n  name\n  reviews {\n    difficulty\n  }\n}",
+      CompareBossDifficultyDocument,
       "CompareBossDifficulty",
       variables,
       extra
@@ -69,7 +64,7 @@ export abstract class AbstractClient<
     extra?: TOperationExtra
   ): Promise<XCreateBossReview<TExtensions> & TExecutionResultExtra> {
     return this.mutate(
-      "mutation CreateBossReview($input: CreateBossReviewInput!) {\n  createBossReview(input: $input) {\n    id\n  }\n}",
+      CreateBossReviewDocument,
       "CreateBossReview",
       variables,
       extra
@@ -81,7 +76,7 @@ export abstract class AbstractClient<
     extra?: TOperationExtra
   ): Promise<XCreateLocationReview<TExtensions> & TExecutionResultExtra> {
     return this.mutate(
-      "mutation CreateLocationReview($input: CreateLocationReviewInput!) {\n  createLocationReview(input: $input) {\n    id\n  }\n}",
+      CreateLocationReviewDocument,
       "CreateLocationReview",
       variables,
       extra
@@ -92,50 +87,33 @@ export abstract class AbstractClient<
     variables?: undefined,
     extra?: TOperationExtra
   ): Promise<XLocations<TExtensions> & TExecutionResultExtra> {
-    return this.query(
-      "query Locations {\n  locations {\n    id\n    name\n    bosses {\n      id\n      name\n    }\n  }\n}",
-      "Locations",
-      variables,
-      extra
-    );
+    return this.query(LocationsDocument, "Locations", variables, extra);
   }
 
   async queryReviews(
     variables?: undefined,
     extra?: TOperationExtra
   ): Promise<XReviews<TExtensions> & TExecutionResultExtra> {
-    return this.query(
-      "query Reviews {\n  reviews {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}",
-      "Reviews",
-      variables,
-      extra
-    );
+    return this.query(ReviewsDocument, "Reviews", variables, extra);
   }
 
   subscribeNewReviews(
     variables: VNewReviews,
     extra?: TOperationExtra
   ): AsyncIterableIterator<XNewReviews<TExtensions> & TExecutionResultExtra> {
-    return this.subscribe(
-      "subscription NewReviews($limit: Int) {\n  newReview(limit: $limit) {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}",
-      "NewReviews",
-      variables,
-      extra
-    );
+    return this.subscribe(NewReviewsDocument, "NewReviews", variables, extra);
   }
 
   async querySearch(
     variables: VSearch,
     extra?: TOperationExtra
   ): Promise<XSearch<TExtensions> & TExecutionResultExtra> {
-    return this.query(
-      "query Search($q: String!, $types: [SearchType!]) {\n  search(q: $q, types: $types) {\n    __typename\n    ... on Boss {\n      id\n      name\n    }\n    ... on Location {\n      id\n      name\n    }\n  }\n}",
-      "Search",
-      variables,
-      extra
-    );
+    return this.query(SearchDocument, "Search", variables, extra);
   }
 }
+
+export const BossesDocument =
+  "query Bosses {\n  bosses {\n    id\n    name\n    location {\n      id\n      name\n    }\n  }\n}";
 
 export type XBosses<TExtensions> = ExecutionResult<DBosses, TExtensions>;
 
@@ -155,6 +133,9 @@ export type DBosses = {
   >;
 };
 
+export const CompareBossDifficultyDocument =
+  "query CompareBossDifficulty($left: ID!, $right: ID!) {\n  left: boss(id: $left) {\n    ...compareBossDifficultyData\n  }\n  right: boss(id: $right) {\n    ...compareBossDifficultyData\n  }\n}\n\nfragment compareBossDifficultyData on Boss {\n  id\n  name\n  reviews {\n    difficulty\n  }\n}";
+
 export interface VCompareBossDifficulty {
   left: string;
   right: string;
@@ -171,6 +152,9 @@ export type DCompareBossDifficulty = {
   right: Maybe<{} & FCompareBossDifficultyData>;
 };
 
+export const CreateBossReviewDocument =
+  "mutation CreateBossReview($input: CreateBossReviewInput!) {\n  createBossReview(input: $input) {\n    id\n  }\n}";
+
 export interface VCreateBossReview {
   input: TCreateBossReviewInput;
 }
@@ -186,6 +170,9 @@ export type DCreateBossReview = {
   }>;
 };
 
+export const CreateLocationReviewDocument =
+  "mutation CreateLocationReview($input: CreateLocationReviewInput!) {\n  createLocationReview(input: $input) {\n    id\n  }\n}";
+
 export interface VCreateLocationReview {
   input: TCreateLocationReviewInput;
 }
@@ -200,6 +187,9 @@ export type DCreateLocationReview = {
     id: string;
   }>;
 };
+
+export const LocationsDocument =
+  "query Locations {\n  locations {\n    id\n    name\n    bosses {\n      id\n      name\n    }\n  }\n}";
 
 export type XLocations<TExtensions> = ExecutionResult<DLocations, TExtensions>;
 
@@ -221,11 +211,17 @@ export type DLocations = {
   >;
 };
 
+export const ReviewsDocument =
+  "query Reviews {\n  reviews {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}";
+
 export type XReviews<TExtensions> = ExecutionResult<DReviews, TExtensions>;
 
 export type DReviews = {
   reviews: Maybe<Array<({} & FReviewData) | ({} & FReviewData)>>;
 };
+
+export const NewReviewsDocument =
+  "subscription NewReviews($limit: Int) {\n  newReview(limit: $limit) {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}";
 
 export interface VNewReviews {
   limit?: number;
@@ -239,6 +235,9 @@ export type XNewReviews<TExtensions> = ExecutionResult<
 export type DNewReviews = {
   newReview: ({} & FReviewData) | ({} & FReviewData);
 };
+
+export const SearchDocument =
+  "query Search($q: String!, $types: [SearchType!]) {\n  search(q: $q, types: $types) {\n    __typename\n    ... on Boss {\n      id\n      name\n    }\n    ... on Location {\n      id\n      name\n    }\n  }\n}";
 
 export interface VSearch {
   q: string;
