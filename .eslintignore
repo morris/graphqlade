@@ -1,5 +1,5 @@
 /.nyc_output
 /coverage
 /dist
-/examples/client/public/bundle.js
+/examples/client/public
 node_modules

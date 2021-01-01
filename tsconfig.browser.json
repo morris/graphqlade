@@ -6,7 +6,7 @@
     "module": "AMD",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,

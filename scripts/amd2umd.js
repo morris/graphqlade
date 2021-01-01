@@ -4,6 +4,8 @@ if (require.main === module) {
   runAmdToUmd();
 }
 
+// TODO support source maps
+
 function runAmdToUmd() {
   const rootModule = process.argv[2];
   const globalName = process.argv[3];
@@ -78,8 +80,12 @@ function amdToUmd(amdCode, rootModule, globalName) {
       root.${globalName} = staticRequire("${rootModule}");
     }
   }(typeof self !== "undefined" ? self : this, function (define) {
-    ${amdCode}
+${stripSourceMap(amdCode)}
   }));`;
+}
+
+function stripSourceMap(code) {
+  return code.replace(/\/\/# sourceMappingURL=[^\r\n]*/, "");
 }
 
 module.exports = {

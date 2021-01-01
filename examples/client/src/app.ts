@@ -41,6 +41,7 @@ export function App(el: Element) {
         }
       }
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err);
     }
   }, 100);
