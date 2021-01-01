@@ -22,6 +22,11 @@ export const queryResolvers: ResolverMap<MyContext> = {
     reviews(_, __, context) {
       return context.getReviews();
     },
+    search(_, args, context) {
+      if (args.types) throw new Error("Not implemented");
+
+      return context.search(args.q);
+    },
   },
 
   Boss: {
@@ -79,6 +84,12 @@ export const queryResolvers: ResolverMap<MyContext> = {
     },
     difficulty(data) {
       return data.difficulty.toUpperCase();
+    },
+  },
+
+  SearchResult: {
+    __resolveType(data) {
+      return data.id < 10 ? "Boss" : "Location";
     },
   },
 

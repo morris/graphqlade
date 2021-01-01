@@ -21,7 +21,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "sh scripts/dev.sh",
+    "example": "sh scripts/example.sh",
     "build": "sh scripts/build.sh",
     "build-examples": "sh scripts/build-examples.sh",
     "lint": "eslint .",
@@ -35,8 +35,7 @@
       ".ts"
     ],
     "include": [
-      "src",
-      "examples/server/src"
+      "src"
     ],
     "exclude": [
       "**/*.d.ts"
@@ -78,7 +77,6 @@
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
     "body-parser": "^1.19.0",
-    "concurrently": "^5.3.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "eslint": "^7.15.0",
@@ -89,7 +87,6 @@
     "husky": "^4",
     "lint-staged": "^10",
     "mocha": "^8",
-    "nodemon": "^2.0.6",
     "nyc": "^15",
     "prettier": "^2",
     "source-map-support": "^0.5",

@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { bosses, locations, reviews } from "./data";
-import { ReviewData } from "./types";
+import { BossData, LocationData, ReviewData } from "./types";
 
 export class MyContext {
   pubsub: EventEmitter;
@@ -46,7 +46,7 @@ export class MyContext {
     return reviewWithId;
   }
 
-  search(q: string) {
+  search(q: string): Array<LocationData | BossData> {
     return [
       ...locations.filter((it) => it.name.match(q)),
       ...bosses.filter((it) => it.name.match(q)),

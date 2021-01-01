@@ -5,6 +5,7 @@ import {
   GraphQLSchemaManager,
   SubscriptionResolver,
   ResolverMap,
+  ResolverErrorHandler,
 } from "./GraphQLSchemaManager";
 
 export interface BuildExecutableSchemaOptions<TContext> {
@@ -14,7 +15,8 @@ export interface BuildExecutableSchemaOptions<TContext> {
   subscriptionResolver?:
     | SubscriptionResolver<TContext>
     | { __isGeneratedSubscriptionResolver?: TContext };
-  defaultResolver?: GraphQLFieldResolver<unknown, TContext>;
+  defaultFieldResolver?: GraphQLFieldResolver<unknown, TContext>;
+  resolverErrorHandler?: ResolverErrorHandler<TContext>;
   reader?: GraphQLReader;
 }
 
@@ -42,8 +44,12 @@ export async function buildExecutableSchema<TContext>(
     );
   }
 
-  if (options.defaultResolver) {
-    schemaManager.addDefaultResolversToSchema(options.defaultResolver);
+  if (options.defaultFieldResolver) {
+    schemaManager.addDefaultFieldResolverToSchema(options.defaultFieldResolver);
+  }
+
+  if (options.resolverErrorHandler) {
+    schemaManager.setResolverErrorHandler(options.resolverErrorHandler);
   }
 
   return schema;

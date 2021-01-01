@@ -1,11 +1,13 @@
 import {
   assertScalarType,
+  defaultFieldResolver,
   GraphQLEnumType,
   GraphQLFieldResolver,
   GraphQLInterfaceType,
   GraphQLIsTypeOfFn,
   GraphQLNamedType,
   GraphQLObjectType,
+  GraphQLResolveInfo,
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLTypeResolver,
@@ -53,6 +55,14 @@ export interface SubscriptionResolver<TContext> {
   [fieldName: string]: GraphQLFieldResolver<unknown, TContext>;
 }
 
+export type ResolverErrorHandler<TContext> = (
+  err: Error,
+  data: unknown,
+  args: unknown,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => Error | undefined | void;
+
 export class GraphQLSchemaManager<TContext> {
   protected schema: GraphQLSchema;
 
@@ -62,23 +72,23 @@ export class GraphQLSchemaManager<TContext> {
 
   // default resolvers
 
-  addDefaultResolversToSchema(
-    defaultResolver: GraphQLFieldResolver<unknown, TContext>
+  addDefaultFieldResolverToSchema(
+    defaultFieldResolver: GraphQLFieldResolver<unknown, TContext>
   ) {
     for (const type of Object.values(this.schema.getTypeMap())) {
-      this.addDefaultResolversToType(type, defaultResolver);
+      this.addDefaultFieldResolverToType(type, defaultFieldResolver);
     }
   }
 
-  addDefaultResolversToType(
+  addDefaultFieldResolverToType(
     type: GraphQLNamedType,
-    defaultResolver: GraphQLFieldResolver<unknown, TContext>
+    defaultFieldResolver: GraphQLFieldResolver<unknown, TContext>
   ) {
     if (isObjectType(type) || isInterfaceType(type)) {
       for (const field of Object.values(type.getFields())) {
         if (field.name.startsWith("__")) continue;
 
-        if (!field.resolve) field.resolve = defaultResolver;
+        if (!field.resolve) field.resolve = defaultFieldResolver;
       }
     }
   }
@@ -249,6 +259,35 @@ export class GraphQLSchemaManager<TContext> {
 
     for (const fieldName of Object.keys(resolver)) {
       fields[fieldName].subscribe = resolver[fieldName];
+    }
+  }
+
+  // resolve error handling
+
+  setResolverErrorHandler(handler: ResolverErrorHandler<TContext>) {
+    for (const type of Object.values(this.schema.getTypeMap())) {
+      this.setResolverErrorHandlerOnType(type, handler);
+    }
+  }
+
+  setResolverErrorHandlerOnType(
+    type: GraphQLNamedType,
+    handler: ResolverErrorHandler<TContext>
+  ) {
+    if (isObjectType(type) || isInterfaceType(type)) {
+      for (const field of Object.values(type.getFields())) {
+        const originalResolve = field.resolve ?? defaultFieldResolver;
+
+        field.resolve = async (data, args, context, info) => {
+          try {
+            return await originalResolve(data, args, context, info);
+          } catch (err) {
+            const newErr = handler(err, data, args, context, info);
+
+            throw newErr ?? err;
+          }
+        };
+      }
     }
   }
 }

@@ -92,6 +92,7 @@ describe("The example (ws)", () => {
       connect(url, protocol) {
         return new GraphQLClientWebSocket({
           socket: new WebSocket(url, protocol),
+          connectionAckTimeout: 3000,
         }).init({ thief: true });
       },
     });
@@ -107,12 +108,44 @@ describe("The example (ws)", () => {
     }
   });
 
+  it("should reject invalid operations with an error message", async () => {
+    const client = new GraphQLWebSocketClient({
+      url: "ws://localhost:4999/graphql",
+      connect(url, protocol) {
+        return new GraphQLClientWebSocket({
+          socket: new WebSocket(url, protocol),
+          connectionAckTimeout: 3000,
+        }).init({ keys: ["MASTER_KEY"] });
+      },
+    });
+
+    try {
+      for await (const result of client.subscribe({
+        query: `subscription DoesNotExist {
+          hello
+        }`,
+      })) {
+        assert.ok(result);
+      }
+
+      assert.ok(false, "should have thrown");
+    } catch (err) {
+      assert.strictEqual(
+        err.message,
+        'Subscription error: Cannot query field "hello" on type "Subscription".'
+      );
+    }
+
+    client.close();
+  });
+
   it("should serve GraphQL subscriptions over web sockets", async () => {
     const client = new GraphQLWebSocketClient({
       url: "ws://localhost:4999/graphql",
       connect(url, protocol) {
         return new GraphQLClientWebSocket({
           socket: new WebSocket(url, protocol),
+          connectionAckTimeout: 3000,
         }).init({ keys: ["MASTER_KEY"] });
       },
     });
@@ -237,6 +270,7 @@ describe("The example (ws)", () => {
       connect(url, protocol) {
         return new GraphQLClientWebSocket({
           socket: new WebSocket(url, protocol),
+          connectionAckTimeout: 3000,
         }).init({ keys: ["MASTER_KEY"] });
       },
     });

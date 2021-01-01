@@ -10,7 +10,6 @@ import type {
 import type { RawExecutionArgs } from "../server/GraphQLExecutionArgsParser";
 import { isAsyncIterator } from "../util/misc";
 import { DeferredPromise } from "../util/DeferredPromise";
-
 import { assertType, assertRecord, assertDefined } from "../util/assert";
 
 export interface GraphQLServerWebSocketOptions {
@@ -46,7 +45,7 @@ export class GraphQLServerWebSocket {
   protected acknowledged = false;
   protected subscriptions = new Map<
     string,
-    AsyncIterableIterator<ExecutionResult>
+    Promise<AsyncIterableIterator<ExecutionResult>>
   >();
 
   constructor(options: GraphQLServerWebSocketOptions) {
@@ -99,7 +98,7 @@ export class GraphQLServerWebSocket {
     );
 
     for (const [, subscription] of this.subscriptions) {
-      subscription.return?.();
+      (await subscription).return?.();
     }
   }
 
@@ -112,7 +111,7 @@ export class GraphQLServerWebSocket {
     this.acknowledgement.reject(err);
 
     for (const [, subscription] of this.subscriptions) {
-      subscription.return?.();
+      (await subscription).return?.();
     }
   }
 
@@ -188,42 +187,47 @@ export class GraphQLServerWebSocket {
       );
     }
 
-    const result = await this.subscribe(message.payload);
+    const promise = this.subscribe(message.payload).then(async (result) => {
+      if (isAsyncIterator(result)) {
+        try {
+          for await (const r of result) {
+            if (!this.isOpen()) break;
 
-    if (isAsyncIterator(result)) {
-      this.subscriptions.set(message.id, result);
+            await this.send({ type: "next", id: message.id, payload: r });
+          }
 
-      try {
-        for await (const r of result) {
-          if (!this.isOpen()) break;
-
-          await this.send({ type: "next", id: message.id, payload: r });
+          await this.send({ type: "complete", id: message.id });
+        } finally {
+          setTimeout(() => {
+            this.subscriptions.delete(message.id);
+          }, 3000);
         }
 
-        await this.send({ type: "complete", id: message.id });
-      } finally {
-        setTimeout(() => {
-          this.subscriptions.delete(message.id);
-        }, 3000);
-      }
-    } else {
-      assertDefined(
-        result.errors,
-        "Received non-async-iterable without errors"
-      );
+        return result;
+      } else {
+        assertDefined(
+          result.errors,
+          "Received non-async-iterable without errors"
+        );
 
-      await this.send({
-        type: "error",
-        id: message.id,
-        payload: result.errors,
-      });
-    }
+        await this.send({
+          type: "error",
+          id: message.id,
+          payload: result.errors,
+        });
+
+        // TODO this is never used, should be safe
+        return (null as unknown) as AsyncIterableIterator<ExecutionResult>;
+      }
+    });
+
+    this.subscriptions.set(message.id, promise);
   }
 
   async handleCompleteMessage(message: CompleteMessage) {
     await this.requireAck();
 
-    this.requireSubscription(message.id).return?.();
+    (await this.requireSubscription(message.id)).return?.();
   }
 
   // message parsers
@@ -293,7 +297,7 @@ export class GraphQLServerWebSocket {
     await this.acknowledgement;
   }
 
-  requireSubscription(id: string) {
+  async requireSubscription(id: string) {
     const subscription = this.subscriptions.get(id);
 
     if (!subscription) {

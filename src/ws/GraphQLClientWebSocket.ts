@@ -12,7 +12,7 @@ import { AsyncPushIterator } from "../util/AsyncPushIterator";
 
 export interface GraphQLClientWebSocketOptions {
   socket: WebSocketLike;
-  connectionAckTimeout?: number;
+  connectionAckTimeout: number;
 }
 
 export type WebSocketLike = Pick<
@@ -35,7 +35,7 @@ export class GraphQLClientWebSocket {
 
   constructor(options: GraphQLClientWebSocketOptions) {
     this.socket = options.socket;
-    this.connectionAckWaitTimeout = options.connectionAckTimeout ?? 3000;
+    this.connectionAckWaitTimeout = options.connectionAckTimeout;
 
     this.setup();
   }

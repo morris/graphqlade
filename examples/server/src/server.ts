@@ -25,6 +25,10 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
     root: __dirname + "/..",
     resolvers,
     subscriptionResolver: Subscription,
+    resolverErrorHandler: (err) => {
+      // eslint-disable-next-line no-console
+      console.error(err.stack);
+    },
   });
 
   // build graphql server

@@ -68,12 +68,12 @@ design principle.
 - Client-side code generation from GraphQL operations and remote schemata
   - Generates types for execution results of named operations
   - Generates an abstract class with methods for all named operations
-    - Users only need to provide some `fetch` implementation.
+    - Users only need to provide some `fetch`-like implementation.
   - Validates operations against a GraphQL API at build time
   - Extensions type injection
   - Type mapping for scalars
   - Watch mode
-- Client-side GraphQL WebSocket _TBD_
+- Client-side GraphQL WebSocket
   - Supports [graphql-ws](https://github.com/enisdenjo/graphql-ws)
     (possibly the future standard)
   - Supports [subscription-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)

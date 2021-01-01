@@ -9,6 +9,7 @@ export interface GraphQLWebSocketClientOptions {
   url: string;
   protocol?: string;
   connectionInitPayload?: Record<string, unknown>;
+  connectionAckTimeout?: number;
   connect?: ConnectFn;
   minReconnectDelay?: number;
   maxReconnectDelay?: number;
@@ -37,6 +38,7 @@ export class GraphQLWebSocketClient {
   public readonly url: string;
   public readonly protocol: string;
   protected connectionInitPayload?: Record<string, unknown>;
+  protected connectionAckTimeout: number;
   protected connectionAckPayload?: Record<string, unknown>;
   protected connect: ConnectFn;
   protected minReconnectDelay: number;
@@ -51,12 +53,14 @@ export class GraphQLWebSocketClient {
     this.url = options.url;
     this.protocol = options.protocol ?? "graphql-transport-ws";
     this.connectionInitPayload = options.connectionInitPayload;
+    this.connectionAckTimeout = options.connectionAckTimeout ?? 3000;
 
     this.connect =
       options.connect ??
       ((url, protocol, connectionInitPayload?) =>
         new GraphQLClientWebSocket({
           socket: new WebSocket(url, protocol),
+          connectionAckTimeout: this.connectionAckTimeout,
         }).init(connectionInitPayload));
 
     this.minReconnectDelay = options.minReconnectDelay ?? 500;
@@ -100,11 +104,11 @@ export class GraphQLWebSocketClient {
   }
 
   close(code?: number, reason?: string) {
-    this.socket?.close(code ?? 1000, reason ?? "Normal Closure");
-
     for (const subscription of this.subscriptions) {
       subscription.finish();
     }
+
+    this.socket?.close(code ?? 1000, reason ?? "Normal Closure");
   }
 
   shouldRetry(err: Error & { code?: number }) {
