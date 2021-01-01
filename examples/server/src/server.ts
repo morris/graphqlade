@@ -56,15 +56,7 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
     }
   }
 
-  const app = express();
-
-  app.use(cors());
-  app.use("/", express.static(`${__dirname}/../../client/public`));
-  app.get("/graphql", serveGraphQL);
-  app.post("/graphql", bodyParser.json(), serveGraphQL);
-
-  const server = createServer(app);
-
+  // build graphql web socket server
   const gqlWsServer = new GraphQLWebSocketServer({
     schema,
     connectionInitWaitTimeout: 1000,
@@ -81,6 +73,16 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
     },
   });
 
+  // setup web server (express in this case)
+  const app = express();
+
+  app.use(cors());
+  app.use("/", express.static(`${__dirname}/../../client/public`));
+  app.get("/graphql", serveGraphQL);
+  app.post("/graphql", bodyParser.json(), serveGraphQL);
+
+  const server = createServer(app);
+
   const wsServer = new ws.Server({
     server,
     path: "/graphql",
@@ -93,9 +95,10 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
       new MyContext({ pubsub })
     );
 
+    // just for testing disconnections
     setTimeout(() => {
       gqlSocket.close(1000, "WS_MAX_TIME");
-    }, parseInt(process.env.WS_MAX_TIME ?? "3000", 10));
+    }, parseInt(process.env.WS_MAX_TIME ?? "10000", 10));
   });
 
   server.listen(env.PORT ? parseInt(env.PORT, 10) : 4000);

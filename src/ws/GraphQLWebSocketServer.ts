@@ -1,6 +1,6 @@
 import { GraphQLError, GraphQLSchema, subscribe, validate } from "graphql";
-import { IncomingMessage } from "http";
-import WebSocket from "ws";
+import type { IncomingMessage } from "http";
+import type WebSocket from "ws";
 import {
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
