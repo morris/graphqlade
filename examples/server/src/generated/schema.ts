@@ -479,9 +479,9 @@ export interface RSubscription<TContext> {
   /**
    * (Review)
    */
-  newReviews?: (
+  newReview?: (
     source: TSubscription,
-    args: SubscriptionNewReviewsArgs,
+    args: SubscriptionNewReviewArgs,
     context: TContext,
     info: GraphQLResolveInfo
   ) => AsyncResult<ReviewData>;
@@ -1038,12 +1038,12 @@ export interface SSubscription<TContext> {
   /**
    * (Review)
    */
-  newReviews?: (
+  newReview?: (
     source: TSubscription,
-    args: SubscriptionNewReviewsArgs,
+    args: SubscriptionNewReviewArgs,
     context: TContext,
     info: GraphQLResolveInfo
-  ) => AsyncResult<AsyncIterableIterator<{ newReviews: ReviewData }>>;
+  ) => AsyncResult<AsyncIterableIterator<{ newReview: ReviewData }>>;
 }
 
 export interface TMutation {
@@ -1233,7 +1233,7 @@ export interface TSubscription {
   /**
    * (Review)
    */
-  newReviews: ReviewData;
+  newReview: ReviewData;
 }
 
 /**
@@ -1462,7 +1462,7 @@ export interface QuerySearchArgs {
   types?: Array<TSearchType>;
 }
 
-export interface SubscriptionNewReviewsArgs {
+export interface SubscriptionNewReviewArgs {
   /**
    * (Int)
    */

@@ -174,7 +174,7 @@ export class ClientCodeGenerator {
         operationName: string,
         variables: TVariables,
         extra?: TOperationExtra
-      ): AsyncIterator<TExecutionResult & TExecutionResultExtra> {
+      ): AsyncIterableIterator<TExecutionResult & TExecutionResultExtra> {
         throw new Error("AbstractClient.subscribe not implemented");
       }
 
@@ -241,7 +241,7 @@ export class ClientCodeGenerator {
     const variablesArg = this.generateVariablesArg(node);
 
     return `subscribe${name}(${variablesArg}, extra?: TOperationExtra):
-        AsyncIterator<X${name}<TExtensions> & TExecutionResultExtra> {
+        AsyncIterableIterator<X${name}<TExtensions> & TExecutionResultExtra> {
       return this.subscribe(${safeDocument}, ${safeName}, variables, extra);
     }`;
   }

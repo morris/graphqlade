@@ -36,7 +36,7 @@ export abstract class AbstractClient<
     operationName: string,
     variables: TVariables,
     extra?: TOperationExtra
-  ): AsyncIterator<TExecutionResult & TExecutionResultExtra> {
+  ): AsyncIterableIterator<TExecutionResult & TExecutionResultExtra> {
     throw new Error("AbstractClient.subscribe not implemented");
   }
 
@@ -115,9 +115,9 @@ export abstract class AbstractClient<
   subscribeNewReviews(
     variables: VNewReviews,
     extra?: TOperationExtra
-  ): AsyncIterator<XNewReviews<TExtensions> & TExecutionResultExtra> {
+  ): AsyncIterableIterator<XNewReviews<TExtensions> & TExecutionResultExtra> {
     return this.subscribe(
-      "subscription NewReviews($limit: Int) {\n  newReviews(limit: $limit) {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}",
+      "subscription NewReviews($limit: Int) {\n  newReview(limit: $limit) {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}",
       "NewReviews",
       variables,
       extra
@@ -237,7 +237,7 @@ export type XNewReviews<TExtensions> = ExecutionResult<
 >;
 
 export type DNewReviews = {
-  newReviews: ({} & FReviewData) | ({} & FReviewData);
+  newReview: ({} & FReviewData) | ({} & FReviewData);
 };
 
 export interface VSearch {

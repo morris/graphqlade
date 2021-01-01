@@ -17,8 +17,8 @@ export interface GraphQLServerWebSocketOptions {
   socket: WebSocket;
   req: IncomingMessage;
   subscribe: SubscribeFn;
-  connectionInitWaitTimeout?: number;
-  acknowledge?: AcknowledgeFn;
+  connectionInitWaitTimeout: number;
+  acknowledge: AcknowledgeFn;
 }
 
 export type AcknowledgeFn = (
@@ -42,8 +42,8 @@ export class GraphQLServerWebSocket {
   protected acknowledge: AcknowledgeFn;
   protected connectionInitWaitTimeoutId?: NodeJS.Timeout;
   protected initialized = false;
-  protected acknowledged = false;
   protected acknowledgement = new DeferredPromise<boolean>();
+  protected acknowledged = false;
   protected subscriptions = new Map<
     string,
     AsyncIterableIterator<ExecutionResult>
@@ -52,9 +52,14 @@ export class GraphQLServerWebSocket {
   constructor(options: GraphQLServerWebSocketOptions) {
     this.socket = options.socket;
     this.req = options.req;
-    this.connectionInitWaitTimeout = options.connectionInitWaitTimeout ?? 3000;
-    this.acknowledge = options.acknowledge ?? (() => null);
+    this.connectionInitWaitTimeout = options.connectionInitWaitTimeout;
+    this.acknowledge = options.acknowledge;
     this.subscribe = options.subscribe;
+
+    // prevent uncaught exceptions
+    this.acknowledgement.catch(() => {
+      // ignore
+    });
 
     this.setup();
   }
@@ -89,8 +94,9 @@ export class GraphQLServerWebSocket {
       clearTimeout(this.connectionInitWaitTimeoutId);
     }
 
-    this.acknowledged = false;
-    this.acknowledgement.resolve(false);
+    this.acknowledgement.reject(
+      new Error(`Web socket closed: ${code} ${reason}`)
+    );
 
     for (const [, subscription] of this.subscriptions) {
       subscription.return?.();
@@ -103,8 +109,7 @@ export class GraphQLServerWebSocket {
       clearTimeout(this.connectionInitWaitTimeoutId);
     }
 
-    this.acknowledged = false;
-    this.acknowledgement.resolve(false);
+    this.acknowledgement.reject(err);
 
     for (const [, subscription] of this.subscriptions) {
       subscription.return?.();
@@ -160,11 +165,16 @@ export class GraphQLServerWebSocket {
     try {
       payload = await this.acknowledge(this, message.payload);
       await this.send({ type: "connection_ack", payload });
-      this.acknowledged = true;
       this.acknowledgement.resolve(true);
+      this.acknowledged = true;
     } catch (err) {
-      this.acknowledged = false;
-      this.acknowledgement.resolve(false);
+      const unauthorized = this.makeClosingError(
+        4401,
+        `Unauthorized: ${err.message}`
+      );
+      this.acknowledgement.reject(unauthorized);
+
+      throw unauthorized;
     }
   }
 
@@ -276,12 +286,11 @@ export class GraphQLServerWebSocket {
   // helpers
 
   async requireAck() {
-    if (
-      (this.socket.protocol === "graphql-ws-transport" && !this.acknowledged) ||
-      (this.socket.protocol === "graphql-ws" && !(await this.acknowledgement))
-    ) {
+    if (this.socket.protocol === "graphql-ws-transport" && !this.acknowledged) {
       throw this.makeClosingError(4401, "Unauthorized");
     }
+
+    await this.acknowledgement;
   }
 
   requireSubscription(id: string) {

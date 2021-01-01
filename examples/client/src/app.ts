@@ -33,8 +33,15 @@ export function App(el: Element) {
   client.queryReviews().then((x) => update({ reviewData: x.data }));
 
   setTimeout(async () => {
-    for await (const review of client.subscribeNewReviews({}) as any) {
-      console.log(review);
+    try {
+      for await (const review of client.subscribeNewReviews({})) {
+        if (review.data?.newReview) {
+          state.reviewData?.reviews?.push(review.data?.newReview);
+          update({});
+        }
+      }
+    } catch (err) {
+      console.error(err);
     }
   }, 100);
 

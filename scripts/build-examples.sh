@@ -4,9 +4,6 @@ set -e
 node examples/server/gql2ts.js
 
 # client
-ts-node examples/server/src/server.ts &
-sleep 10
-node examples/client/gql2ts.js
-tsc --project examples/client/tsconfig.json
+node examples/client/gql2ts.static.js
+tsc --project examples/client/tsconfig.json --incremental --tsBuildInfoFile build/examples.client.tsbuildinfo
 cp dist/*.umd.* examples/client/public
-kill %1

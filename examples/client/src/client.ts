@@ -9,7 +9,9 @@ export class MyClient extends AbstractClient {
 
     this.socketClient = new GraphQLWebSocketClient({
       url: "ws://localhost:4000/graphql",
-      protocol: "graphql-transport-ws",
+      connectionInitPayload: {
+        keys: ["MASTER_KEY"],
+      },
     });
   }
 
@@ -37,10 +39,13 @@ export class MyClient extends AbstractClient {
     operationName: string,
     variables: TVariables
   ) {
-    return this.socketClient.subscribe<TExecutionResult>({
-      query,
-      operationName,
-      variables: variables as Record<string, unknown>,
-    });
+    return this.socketClient.subscribe<TExecutionResult>(
+      {
+        query,
+        operationName,
+        variables: variables as Record<string, unknown>,
+      },
+      { maxRetries: Infinity }
+    );
   }
 }

@@ -260,15 +260,19 @@
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       throw(err) {
-        return __awaiter(this, void 0, void 0, function* () {
-          if (!this.done) {
-            this.done = true;
-            this.error = err;
-            this.teardownOnce();
-            this.continue();
-          }
-          throw err;
+        if (!this.done) {
+          this.done = true;
+          this.error = err;
+          this.teardownOnce();
+          this.continue();
+        }
+        const rejection = Promise.reject(err);
+        // don't cause uncaught exceptions
+        // it's user responsibility to catch this during iteration
+        rejection.catch(() => {
+          // ignore
         });
+        return rejection;
       }
       [Symbol.asyncIterator]() {
         return this;
@@ -562,36 +566,46 @@
     exports.GraphQLWebSocketClient = void 0;
     class GraphQLWebSocketClient {
       constructor(options) {
-        var _a;
+        var _a, _b, _c, _d, _e;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.subscriptions = new Set();
         this.explicitlyClosed = false;
         this.url = options.url;
-        this.protocol = options.protocol;
-        this.connect =
-          (_a = options.connect) !== null && _a !== void 0
+        this.protocol =
+          (_a = options.protocol) !== null && _a !== void 0
             ? _a
+            : "graphql-transport-ws";
+        this.connectionInitPayload = options.connectionInitPayload;
+        this.connect =
+          (_b = options.connect) !== null && _b !== void 0
+            ? _b
             : (url, protocol, connectionInitPayload) =>
                 new GraphQLClientWebSocket_1.GraphQLClientWebSocket({
                   socket: new WebSocket(url, protocol),
                 }).init(connectionInitPayload);
+        this.minReconnectDelay =
+          (_c = options.minReconnectDelay) !== null && _c !== void 0 ? _c : 500;
+        this.maxReconnectDelay =
+          (_d = options.maxReconnectDelay) !== null && _d !== void 0
+            ? _d
+            : 30000;
+        this.reconnectDelayMultiplier =
+          (_e = options.reconnectDelayMultiplier) !== null && _e !== void 0
+            ? _e
+            : 2;
+        this.reconnectDelay = 0;
       }
       subscribe(payload, options) {
         this.explicitlyClosed = false;
         return new AsyncPushIterator_2.AsyncPushIterator((it) =>
           __awaiter(this, void 0, void 0, function* () {
+            var _a;
             this.subscriptions.add(it);
-            const {
-              maxRetries = 0,
-              minRetryDelay = 500,
-              maxRetryDelay = 10000,
-              delayMultiplier = 2,
-            } = options !== null && options !== void 0 ? options : {};
-            let retryTimeoutId;
-            const run = (retries, retryDelay) =>
+            const run = (retries) =>
               __awaiter(this, void 0, void 0, function* () {
-                var e_1, _a;
+                var e_1, _b;
                 try {
-                  const socket = yield this.maybeConnect();
+                  const socket = yield this.requireConnection();
                   const results = socket.subscribe(payload);
                   try {
                     for (
@@ -609,9 +623,9 @@
                       if (
                         results_1_1 &&
                         !results_1_1.done &&
-                        (_a = results_1.return)
+                        (_b = results_1.return)
                       )
-                        yield _a.call(results_1);
+                        yield _b.call(results_1);
                     } finally {
                       if (e_1) throw e_1.error;
                     }
@@ -623,22 +637,21 @@
                     retries > 0 &&
                     this.shouldRetry(err)
                   ) {
-                    const nextRetryDelay = Math.floor(
-                      Math.min(delayMultiplier * retryDelay, maxRetryDelay) +
-                        Math.random() * minRetryDelay
-                    );
-                    retryTimeoutId = setTimeout(
-                      () => run(retries - 1, nextRetryDelay),
-                      retryDelay
-                    );
+                    run(retries - 1);
                   } else {
                     it.throw(err);
                   }
                 }
               });
-            run(maxRetries, minRetryDelay);
+            run(
+              (_a =
+                options === null || options === void 0
+                  ? void 0
+                  : options.maxRetries) !== null && _a !== void 0
+                ? _a
+                : 0
+            );
             return () => {
-              clearTimeout(retryTimeoutId);
               this.subscriptions.delete(it);
             };
           })
@@ -658,7 +671,6 @@
         }
       }
       shouldRetry(err) {
-        if (typeof err.code !== "number") return false;
         switch (err.code) {
           case 1002:
           case 1011:
@@ -668,20 +680,37 @@
           case 4429:
             return false;
         }
-        return false;
+        return true;
       }
-      maybeConnect() {
+      requireConnection() {
         return __awaiter(this, void 0, void 0, function* () {
-          // TODO isOpen is bad here
           if (!this.socket || !this.socket.isOpenOrConnecting()) {
+            if (this.reconnectDelay > 0) {
+              yield new Promise((resolve) =>
+                setTimeout(resolve, this.reconnectDelay)
+              );
+            }
             this.socket = this.connect(
               this.url,
               this.protocol,
               this.connectionInitPayload
             );
           }
-          this.connectionAckPayload = yield this.socket.requireAck();
-          return this.socket;
+          try {
+            this.connectionAckPayload = yield this.socket.requireAck();
+            this.reconnectDelay = this.minReconnectDelay;
+            return this.socket;
+          } catch (err) {
+            this.reconnectDelay = Math.floor(
+              Math.min(
+                this.reconnectDelayMultiplier *
+                  Math.max(this.reconnectDelay, this.minReconnectDelay),
+                this.maxReconnectDelay
+              ) +
+                Math.random() * this.minReconnectDelay
+            );
+            throw err;
+          }
         });
       }
     }

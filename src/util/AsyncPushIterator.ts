@@ -52,7 +52,7 @@ export class AsyncPushIterator<T> implements AsyncIterator<T> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async throw(err: any): Promise<IteratorResult<T>> {
+  throw(err: any): Promise<IteratorResult<T>> {
     if (!this.done) {
       this.done = true;
       this.error = err;
@@ -60,7 +60,15 @@ export class AsyncPushIterator<T> implements AsyncIterator<T> {
       this.continue();
     }
 
-    throw err;
+    const rejection = Promise.reject(err);
+
+    // don't cause uncaught exceptions
+    // it's user responsibility to catch errors during iteration
+    rejection.catch(() => {
+      // ignore
+    });
+
+    return rejection;
   }
 
   [Symbol.asyncIterator]() {

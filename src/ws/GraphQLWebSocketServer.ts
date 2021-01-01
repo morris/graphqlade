@@ -1,22 +1,49 @@
 import { GraphQLError, GraphQLSchema, subscribe, validate } from "graphql";
+import { IncomingMessage } from "http";
+import WebSocket from "ws";
 import {
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
   RawExecutionArgs,
 } from "../server/GraphQLExecutionArgsParser";
+import {
+  GraphQLServerWebSocket,
+  AcknowledgeFn,
+} from "./GraphQLServerWebSocket";
 
 export interface GraphQLWebSocketServerOptions {
   schema: GraphQLSchema;
-  parser?: GraphQLExecutionArgsParser;
+  executionArgsParser?: GraphQLExecutionArgsParser;
+  connectionInitWaitTimeout?: number;
+  acknowledge?: AcknowledgeFn;
 }
 
 export class GraphQLWebSocketServer<TContext> {
   public readonly schema: GraphQLSchema;
-  public readonly requestParser: GraphQLExecutionArgsParser;
+  public readonly executionArgsParser: GraphQLExecutionArgsParser;
+  protected connectionInitWaitTimeout: number;
+  protected acknowledge: AcknowledgeFn;
 
   constructor(options: GraphQLWebSocketServerOptions) {
     this.schema = options.schema;
-    this.requestParser = options.parser ?? new GraphQLExecutionArgsParser();
+    this.executionArgsParser =
+      options.executionArgsParser ?? new GraphQLExecutionArgsParser();
+    this.connectionInitWaitTimeout = options.connectionInitWaitTimeout ?? 3000;
+    this.acknowledge = options.acknowledge ?? (() => null);
+  }
+
+  handleConnection(
+    socket: WebSocket,
+    req: IncomingMessage,
+    contextValue: TContext
+  ) {
+    return new GraphQLServerWebSocket({
+      socket,
+      req,
+      subscribe: (args) => this.subscribe(args, contextValue),
+      connectionInitWaitTimeout: this.connectionInitWaitTimeout,
+      acknowledge: this.acknowledge,
+    });
   }
 
   async subscribe(args: RawExecutionArgs, contextValue: TContext) {
@@ -58,7 +85,7 @@ export class GraphQLWebSocketServer<TContext> {
   // parse
 
   parse(request: RawExecutionArgs) {
-    return this.requestParser.parse(request);
+    return this.executionArgsParser.parse(request);
   }
 
   // util

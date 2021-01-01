@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -9,12 +10,14 @@ import { MyContext } from "./context";
 import {
   buildExecutableSchema,
   GraphQLServer,
-  GraphQLServerWebSocket,
   GraphQLWebSocketServer,
 } from "../../../src"; // graphqlade/server in your app
 import { AddressInfo } from "net";
 import { Subscription } from "./resolvers/Subscription";
 import { EventEmitter } from "events";
+
+dotenv.config({ path: __dirname + "/../.env" });
+dotenv.config({ path: __dirname + "/../default.env" });
 
 export async function bootstrap(env: NodeJS.ProcessEnv) {
   // build executable schema
@@ -58,7 +61,21 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
 
   const server = createServer(app);
 
-  const gqlWsServer = new GraphQLWebSocketServer({ schema });
+  const gqlWsServer = new GraphQLWebSocketServer({
+    schema,
+    connectionInitWaitTimeout: 1000,
+    acknowledge: (socket, payload) => {
+      const keys = Array.isArray(payload?.keys)
+        ? new Set(payload?.keys)
+        : new Set();
+
+      if (!keys.has("MASTER_KEY")) {
+        throw new Error("It appears to be locked");
+      }
+
+      return { version: 1 };
+    },
+  });
 
   const wsServer = new ws.Server({
     server,
@@ -66,13 +83,15 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
   });
 
   wsServer.on("connection", (socket, req) => {
-    new GraphQLServerWebSocket({
+    const gqlSocket = gqlWsServer.handleConnection(
       socket,
       req,
-      subscribe: (args) =>
-        gqlWsServer.subscribe(args, new MyContext({ pubsub })),
-      connectionInitWaitTimeout: 1000,
-    });
+      new MyContext({ pubsub })
+    );
+
+    setTimeout(() => {
+      gqlSocket.close(1000, "WS_MAX_TIME");
+    }, parseInt(process.env.WS_MAX_TIME ?? "3000", 10));
   });
 
   server.listen(env.PORT ? parseInt(env.PORT, 10) : 4000);

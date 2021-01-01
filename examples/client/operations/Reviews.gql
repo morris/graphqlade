@@ -5,7 +5,7 @@ query Reviews {
 }
 
 subscription NewReviews($limit: Int) {
-  newReviews(limit: $limit) {
+  newReview(limit: $limit) {
     ...reviewData
   }
 }

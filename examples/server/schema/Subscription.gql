@@ -1,3 +1,3 @@
 type Subscription {
-  newReviews(limit: Int): Review!
+  newReview(limit: Int): Review!
 }
