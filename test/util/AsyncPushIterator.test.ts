@@ -8,7 +8,7 @@ describe("An AsyncPushIterator", () => {
     const iterator = new AsyncPushIterator<number>((it) => {
       let i = 0;
       const intervalId = setInterval(() => it.push(++i), 100);
-      const timeoutId = setTimeout(() => it.return(), 1050);
+      const timeoutId = setTimeout(() => it.return(), 550);
 
       return () => {
         cleared = true;
@@ -23,7 +23,7 @@ describe("An AsyncPushIterator", () => {
       results.push(i);
     }
 
-    assert.deepStrictEqual(results, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    assert.deepStrictEqual(results, [1, 2, 3, 4, 5]);
     assert.ok(cleared, "not cleared");
   });
 
@@ -36,7 +36,7 @@ describe("An AsyncPushIterator", () => {
       const timeoutId = setTimeout(() => {
         it.push(++i);
         it.finish();
-      }, 1050);
+      }, 550);
 
       return () => {
         cleared = true;
@@ -51,7 +51,7 @@ describe("An AsyncPushIterator", () => {
       results.push(i);
     }
 
-    assert.deepStrictEqual(results, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    assert.deepStrictEqual(results, [1, 2, 3, 4, 5, 6]);
     assert.ok(cleared, "not cleared");
   });
 
@@ -90,7 +90,7 @@ describe("An AsyncPushIterator", () => {
         it.push(++i);
         it.push(++i);
       }, 100);
-      const timeoutId = setTimeout(() => it.return(), 1050);
+      const timeoutId = setTimeout(() => it.return(), 550);
 
       return () => {
         cleared = true;
@@ -105,8 +105,39 @@ describe("An AsyncPushIterator", () => {
       results.push(i);
     }
 
-    assert.strictEqual(results.length, 30);
+    assert.strictEqual(results.length, 15);
     assert.ok(cleared, "not cleared");
+  });
+
+  it("should be cancelable with an error", async () => {
+    let cleared = false;
+
+    const iterator = new AsyncPushIterator<number>((it) => {
+      let i = 0;
+      const intervalId = setInterval(() => it.push(++i), 100);
+      const timeoutId = setTimeout(() => it.throw(new Error("test")), 550);
+
+      return () => {
+        cleared = true;
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
+      };
+    });
+
+    const results: number[] = [];
+
+    try {
+      for await (const i of iterator) {
+        results.push(i);
+      }
+
+      assert.ok(false, "should have thrown");
+    } catch (err) {
+      assert.strictEqual(err.message, "test");
+    }
+
+    assert.deepStrictEqual(results, [1, 2, 3, 4, 5]);
+    assert.ok(cleared);
   });
 
   it("should handle chaotic iteration", async () => {
@@ -183,36 +214,5 @@ describe("An AsyncPushIterator", () => {
     assert.strictEqual(results.length, 30);
     assert.ok(_done, "not done");
     assert.ok(cleared, "not cleared");
-  });
-
-  it("should be cancelable with an error", async () => {
-    let cleared = false;
-
-    const iterator = new AsyncPushIterator<number>((it) => {
-      let i = 0;
-      const intervalId = setInterval(() => it.push(++i), 100);
-      const timeoutId = setTimeout(() => it.throw(new Error("test")), 550);
-
-      return () => {
-        cleared = true;
-        clearInterval(intervalId);
-        clearTimeout(timeoutId);
-      };
-    });
-
-    const results: number[] = [];
-
-    try {
-      for await (const i of iterator) {
-        results.push(i);
-      }
-
-      assert.ok(false, "should have thrown");
-    } catch (err) {
-      assert.strictEqual(err.message, "test");
-    }
-
-    assert.deepStrictEqual(results, [1, 2, 3, 4, 5]);
-    assert.ok(cleared);
   });
 });

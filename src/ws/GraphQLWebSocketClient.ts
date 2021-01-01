@@ -7,7 +7,7 @@ import { AsyncPushIterator } from "../util/AsyncPushIterator";
 
 export interface GraphQLWebSocketClientOptions {
   url: string;
-  protocol: string;
+  protocol?: string;
   connectionInitPayload?: Record<string, unknown>;
   connect?: ConnectFn;
 }
@@ -42,14 +42,13 @@ export class GraphQLWebSocketClient {
 
   constructor(options: GraphQLWebSocketClientOptions) {
     this.url = options.url;
-    this.protocol = options.protocol;
+    this.protocol = options.protocol ?? "graphql-transport-ws";
     this.connect =
       options.connect ??
       ((url, protocol, connectionInitPayload?) =>
         new GraphQLClientWebSocket({
           socket: new WebSocket(url, protocol),
-          connectionInitPayload,
-        }));
+        }).init(connectionInitPayload));
   }
 
   subscribe<TExecutionResult>(
@@ -65,7 +64,7 @@ export class GraphQLWebSocketClient {
         maxRetries = 0,
         minRetryDelay = 500,
         maxRetryDelay = 10000,
-        delayMultiplier: exponentialBackoffMultiplier = 2,
+        delayMultiplier = 2,
       } = options ?? {};
 
       let retryTimeoutId: NodeJS.Timeout;
@@ -73,7 +72,7 @@ export class GraphQLWebSocketClient {
       const run = async (retries: number, retryDelay: number) => {
         try {
           const socket = await this.maybeConnect();
-          const results = await socket.subscribe<TExecutionResult>(payload);
+          const results = socket.subscribe<TExecutionResult>(payload);
 
           for await (const result of results) {
             it.push(result);
@@ -83,10 +82,7 @@ export class GraphQLWebSocketClient {
         } catch (err) {
           if (!this.explicitlyClosed && retries > 0 && this.shouldRetry(err)) {
             const nextRetryDelay = Math.floor(
-              Math.min(
-                exponentialBackoffMultiplier * retryDelay,
-                maxRetryDelay
-              ) +
+              Math.min(delayMultiplier * retryDelay, maxRetryDelay) +
                 Math.random() * minRetryDelay
             );
 
@@ -112,6 +108,10 @@ export class GraphQLWebSocketClient {
   close(code?: number, reason?: string) {
     this.socket?.close(code ?? 1000, reason ?? "Normal Closure");
     this.explicitlyClosed = true;
+
+    for (const subscription of this.subscriptions) {
+      subscription.finish();
+    }
   }
 
   shouldRetry(err: Error & { code?: number }) {
@@ -132,7 +132,7 @@ export class GraphQLWebSocketClient {
 
   async maybeConnect() {
     // TODO isOpen is bad here
-    if (!this.socket || !this.socket.isOpen()) {
+    if (!this.socket || !this.socket.isOpenOrConnecting()) {
       this.socket = this.connect(
         this.url,
         this.protocol,

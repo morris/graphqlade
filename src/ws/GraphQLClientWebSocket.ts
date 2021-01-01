@@ -12,20 +12,18 @@ import { AsyncPushIterator } from "../util/AsyncPushIterator";
 
 export interface GraphQLClientWebSocketOptions {
   socket: WebSocketLike;
-  connectionInitPayload?: Record<string, unknown>;
   connectionAckTimeout?: number;
 }
 
 export type WebSocketLike = Pick<
   WebSocket,
-  "addEventListener" | "send" | "close" | "readyState" | "OPEN"
+  "addEventListener" | "send" | "close" | "readyState" | "OPEN" | "CONNECTING"
 >;
 
 export type SubscribePayload = SubscribeMessage["payload"];
 
 export class GraphQLClientWebSocket {
   public readonly socket: WebSocketLike;
-  protected connectionInitPayload?: Record<string, unknown>;
   protected connectionAckWaitTimeout: number;
   protected connectionAckWaitTimeoutId?: NodeJS.Timeout;
   protected connectionAckPayload = new DeferredPromise<
@@ -37,17 +35,12 @@ export class GraphQLClientWebSocket {
 
   constructor(options: GraphQLClientWebSocketOptions) {
     this.socket = options.socket;
-    this.connectionInitPayload = options.connectionInitPayload;
     this.connectionAckWaitTimeout = options.connectionAckTimeout ?? 3000;
 
     this.setup();
   }
 
-  protected setup() {
-    this.socket.addEventListener("close", (e) => this.handleClose(e));
-    this.socket.addEventListener("error", (e) => this.handleError(e));
-    this.socket.addEventListener("message", (e) => this.handleMessage(e));
-
+  init(connectionInitPayload?: Record<string, unknown>) {
     this.connectionAckWaitTimeoutId = setTimeout(() => {
       this.close(4408, "Connection acknowledgement timeout");
     }, this.connectionAckWaitTimeout);
@@ -55,24 +48,24 @@ export class GraphQLClientWebSocket {
     if (this.isOpen()) {
       this.send({
         type: "connection_init",
-        payload: this.connectionInitPayload,
+        payload: connectionInitPayload,
       });
     } else {
       this.socket.addEventListener("open", () => {
         this.send({
           type: "connection_init",
-          payload: this.connectionInitPayload,
+          payload: connectionInitPayload,
         });
       });
     }
+
+    return this;
   }
 
-  // public
-
-  async subscribe<TExecutionResult>(payload: SubscribePayload) {
-    await this.requireAck();
-
+  subscribe<TExecutionResult>(payload: SubscribePayload) {
     return new AsyncPushIterator<TExecutionResult>(async (it) => {
+      await this.requireAck();
+
       const id = (this.nextSubscriptionId++).toString();
       this.subscriptions.set(id, it);
 
@@ -84,6 +77,9 @@ export class GraphQLClientWebSocket {
 
       return () => {
         this.send({ type: "complete", id });
+        setTimeout(() => {
+          this.subscriptions.delete(id);
+        }, 3000);
       };
     });
   }
@@ -95,10 +91,12 @@ export class GraphQLClientWebSocket {
       clearTimeout(this.connectionAckWaitTimeoutId);
     }
 
-    this.connectionAckPayload.reject(new Error("CLOSED"));
+    this.connectionAckPayload.reject(
+      new Error(`Web socket closed: ${event.code} ${event.reason}`)
+    );
 
     for (const [, subscription] of this.subscriptions) {
-      subscription.throw(this.makeProtocolError(event.code, event.reason));
+      subscription.throw(this.makeClosingError(event.code, event.reason));
     }
   }
 
@@ -108,10 +106,10 @@ export class GraphQLClientWebSocket {
       clearTimeout(this.connectionAckWaitTimeoutId);
     }
 
-    this.connectionAckPayload.reject(new Error("CLOSED"));
+    this.connectionAckPayload.reject(new Error("Web socket error"));
 
     for (const [, subscription] of this.subscriptions) {
-      subscription.throw(new Error("WebSocket error"));
+      subscription.throw(new Error("Web socket error"));
     }
   }
 
@@ -139,7 +137,7 @@ export class GraphQLClientWebSocket {
           this.handleCompleteMessage(this.parseCompleteMessage(message));
           break;
         default:
-          throw new TypeError(`Invalid message type ${message.type}`);
+          this.close(4400, `Invalid message type ${message.type}`);
       }
     } catch (err) {
       this.closeByError(err);
@@ -151,6 +149,7 @@ export class GraphQLClientWebSocket {
   handleConnectionAckMessage(message: ConnectionAckMessage) {
     if (this.connectionAckWaitTimeoutId) {
       clearTimeout(this.connectionAckWaitTimeoutId);
+      this.connectionAckWaitTimeoutId = undefined;
     }
 
     this.connectionAckPayload.resolve(message.payload);
@@ -236,7 +235,7 @@ export class GraphQLClientWebSocket {
     const subscription = this.subscriptions.get(id);
 
     if (!subscription) {
-      throw this.makeProtocolError(4409, `Subscriber for ${id} does not exist`);
+      throw this.makeClosingError(4409, `Subscriber for ${id} does not exist`);
     }
 
     return subscription;
@@ -244,14 +243,14 @@ export class GraphQLClientWebSocket {
 
   // low-level
 
-  send(message: GraphQLWebSocketClientMessage) {
-    if (this.isOpen()) this.socket.send(JSON.stringify(message));
+  protected setup() {
+    this.socket.addEventListener("close", (e) => this.handleClose(e));
+    this.socket.addEventListener("error", (e) => this.handleError(e));
+    this.socket.addEventListener("message", (e) => this.handleMessage(e));
   }
 
   closeByError(err: Error & { code?: number }) {
-    if (err.message === "CLOSED") {
-      // we're good
-    } else if (typeof err.code === "number") {
+    if (typeof err.code === "number") {
       this.close(err.code, err.message);
     } else if (err instanceof TypeError) {
       this.close(4400, `Invalid message: ${err.message}`);
@@ -260,15 +259,26 @@ export class GraphQLClientWebSocket {
     }
   }
 
+  send(message: GraphQLWebSocketClientMessage) {
+    if (this.isOpen()) this.socket.send(JSON.stringify(message));
+  }
+
   close(code: number, reason: string) {
-    if (this.isOpen()) this.socket.close(code, reason);
+    if (this.isOpenOrConnecting()) this.socket.close(code, reason);
+  }
+
+  isOpenOrConnecting() {
+    return (
+      this.socket.readyState === this.socket.OPEN ||
+      this.socket.readyState === this.socket.CONNECTING
+    );
   }
 
   isOpen() {
     return this.socket.readyState === this.socket.OPEN;
   }
 
-  makeProtocolError(code: number, reason: string) {
+  makeClosingError(code: number, reason: string) {
     return Object.assign(new Error(reason), { code });
   }
 }

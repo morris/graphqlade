@@ -9,7 +9,7 @@ export class MyClient extends AbstractClient {
 
     this.socketClient = new GraphQLWebSocketClient({
       url: "ws://localhost:4000/graphql",
-      protocol: "graphql-ws-transport",
+      protocol: "graphql-transport-ws",
     });
   }
 

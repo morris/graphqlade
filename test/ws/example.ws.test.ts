@@ -3,10 +3,14 @@ import * as assert from "assert";
 import got from "got";
 import { ExecutionResult } from "graphql";
 import WebSocket from "ws";
-import { GraphQLClientWebSocket, GraphQLReader } from "../../src";
-import { requireExampleServer } from "../util";
+import {
+  GraphQLClientWebSocket,
+  GraphQLReader,
+  GraphQLWebSocketClient,
+} from "../../src";
+import { requireExampleServer, wsClosed } from "../util";
 
-describe("The example", () => {
+describe("The example (ws)", () => {
   let operations: string;
 
   requireExampleServer();
@@ -18,25 +22,73 @@ describe("The example", () => {
     );
   });
 
-  it("should serve GraphQL subscriptions over (unmanaged) web sockets", async () => {
+  it("should close sockets with invalid protocols immediately", async () => {
+    const socket = new WebSocket("ws://localhost:4999/graphql", "foo-bar-baz");
+
+    assert.deepStrictEqual(await wsClosed(socket), [
+      1002,
+      "Unsupported web socket protocol foo-bar-baz",
+    ]);
+  });
+
+  it("should close sockets if they don't send a connection_init message in time", async () => {
     const socket = new WebSocket(
       "ws://localhost:4999/graphql",
       "graphql-transport-ws"
     );
 
-    const closed = new Promise((resolve) => {
-      socket.on("close", (code, reason) => {
-        resolve([code, reason]);
-      });
+    assert.deepStrictEqual(await wsClosed(socket), [
+      4408,
+      "Connection initialization timeout",
+    ]);
+  });
+
+  it("should close sockets immediately if they send more than one connection_init message", async () => {
+    const socket = new WebSocket(
+      "ws://localhost:4999/graphql",
+      "graphql-transport-ws"
+    );
+
+    socket.on("open", () => {
+      socket.send(JSON.stringify({ type: "connection_init" }));
+      socket.send(JSON.stringify({ type: "connection_init" }));
     });
 
-    const gqlSocket = new GraphQLClientWebSocket({
-      socket,
+    assert.deepStrictEqual(await wsClosed(socket), [
+      4429,
+      "Too many initialization requests",
+    ]);
+  });
+
+  it("should close sockets immediately if they send invalid message types", async () => {
+    const socket = new WebSocket(
+      "ws://localhost:4999/graphql",
+      "graphql-transport-ws"
+    );
+
+    socket.on("open", () => {
+      socket.send(JSON.stringify({ type: "hello" }));
+    });
+
+    assert.deepStrictEqual(await wsClosed(socket), [
+      4400,
+      "Invalid message type: hello",
+    ]);
+  });
+
+  it("should serve GraphQL subscriptions over web sockets", async () => {
+    const client = new GraphQLWebSocketClient({
+      url: "ws://localhost:4999/graphql",
+      connect(url, protocol) {
+        return new GraphQLClientWebSocket({
+          socket: new WebSocket(url, protocol),
+        }).init();
+      },
     });
 
     const results: ExecutionResult<any, any>[] = [];
 
-    const iterator = await gqlSocket.subscribe<ExecutionResult>({
+    const iterator = client.subscribe<ExecutionResult>({
       query: operations,
       operationName: "NewReviews",
       variables: {
@@ -49,6 +101,8 @@ describe("The example", () => {
         results.push(result);
       }
     })();
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     await got("http://localhost:4999/graphql", {
       method: "POST",
@@ -90,9 +144,12 @@ describe("The example", () => {
 
     await complete;
 
-    gqlSocket.close(1000, "Normal Closure");
+    client.close();
 
-    assert.deepStrictEqual(await closed, [1000, "Normal Closure"]);
+    assert.deepStrictEqual(await wsClosed((client as any).socket.socket), [
+      1000,
+      "Normal Closure",
+    ]);
 
     assert.strictEqual(results.length, 2);
     assert.deepStrictEqual(

@@ -71,6 +71,7 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
       req,
       subscribe: (args) =>
         gqlWsServer.subscribe(args, new MyContext({ pubsub })),
+      connectionInitWaitTimeout: 1000,
     });
   });
 

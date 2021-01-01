@@ -333,53 +333,50 @@
         this.subscriptions = new Map();
         this.nextSubscriptionId = 1;
         this.socket = options.socket;
-        this.connectionInitPayload = options.connectionInitPayload;
         this.connectionAckWaitTimeout =
           (_a = options.connectionAckTimeout) !== null && _a !== void 0
             ? _a
             : 3000;
         this.setup();
       }
-      setup() {
-        this.socket.addEventListener("close", (e) => this.handleClose(e));
-        this.socket.addEventListener("error", (e) => this.handleError(e));
-        this.socket.addEventListener("message", (e) => this.handleMessage(e));
+      init(connectionInitPayload) {
         this.connectionAckWaitTimeoutId = setTimeout(() => {
           this.close(4408, "Connection acknowledgement timeout");
         }, this.connectionAckWaitTimeout);
         if (this.isOpen()) {
           this.send({
             type: "connection_init",
-            payload: this.connectionInitPayload,
+            payload: connectionInitPayload,
           });
         } else {
           this.socket.addEventListener("open", () => {
             this.send({
               type: "connection_init",
-              payload: this.connectionInitPayload,
+              payload: connectionInitPayload,
             });
           });
         }
+        return this;
       }
-      // public
       subscribe(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
-          yield this.requireAck();
-          return new AsyncPushIterator_1.AsyncPushIterator((it) =>
-            __awaiter(this, void 0, void 0, function* () {
-              const id = (this.nextSubscriptionId++).toString();
-              this.subscriptions.set(id, it);
-              this.send({
-                type: "subscribe",
-                id,
-                payload,
-              });
-              return () => {
-                this.send({ type: "complete", id });
-              };
-            })
-          );
-        });
+        return new AsyncPushIterator_1.AsyncPushIterator((it) =>
+          __awaiter(this, void 0, void 0, function* () {
+            yield this.requireAck();
+            const id = (this.nextSubscriptionId++).toString();
+            this.subscriptions.set(id, it);
+            this.send({
+              type: "subscribe",
+              id,
+              payload,
+            });
+            return () => {
+              this.send({ type: "complete", id });
+              setTimeout(() => {
+                this.subscriptions.delete(id);
+              }, 3000);
+            };
+          })
+        );
       }
       // event handlers
       handleClose(event) {
@@ -387,11 +384,11 @@
           if (this.connectionAckWaitTimeoutId) {
             clearTimeout(this.connectionAckWaitTimeoutId);
           }
-          this.connectionAckPayload.reject(new Error("CLOSED"));
+          this.connectionAckPayload.reject(
+            new Error(`Web socket closed: ${event.code} ${event.reason}`)
+          );
           for (const [, subscription] of this.subscriptions) {
-            subscription.throw(
-              this.makeProtocolError(event.code, event.reason)
-            );
+            subscription.throw(this.makeClosingError(event.code, event.reason));
           }
         });
       }
@@ -401,9 +398,9 @@
           if (this.connectionAckWaitTimeoutId) {
             clearTimeout(this.connectionAckWaitTimeoutId);
           }
-          this.connectionAckPayload.reject(new Error("CLOSED"));
+          this.connectionAckPayload.reject(new Error("Web socket error"));
           for (const [, subscription] of this.subscriptions) {
-            subscription.throw(new Error("WebSocket error"));
+            subscription.throw(new Error("Web socket error"));
           }
         });
       }
@@ -430,7 +427,7 @@
                 this.handleCompleteMessage(this.parseCompleteMessage(message));
                 break;
               default:
-                throw new TypeError(`Invalid message type ${message.type}`);
+                this.close(4400, `Invalid message type ${message.type}`);
             }
           } catch (err) {
             this.closeByError(err);
@@ -441,6 +438,7 @@
       handleConnectionAckMessage(message) {
         if (this.connectionAckWaitTimeoutId) {
           clearTimeout(this.connectionAckWaitTimeoutId);
+          this.connectionAckWaitTimeoutId = undefined;
         }
         this.connectionAckPayload.resolve(message.payload);
       }
@@ -510,7 +508,7 @@
       requireSubscription(id) {
         const subscription = this.subscriptions.get(id);
         if (!subscription) {
-          throw this.makeProtocolError(
+          throw this.makeClosingError(
             4409,
             `Subscriber for ${id} does not exist`
           );
@@ -518,13 +516,13 @@
         return subscription;
       }
       // low-level
-      send(message) {
-        if (this.isOpen()) this.socket.send(JSON.stringify(message));
+      setup() {
+        this.socket.addEventListener("close", (e) => this.handleClose(e));
+        this.socket.addEventListener("error", (e) => this.handleError(e));
+        this.socket.addEventListener("message", (e) => this.handleMessage(e));
       }
       closeByError(err) {
-        if (err.message === "CLOSED") {
-          // we're good
-        } else if (typeof err.code === "number") {
+        if (typeof err.code === "number") {
           this.close(err.code, err.message);
         } else if (err instanceof TypeError) {
           this.close(4400, `Invalid message: ${err.message}`);
@@ -532,13 +530,22 @@
           this.close(1011, `Internal server error: ${err.message}`);
         }
       }
+      send(message) {
+        if (this.isOpen()) this.socket.send(JSON.stringify(message));
+      }
       close(code, reason) {
-        if (this.isOpen()) this.socket.close(code, reason);
+        if (this.isOpenOrConnecting()) this.socket.close(code, reason);
+      }
+      isOpenOrConnecting() {
+        return (
+          this.socket.readyState === this.socket.OPEN ||
+          this.socket.readyState === this.socket.CONNECTING
+        );
       }
       isOpen() {
         return this.socket.readyState === this.socket.OPEN;
       }
-      makeProtocolError(code, reason) {
+      makeClosingError(code, reason) {
         return Object.assign(new Error(reason), { code });
       }
     }
@@ -566,8 +573,7 @@
             : (url, protocol, connectionInitPayload) =>
                 new GraphQLClientWebSocket_1.GraphQLClientWebSocket({
                   socket: new WebSocket(url, protocol),
-                  connectionInitPayload,
-                });
+                }).init(connectionInitPayload);
       }
       subscribe(payload, options) {
         this.explicitlyClosed = false;
@@ -578,7 +584,7 @@
               maxRetries = 0,
               minRetryDelay = 500,
               maxRetryDelay = 10000,
-              delayMultiplier: exponentialBackoffMultiplier = 2,
+              delayMultiplier = 2,
             } = options !== null && options !== void 0 ? options : {};
             let retryTimeoutId;
             const run = (retries, retryDelay) =>
@@ -586,7 +592,7 @@
                 var e_1, _a;
                 try {
                   const socket = yield this.maybeConnect();
-                  const results = yield socket.subscribe(payload);
+                  const results = socket.subscribe(payload);
                   try {
                     for (
                       var results_1 = __asyncValues(results), results_1_1;
@@ -618,10 +624,7 @@
                     this.shouldRetry(err)
                   ) {
                     const nextRetryDelay = Math.floor(
-                      Math.min(
-                        exponentialBackoffMultiplier * retryDelay,
-                        maxRetryDelay
-                      ) +
+                      Math.min(delayMultiplier * retryDelay, maxRetryDelay) +
                         Math.random() * minRetryDelay
                     );
                     retryTimeoutId = setTimeout(
@@ -650,6 +653,9 @@
               reason !== null && reason !== void 0 ? reason : "Normal Closure"
             );
         this.explicitlyClosed = true;
+        for (const subscription of this.subscriptions) {
+          subscription.finish();
+        }
       }
       shouldRetry(err) {
         if (typeof err.code !== "number") return false;
@@ -667,7 +673,7 @@
       maybeConnect() {
         return __awaiter(this, void 0, void 0, function* () {
           // TODO isOpen is bad here
-          if (!this.socket || !this.socket.isOpen()) {
+          if (!this.socket || !this.socket.isOpenOrConnecting()) {
             this.socket = this.connect(
               this.url,
               this.protocol,

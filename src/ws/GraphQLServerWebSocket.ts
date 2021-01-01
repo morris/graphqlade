@@ -74,7 +74,10 @@ export class GraphQLServerWebSocket {
         }, this.connectionInitWaitTimeout);
         break;
       default:
-        this.close(1002, `Unsupported sub-protocol ${this.socket.protocol}`);
+        this.close(
+          1002,
+          `Unsupported web socket protocol ${this.socket.protocol}`
+        );
     }
   }
 
@@ -131,7 +134,7 @@ export class GraphQLServerWebSocket {
           await this.handleCompleteMessage(this.parseCompleteMessage(message));
           break;
         default:
-          throw new TypeError(`Invalid message type ${message.type}`);
+          this.close(4400, `Invalid message type: ${message.type}`);
       }
     } catch (err) {
       this.closeByError(err);
@@ -142,13 +145,14 @@ export class GraphQLServerWebSocket {
 
   async handleConnectionInitMessage(message: ConnectionInitMessage) {
     if (this.initialized) {
-      throw this.makeProtocolError(4429, "Too many initialization requests");
+      throw this.makeClosingError(4429, "Too many initialization requests");
     }
 
     this.initialized = true;
 
     if (this.connectionInitWaitTimeoutId) {
       clearTimeout(this.connectionInitWaitTimeoutId);
+      this.connectionInitWaitTimeoutId = undefined;
     }
 
     let payload: Record<string, unknown> | null | undefined;
@@ -159,6 +163,7 @@ export class GraphQLServerWebSocket {
       this.acknowledged = true;
       this.acknowledgement.resolve(true);
     } catch (err) {
+      this.acknowledged = false;
       this.acknowledgement.resolve(false);
     }
   }
@@ -167,7 +172,7 @@ export class GraphQLServerWebSocket {
     await this.requireAck();
 
     if (this.subscriptions.has(message.id)) {
-      throw this.makeProtocolError(
+      throw this.makeClosingError(
         4409,
         `Subscriber for ${message.id} already exists`
       );
@@ -178,13 +183,19 @@ export class GraphQLServerWebSocket {
     if (isAsyncIterator(result)) {
       this.subscriptions.set(message.id, result);
 
-      for await (const r of result) {
-        if (!this.isOpen()) break;
+      try {
+        for await (const r of result) {
+          if (!this.isOpen()) break;
 
-        await this.send({ type: "next", id: message.id, payload: r });
+          await this.send({ type: "next", id: message.id, payload: r });
+        }
+
+        await this.send({ type: "complete", id: message.id });
+      } finally {
+        setTimeout(() => {
+          this.subscriptions.delete(message.id);
+        }, 3000);
       }
-
-      await this.send({ type: "complete", id: message.id });
     } else {
       assertDefined(
         result.errors,
@@ -269,7 +280,7 @@ export class GraphQLServerWebSocket {
       (this.socket.protocol === "graphql-ws-transport" && !this.acknowledged) ||
       (this.socket.protocol === "graphql-ws" && !(await this.acknowledgement))
     ) {
-      throw this.makeProtocolError(4401, "Unauthorized");
+      throw this.makeClosingError(4401, "Unauthorized");
     }
   }
 
@@ -277,13 +288,27 @@ export class GraphQLServerWebSocket {
     const subscription = this.subscriptions.get(id);
 
     if (!subscription) {
-      throw this.makeProtocolError(4409, `Subscriber for ${id} does not exist`);
+      throw this.makeClosingError(4409, `Subscriber for ${id} does not exist`);
     }
 
     return subscription;
   }
 
   // low-level
+
+  closeByError(err: Error & { code?: number }) {
+    if (typeof err.code === "number") {
+      this.close(err.code, err.message);
+    } else if (err instanceof TypeError) {
+      this.close(4400, `Invalid message: ${err.message}`);
+    } else {
+      this.close(1011, `Internal server error: ${err.message}`);
+    }
+  }
+
+  makeClosingError(code: number, reason: string) {
+    return Object.assign(new Error(reason), { code });
+  }
 
   async send(message: GraphQLWebSocketServerMessage): Promise<void> {
     if (!this.isOpen()) return;
@@ -295,27 +320,11 @@ export class GraphQLServerWebSocket {
     });
   }
 
-  closeByError(err: Error & { code?: number }) {
-    if (err.message === "CLOSED") {
-      // we're good
-    } else if (typeof err.code === "number") {
-      this.close(err.code, err.message);
-    } else if (err instanceof TypeError) {
-      this.close(4400, `Invalid message: ${err.message}`);
-    } else {
-      this.close(1011, `Internal server error: ${err.message}`);
-    }
-  }
-
   close(code: number, reason: string) {
     if (this.isOpen()) this.socket.close(code, reason);
   }
 
   isOpen() {
     return this.socket.readyState === this.socket.OPEN;
-  }
-
-  makeProtocolError(code: number, reason: string) {
-    return Object.assign(new Error(reason), { code });
   }
 }
