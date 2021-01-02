@@ -1,6 +1,6 @@
 {
   "name": "graphqlade",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Opinionated, complete library for GraphQL + TypeScript development",
   "keywords": [
     "graphql",
