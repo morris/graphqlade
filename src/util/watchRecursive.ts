@@ -1,7 +1,8 @@
-import { Stats, Dirent } from "fs";
-import { readdir, stat } from "fs/promises";
+import { Stats, Dirent, promises as fsPromises } from "fs";
 import { join } from "path";
 import { canImportModule } from "./canImportModule";
+
+const { readdir, stat } = fsPromises;
 
 export async function watchRecursive(
   dirname: string,

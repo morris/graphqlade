@@ -1,6 +1,8 @@
-import { mkdir, writeFile } from "fs/promises";
+import { promises as fsPromises } from "fs";
 import { dirname } from "path";
 import { canImportModule } from "./canImportModule";
+
+const { mkdir, writeFile } = fsPromises;
 
 export async function writeTypeScript(filename: string, code: string) {
   let output = code;

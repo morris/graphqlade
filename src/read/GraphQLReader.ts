@@ -1,8 +1,9 @@
-import { readdir, readFile, stat } from "fs/promises";
-import { Stats } from "fs";
+import { Stats, promises as fsPromises } from "fs";
 import { join } from "path";
 import { buildSchema, GraphQLError, parse } from "graphql";
 import { compare } from "../util/misc";
+
+const { readdir, readFile, stat } = fsPromises;
 
 export interface GraphQLReaderOptions {
   disableParseCheck?: boolean;
