@@ -32,13 +32,13 @@
     "dist"
   ],
   "scripts": {
-    "build": "sh scripts/build.sh",
-    "build-examples": "sh scripts/build-examples.sh",
-    "clean": "sh scripts/clean.sh",
-    "example": "sh scripts/example.sh",
+    "build": "bash scripts/build.sh",
+    "build-examples": "bash scripts/build-examples.sh",
+    "clean": "bash scripts/clean.sh",
+    "example": "bash scripts/example.sh",
     "format": "prettier --write './**/*.ts' './**/*.js' './**/*.json'",
     "lint": "eslint .",
-    "maybe-publish": "sh scripts/maybe-publish.sh",
+    "maybe-publish": "bash scripts/maybe-publish.sh",
     "test": "nyc mocha test"
   },
   "nyc": {
