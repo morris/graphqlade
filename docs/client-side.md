@@ -17,7 +17,7 @@
 ### 3. Create a code generation script
 
 Create a `gql2ts.js` script.
-See [examples/client/gql2ts.js](../examples/clients/gql2ts.js).
+See [examples/client/gql2ts.js](../examples/client/gql2ts.js).
 Type completion/IntelliSense should be available.
 
 Add an entry under `scripts` of your `package.json`:
