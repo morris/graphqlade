@@ -6,17 +6,15 @@ const { readdir, stat } = fsPromises;
 
 export async function watchRecursive(
   dirname: string,
-  callback: (filename: string) => unknown
+  callback: (path: string) => unknown
 ) {
   const { watchDirectory, watchFile } = await importWatchFunctions();
 
   watchDirectory(
     dirname,
-    async (filename) => {
-      const path = join(dirname, filename);
-      const stats = await stat(path);
-
+    async (path) => {
       try {
+        const stats = await stat(path);
         await watchFileOrDirectory(path, stats, callback);
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -35,7 +33,7 @@ export async function watchRecursive(
   async function watchFileOrDirectory(
     path: string,
     stats: Stats | Dirent,
-    callback: (filename: string) => unknown
+    callback: (path: string) => unknown
   ) {
     if (stats.isFile()) {
       watchFile(path, () => callback(path));
