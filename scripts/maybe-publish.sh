@@ -5,5 +5,5 @@ if [[ $(npm info $NAME@$VERSION) ]]; then
   echo "$NAME@$VERSION already published, skipping"
 else
   echo "Publishing $NAME@$VERSION..."
-  #npm publish
+  npm publish
 fi
