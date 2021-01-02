@@ -21,14 +21,13 @@
     "dist"
   ],
   "scripts": {
-    "example": "sh scripts/example.sh",
     "build": "sh scripts/build.sh",
     "build-examples": "sh scripts/build-examples.sh",
-    "lint": "eslint .",
+    "clean": "sh scripts/clean.sh",
+    "example": "sh scripts/example.sh",
     "format": "prettier --write './**/*.ts' './**/*.js' './**/*.json'",
-    "test": "nyc mocha test",
-    "clean": "rm -rf .nyc_output build coverage dist",
-    "prepare": "npm run clean && npm run build"
+    "lint": "eslint .",
+    "test": "nyc mocha test"
   },
   "nyc": {
     "extension": [

@@ -1,4 +1,4 @@
-set -e
+set -ex
 
 # dist
 tsc --incremental --tsBuildInfoFile build/dist.tsbuildinfo

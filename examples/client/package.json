@@ -8,10 +8,8 @@
     "build": "tsc",
     "gql2ts": "node gql2ts.js"
   },
-  "dependencies": {
-    "graphqlade": "../.."
-  },
   "devDependencies": {
+    "graphqlade": "../..",
     "prettier": "^2",
     "typescript": "^4"
   }
