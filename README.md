@@ -2,13 +2,13 @@
 
 GraphQLade is an opinionated, **complete** library for
 **GraphQL + TypeScript** development on both server- and client-side.
-It emphasizes a _GraphQL first_ approach with **maximum type-safety** through
+It emphasizes a **GraphQL first** approach with **maximum type-safety** through
 interface/type generation from GraphQL schemata and GraphQL client operations.
 
 With a rich feature set and zero dependencies besides
 [GraphQL.js](https://github.com/graphql/graphql-js), it provides a highly
-integrated foundation for GraphQL implementations at currently under 4000 lines
-of readable, tested code&mdash;all in **one place**.
+integrated foundation for GraphQL servers and clients at currently under
+4000 lines of readable, tested code&mdash;all in **one place**.
 
 ## Why?
 
@@ -66,6 +66,7 @@ combination of dependencies.
 - Runtime helpers for building executable
   [GraphQL.js](https://github.com/graphql/graphql-js) schemata
 - Runtime helpers for serving GraphQL over HTTP
+- Operation parser with LRU-cache
 - Server-side GraphQL web sockets, including convenient server helpers
   - Supports [graphql-ws](https://github.com/enisdenjo/graphql-ws)
     (possibly the future standard)
@@ -108,3 +109,22 @@ combination of dependencies.
 - Class-based implementation with granular methods
   - Customization is easily possible through inheritance and method overrides.
   - Classes as config, so to say
+
+## Missing Features
+
+- Automatic persisted queries are more or less planned. There's no
+  clear/emerging standard but it seems viable to add APQs in an opt-in
+  fashion and make the protocol compatible with the Apollo stack.
+- Caching was ignored so far. Apollo's `@cacheControl` style is viable but the
+  benefit seems questionable. Will revisit soon.
+- Remote schemata, stitching, merging, federation etc. look like they should be
+  solved at build time and/or resolver level (plus directives) for now.
+  Will revisit if there's high demand.
+- Writing operations inline (with e.g. template strings tagged `gql`) are not
+  planned. The current approach of separate and named operations in pure
+  GraphQL, combined with interface/client generation, requires the least tooling
+  and has great developer ergonomics (type safety, auto-completion, no
+  duplication).
+- File uploads are out of scope. It's recommended to use regular HTTP endpoints.
+- IDE plug-ins are out of scope or not even required since GraphQLade doesn't
+  introduce non-standard concepts. Existing plug-ins work well so far.
