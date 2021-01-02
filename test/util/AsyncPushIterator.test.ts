@@ -1,4 +1,5 @@
 import * as assert from "assert";
+import { EventEmitter } from "events";
 import { AsyncPushIterator } from "../../src";
 
 describe("An AsyncPushIterator", () => {
@@ -214,5 +215,32 @@ describe("An AsyncPushIterator", () => {
     assert.strictEqual(results.length, 30);
     assert.ok(_done, "not done");
     assert.ok(cleared, "not cleared");
+  });
+
+  it("should work with event emitters", async () => {
+    const ee = new EventEmitter();
+
+    const iterator = new AsyncPushIterator<string>((it) => {
+      const listener = (e: string) => it.push(e);
+
+      ee.on("test", listener);
+
+      return () => {
+        ee.removeListener("test", listener);
+      };
+    });
+
+    setTimeout(() => ee.emit("test", "hello"), 100);
+    setTimeout(() => ee.emit("test", "world"), 200);
+    setTimeout(() => iterator.return(), 300);
+
+    const results: string[] = [];
+
+    for await (const item of iterator) {
+      results.push(item);
+    }
+
+    assert.deepStrictEqual(results, ["hello", "world"]);
+    assert.strictEqual(ee.listenerCount("test"), 0);
   });
 });

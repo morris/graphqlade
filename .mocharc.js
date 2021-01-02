@@ -5,6 +5,6 @@ module.exports = {
   ],
   extension: ["ts"],
   recursive: true,
-  timeout: 9999,
+  timeout: 3000,
   exit: true,
 };

@@ -1,4 +1,4 @@
-import type { ExecutionResult } from "graphql";
+import type { ExecutionResult, GraphQLError } from "graphql";
 import type WebSocket from "ws";
 import type { IncomingMessage } from "http";
 import type {
@@ -98,7 +98,14 @@ export class GraphQLServerWebSocket {
     );
 
     for (const [, subscription] of this.subscriptions) {
-      (await subscription).return?.();
+      try {
+        (await subscription).return?.();
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `Could not return subscription iterator (on close): ${err.stack}`
+        );
+      }
     }
   }
 
@@ -111,7 +118,14 @@ export class GraphQLServerWebSocket {
     this.acknowledgement.reject(err);
 
     for (const [, subscription] of this.subscriptions) {
-      (await subscription).return?.();
+      try {
+        (await subscription).return?.();
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `Could not return subscription iterator (on error): ${err.stack}`
+        );
+      }
     }
   }
 
@@ -163,7 +177,7 @@ export class GraphQLServerWebSocket {
 
     try {
       payload = await this.acknowledge(this, message.payload);
-      await this.send({ type: "connection_ack", payload });
+      this.send({ type: "connection_ack", payload });
       this.acknowledgement.resolve(true);
       this.acknowledged = true;
     } catch (err) {
@@ -189,19 +203,25 @@ export class GraphQLServerWebSocket {
 
     const promise = this.subscribe(message.payload).then(async (result) => {
       if (isAsyncIterator(result)) {
-        try {
-          for await (const r of result) {
-            if (!this.isOpen()) break;
+        (async () => {
+          try {
+            for await (const r of result) {
+              this.send({ type: "next", id: message.id, payload: r });
+            }
 
-            await this.send({ type: "next", id: message.id, payload: r });
+            this.send({ type: "complete", id: message.id });
+          } catch (err) {
+            this.send({
+              type: "error",
+              id: message.id,
+              payload: [{ message: err.message } as GraphQLError],
+            });
+          } finally {
+            setTimeout(() => {
+              this.subscriptions.delete(message.id);
+            }, 3000);
           }
-
-          await this.send({ type: "complete", id: message.id });
-        } finally {
-          setTimeout(() => {
-            this.subscriptions.delete(message.id);
-          }, 3000);
-        }
+        })();
 
         return result;
       } else {
@@ -210,14 +230,13 @@ export class GraphQLServerWebSocket {
           "Received non-async-iterable without errors"
         );
 
-        await this.send({
+        this.send({
           type: "error",
           id: message.id,
           payload: result.errors,
         });
 
-        // TODO this is never used, should be safe
-        return (null as unknown) as AsyncIterableIterator<ExecutionResult>;
+        return {} as AsyncIterableIterator<ExecutionResult>;
       }
     });
 
@@ -315,6 +334,8 @@ export class GraphQLServerWebSocket {
     } else if (err instanceof TypeError) {
       this.close(4400, `Invalid message: ${err.message}`);
     } else {
+      // eslint-disable-next-line no-console
+      console.error(err.stack);
       this.close(1011, `Internal server error: ${err.message}`);
     }
   }
@@ -323,14 +344,10 @@ export class GraphQLServerWebSocket {
     return Object.assign(new Error(reason), { code });
   }
 
-  async send(message: GraphQLWebSocketServerMessage): Promise<void> {
+  send(message: GraphQLWebSocketServerMessage) {
     if (!this.isOpen()) return;
 
-    const data = JSON.stringify(message);
-
-    return new Promise((resolve, reject) => {
-      this.socket.send(data, (err) => (err ? reject(err) : resolve()));
-    });
+    this.socket.send(JSON.stringify(message));
   }
 
   close(code: number, reason: string) {
