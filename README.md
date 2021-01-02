@@ -1,9 +1,9 @@
 # GraphQLade
 
-![NPM version](https://img.shields.io/npm/v/graphqlade)
-![Build status](https://img.shields.io/github/workflow/status/morris/graphqlade/Pipeline)
+![NPM version](https://img.shields.io/npm/v/graphqlade?style=flat-square)
+![Build status](https://img.shields.io/github/workflow/status/morris/graphqlade/Pipeline?style=flat-square)
 
-GraphQLade is an opinionated, **complete** library for
+GraphQLade is a lightweight but **complete** library for
 **GraphQL + TypeScript** development on both server- and client-side.
 It emphasizes a **GraphQL first** approach with **maximum type-safety** through
 interface/type generation from GraphQL schemata and GraphQL client operations.
