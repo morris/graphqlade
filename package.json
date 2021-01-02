@@ -52,8 +52,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint",
-      "git add"
+      "eslint"
     ]
   },
   "peerDependencies": {
