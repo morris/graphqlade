@@ -10,10 +10,21 @@
     "client",
     "websockets"
   ],
+  "homepage": "https://github.com/morris/graphqlade",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/morris/graphqlade.git"
+  },
+  "bugs": {
+    "url": "https://github.com/morris/graphqlade/issues"
+  },
   "contributors": [
     "Morris Brodersen <mb@morrisbrodersen.de> (https://morrisbrodersen.de)"
   ],
   "license": "ISC",
+  "engines": {
+    "node": ">=12"
+  },
   "module": "src/index.ts",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,6 +38,7 @@
     "example": "sh scripts/example.sh",
     "format": "prettier --write './**/*.ts' './**/*.js' './**/*.json'",
     "lint": "eslint .",
+    "maybe-publish": "sh scripts/maybe-publish.sh",
     "test": "nyc mocha test"
   },
   "nyc": {

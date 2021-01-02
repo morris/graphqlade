@@ -1,4 +1,4 @@
-set -e
+set -ex
 
 sh scripts/build.sh
 sh scripts/build-examples.sh
