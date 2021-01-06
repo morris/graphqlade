@@ -40,6 +40,7 @@ function amdToUmd(amdCode, rootModule, globalName) {
     function staticRequire(id) {
       var definition = definitions[id];
 
+      if (!definition) throw new Error('Undefined module ' + id);
       if (!definition.loaded) {
         definition.loaded = true;
 

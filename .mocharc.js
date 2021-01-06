@@ -3,7 +3,7 @@ module.exports = {
     "./node_modules/ts-node/register",
     "./node_modules/source-map-support/register",
   ],
-  extension: ["ts"],
+  extension: ["ts", "js"],
   recursive: true,
   timeout: 3000,
   exit: true,
