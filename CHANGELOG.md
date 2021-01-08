@@ -2,8 +2,9 @@
 
 ## vNEXT
 
-- Fix UMD build
 - Allow creating a context per web socket subscription (breaking change)
+- Fix UMD build
+- Improved types for resolver maps
 
 ## v0.1.2
 

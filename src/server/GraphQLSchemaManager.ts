@@ -20,7 +20,15 @@ import {
 } from "graphql";
 import { assertDefined } from "../util";
 
-export interface ResolverMap<TContext> {
+export type AnyResolverMap<TContext> =
+  | CustomResolverMap<TContext>
+  | GeneratedResolverMap<TContext>;
+
+export interface GeneratedResolverMap<TContext> {
+  __isGeneratedResolverMap?: TContext;
+}
+
+export interface CustomResolverMap<TContext> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [typeName: string]: TypeResolver<any, TContext>;
 }
@@ -51,8 +59,16 @@ export interface UnionResolver<TSource = unknown, TContext = unknown> {
   __resolveType?: GraphQLTypeResolver<TSource, TContext>;
 }
 
-export interface SubscriptionResolver<TContext> {
+export type SubscriptionResolver<TContext> =
+  | CustomSubscriptionResolver<TContext>
+  | GeneratedSubscriptionResolver<TContext>;
+
+export interface CustomSubscriptionResolver<TContext> {
   [fieldName: string]: GraphQLFieldResolver<unknown, TContext>;
+}
+
+export interface GeneratedSubscriptionResolver<TContext> {
+  __isGeneratedSubscriptionResolver?: TContext;
 }
 
 export type ResolverErrorHandler<TContext> = (
@@ -95,9 +111,11 @@ export class GraphQLSchemaManager<TContext> {
 
   // type resolvers
 
-  addResolversToSchema(resolvers: ResolverMap<TContext>): void {
-    for (const typeName of Object.keys(resolvers)) {
-      const resolver = resolvers[typeName];
+  addResolversToSchema(resolvers: AnyResolverMap<TContext>): void {
+    const r = resolvers as CustomResolverMap<TContext>;
+
+    for (const typeName of Object.keys(r)) {
+      const resolver = r[typeName];
       const type = this.schema.getType(typeName);
 
       assertDefined(type, `Cannot set resolver for undefined type ${typeName}`);
@@ -223,7 +241,7 @@ export class GraphQLSchemaManager<TContext> {
 
   // resolver inheritance
 
-  addInheritedResolversToSchema(resolvers: ResolverMap<TContext>): void {
+  addInheritedResolversToSchema(resolvers: AnyResolverMap<TContext>): void {
     for (const typeName of Object.keys(resolvers)) {
       const type = this.schema.getType(typeName);
 
@@ -235,12 +253,14 @@ export class GraphQLSchemaManager<TContext> {
 
   addInheritedResolversToType(
     type: GraphQLNamedType,
-    resolvers: ResolverMap<TContext>
+    resolvers: AnyResolverMap<TContext>
   ) {
     if (!isObjectType(type) && !isInterfaceType(type)) return;
 
+    const r = resolvers as CustomResolverMap<TContext>;
+
     for (const implementedInterface of type.getInterfaces()) {
-      const resolver = resolvers[implementedInterface.name];
+      const resolver = r[implementedInterface.name];
       this.addResolversToType(type, resolver);
     }
   }
@@ -256,9 +276,10 @@ export class GraphQLSchemaManager<TContext> {
     );
 
     const fields = subscriptionType.getFields();
+    const r = resolver as CustomSubscriptionResolver<TContext>;
 
-    for (const fieldName of Object.keys(resolver)) {
-      fields[fieldName].subscribe = resolver[fieldName];
+    for (const fieldName of Object.keys(r)) {
+      fields[fieldName].subscribe = r[fieldName];
     }
   }
 

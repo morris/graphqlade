@@ -4,17 +4,15 @@ import { GraphQLReader } from "../read";
 import {
   GraphQLSchemaManager,
   SubscriptionResolver,
-  ResolverMap,
+  AnyResolverMap,
   ResolverErrorHandler,
 } from "./GraphQLSchemaManager";
 
 export interface BuildExecutableSchemaOptions<TContext> {
   root?: string;
   schema?: string | GraphQLSchema;
-  resolvers: ResolverMap<TContext> | { __isGeneratedResolverMap?: TContext };
-  subscriptionResolver?:
-    | SubscriptionResolver<TContext>
-    | { __isGeneratedSubscriptionResolver?: TContext };
+  resolvers: AnyResolverMap<TContext>;
+  subscriptionResolver?: SubscriptionResolver<TContext>;
   defaultFieldResolver?: GraphQLFieldResolver<unknown, TContext>;
   resolverErrorHandler?: ResolverErrorHandler<TContext>;
   reader?: GraphQLReader;
@@ -30,18 +28,11 @@ export async function buildExecutableSchema<TContext>(
     : await reader.buildSchemaFromDir(join(root, options.schema ?? "schema"));
   const schemaManager = new GraphQLSchemaManager<TContext>(schema);
 
-  schemaManager.addResolversToSchema(
-    options.resolvers as ResolverMap<TContext>
-  );
-
-  schemaManager.addInheritedResolversToSchema(
-    options.resolvers as ResolverMap<TContext>
-  );
+  schemaManager.addResolversToSchema(options.resolvers);
+  schemaManager.addInheritedResolversToSchema(options.resolvers);
 
   if (options.subscriptionResolver) {
-    schemaManager.addSubscriptionResolverToSchema(
-      options.subscriptionResolver as SubscriptionResolver<TContext>
-    );
+    schemaManager.addSubscriptionResolverToSchema(options.subscriptionResolver);
   }
 
   if (options.defaultFieldResolver) {
