@@ -26,7 +26,7 @@ export class GraphQLClientWebSocket {
   public readonly socket: WebSocketLike;
   protected connectionAckWaitTimeout: number;
   protected connectionAckWaitTimeoutId?: NodeJS.Timeout;
-  protected connectionAckPayload = new DeferredPromise<
+  protected connectionAckPayloadPromise = new DeferredPromise<
     Record<string, unknown> | null | undefined
   >();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,7 +91,7 @@ export class GraphQLClientWebSocket {
       clearTimeout(this.connectionAckWaitTimeoutId);
     }
 
-    this.connectionAckPayload.reject(
+    this.connectionAckPayloadPromise.reject(
       new Error(`Web socket closed: ${event.code} ${event.reason}`)
     );
 
@@ -106,7 +106,7 @@ export class GraphQLClientWebSocket {
       clearTimeout(this.connectionAckWaitTimeoutId);
     }
 
-    this.connectionAckPayload.reject(new Error("Web socket error"));
+    this.connectionAckPayloadPromise.reject(new Error("Web socket error"));
 
     for (const [, subscription] of this.subscriptions) {
       subscription.throw(new Error("Web socket error"));
@@ -152,7 +152,7 @@ export class GraphQLClientWebSocket {
       this.connectionAckWaitTimeoutId = undefined;
     }
 
-    this.connectionAckPayload.resolve(message.payload);
+    this.connectionAckPayloadPromise.resolve(message.payload);
   }
 
   handleNextMessage(message: NextMessage) {
@@ -226,7 +226,7 @@ export class GraphQLClientWebSocket {
   // helpers
 
   async requireAck() {
-    const payload = await this.connectionAckPayload;
+    const payload = await this.connectionAckPayloadPromise;
 
     return payload ?? undefined;
   }

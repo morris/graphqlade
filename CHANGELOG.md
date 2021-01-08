@@ -3,6 +3,7 @@
 ## vNEXT
 
 - Fix UMD build
+- Allow creating a context per web socket subscription (breaking change)
 
 ## v0.1.2
 

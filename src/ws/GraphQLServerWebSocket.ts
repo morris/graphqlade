@@ -22,7 +22,7 @@ export interface GraphQLServerWebSocketOptions {
 
 export type AcknowledgeFn = (
   socket: GraphQLServerWebSocket,
-  payload?: Record<string, unknown> | null
+  connectionInitPayload?: Record<string, unknown> | null
 ) =>
   | Promise<Record<string, unknown> | null | undefined>
   | Record<string, unknown>
@@ -30,7 +30,8 @@ export type AcknowledgeFn = (
   | undefined;
 
 export type SubscribeFn = (
-  args: RawExecutionArgs
+  args: RawExecutionArgs,
+  connectionInitPayload?: Record<string, unknown> | null
 ) => Promise<AsyncIterableIterator<ExecutionResult> | ExecutionResult>;
 
 export class GraphQLServerWebSocket {
@@ -41,7 +42,9 @@ export class GraphQLServerWebSocket {
   protected acknowledge: AcknowledgeFn;
   protected connectionInitWaitTimeoutId?: NodeJS.Timeout;
   protected initialized = false;
-  protected acknowledgement = new DeferredPromise<boolean>();
+  protected connectionInitPayloadPromise = new DeferredPromise<
+    Record<string, unknown> | null | undefined
+  >();
   protected acknowledged = false;
   protected subscriptions = new Map<
     string,
@@ -56,7 +59,7 @@ export class GraphQLServerWebSocket {
     this.subscribe = options.subscribe;
 
     // prevent uncaught exceptions
-    this.acknowledgement.catch(() => {
+    this.connectionInitPayloadPromise.catch(() => {
       // ignore
     });
 
@@ -93,7 +96,7 @@ export class GraphQLServerWebSocket {
       clearTimeout(this.connectionInitWaitTimeoutId);
     }
 
-    this.acknowledgement.reject(
+    this.connectionInitPayloadPromise.reject(
       new Error(`Web socket closed: ${code} ${reason}`)
     );
 
@@ -115,7 +118,7 @@ export class GraphQLServerWebSocket {
       clearTimeout(this.connectionInitWaitTimeoutId);
     }
 
-    this.acknowledgement.reject(err);
+    this.connectionInitPayloadPromise.reject(err);
 
     for (const [, subscription] of this.subscriptions) {
       try {
@@ -173,26 +176,26 @@ export class GraphQLServerWebSocket {
       this.connectionInitWaitTimeoutId = undefined;
     }
 
-    let payload: Record<string, unknown> | null | undefined;
+    let connectionAckPayload: Record<string, unknown> | null | undefined;
 
     try {
-      payload = await this.acknowledge(this, message.payload);
-      this.send({ type: "connection_ack", payload });
-      this.acknowledgement.resolve(true);
+      connectionAckPayload = await this.acknowledge(this, message.payload);
+      this.send({ type: "connection_ack", payload: connectionAckPayload });
+      this.connectionInitPayloadPromise.resolve(message.payload);
       this.acknowledged = true;
     } catch (err) {
       const unauthorized = this.makeClosingError(
         4401,
         `Unauthorized: ${err.message}`
       );
-      this.acknowledgement.reject(unauthorized);
+      this.connectionInitPayloadPromise.reject(unauthorized);
 
       throw unauthorized;
     }
   }
 
   async handleSubscribeMessage(message: SubscribeMessage) {
-    await this.requireAck();
+    const connectionInitPayload = await this.requireAck();
 
     if (this.subscriptions.has(message.id)) {
       throw this.makeClosingError(
@@ -201,44 +204,46 @@ export class GraphQLServerWebSocket {
       );
     }
 
-    const promise = this.subscribe(message.payload).then(async (result) => {
-      if (isAsyncIterator(result)) {
-        (async () => {
-          try {
-            for await (const r of result) {
-              this.send({ type: "next", id: message.id, payload: r });
+    const promise = this.subscribe(message.payload, connectionInitPayload).then(
+      async (result) => {
+        if (isAsyncIterator(result)) {
+          (async () => {
+            try {
+              for await (const r of result) {
+                this.send({ type: "next", id: message.id, payload: r });
+              }
+
+              this.send({ type: "complete", id: message.id });
+            } catch (err) {
+              this.send({
+                type: "error",
+                id: message.id,
+                payload: [{ message: err.message } as GraphQLError],
+              });
+            } finally {
+              setTimeout(() => {
+                this.subscriptions.delete(message.id);
+              }, 3000);
             }
+          })();
 
-            this.send({ type: "complete", id: message.id });
-          } catch (err) {
-            this.send({
-              type: "error",
-              id: message.id,
-              payload: [{ message: err.message } as GraphQLError],
-            });
-          } finally {
-            setTimeout(() => {
-              this.subscriptions.delete(message.id);
-            }, 3000);
-          }
-        })();
+          return result;
+        } else {
+          assertDefined(
+            result.errors,
+            "Received non-async-iterable without errors"
+          );
 
-        return result;
-      } else {
-        assertDefined(
-          result.errors,
-          "Received non-async-iterable without errors"
-        );
+          this.send({
+            type: "error",
+            id: message.id,
+            payload: result.errors,
+          });
 
-        this.send({
-          type: "error",
-          id: message.id,
-          payload: result.errors,
-        });
-
-        return {} as AsyncIterableIterator<ExecutionResult>;
+          return {} as AsyncIterableIterator<ExecutionResult>;
+        }
       }
-    });
+    );
 
     this.subscriptions.set(message.id, promise);
   }
@@ -246,7 +251,9 @@ export class GraphQLServerWebSocket {
   async handleCompleteMessage(message: CompleteMessage) {
     await this.requireAck();
 
-    (await this.requireSubscription(message.id)).return?.();
+    const subscription = await this.requireSubscription(message.id);
+
+    subscription.return?.();
   }
 
   // message parsers
@@ -313,7 +320,7 @@ export class GraphQLServerWebSocket {
       throw this.makeClosingError(4401, "Unauthorized");
     }
 
-    await this.acknowledgement;
+    return this.connectionInitPayloadPromise;
   }
 
   async requireSubscription(id: string) {

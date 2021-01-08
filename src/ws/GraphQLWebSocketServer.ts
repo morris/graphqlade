@@ -11,44 +11,54 @@ import {
   AcknowledgeFn,
 } from "./GraphQLServerWebSocket";
 
-export interface GraphQLWebSocketServerOptions {
+export interface GraphQLWebSocketServerOptions<TContext> {
   schema: GraphQLSchema;
   executionArgsParser?: GraphQLExecutionArgsParser;
   connectionInitWaitTimeout?: number;
   acknowledge?: AcknowledgeFn;
+  createContext: CreateContextFn<TContext>;
 }
+
+export type CreateContextFn<TContext> = (
+  connectionInitPayload?: Record<string, unknown> | null
+) => TContext;
 
 export class GraphQLWebSocketServer<TContext> {
   public readonly schema: GraphQLSchema;
   public readonly executionArgsParser: GraphQLExecutionArgsParser;
   protected connectionInitWaitTimeout: number;
   protected acknowledge: AcknowledgeFn;
+  protected createContext: CreateContextFn<TContext>;
 
-  constructor(options: GraphQLWebSocketServerOptions) {
+  constructor(options: GraphQLWebSocketServerOptions<TContext>) {
     this.schema = options.schema;
     this.executionArgsParser =
       options.executionArgsParser ?? new GraphQLExecutionArgsParser();
     this.connectionInitWaitTimeout = options.connectionInitWaitTimeout ?? 3000;
     this.acknowledge = options.acknowledge ?? (() => null);
+    this.createContext = options.createContext;
   }
 
-  handleConnection(
-    socket: WebSocket,
-    req: IncomingMessage,
-    contextValue: TContext
-  ) {
+  handleConnection(socket: WebSocket, req: IncomingMessage) {
     return new GraphQLServerWebSocket({
       socket,
       req,
-      subscribe: (args) => this.subscribe(args, contextValue),
+      subscribe: (args, connectionInitPayload) =>
+        this.subscribe(args, connectionInitPayload),
       connectionInitWaitTimeout: this.connectionInitWaitTimeout,
       acknowledge: this.acknowledge,
     });
   }
 
-  async subscribe(args: RawExecutionArgs, contextValue: TContext) {
+  async subscribe(
+    args: RawExecutionArgs,
+    connectionInitPayload?: Record<string, unknown> | null
+  ) {
     try {
-      return await this.subscribeParsed(this.parse(args), contextValue);
+      return await this.subscribeParsed(
+        this.parse(args),
+        this.createContext(connectionInitPayload)
+      );
     } catch (err) {
       return {
         errors: [this.serializeError(err)],

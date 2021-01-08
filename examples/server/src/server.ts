@@ -57,7 +57,7 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
   }
 
   // build graphql web socket server
-  const gqlWsServer = new GraphQLWebSocketServer({
+  const gqlWsServer = new GraphQLWebSocketServer<MyContext>({
     schema,
     connectionInitWaitTimeout: 1000,
     acknowledge: (socket, payload) => {
@@ -70,6 +70,9 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
       }
 
       return { version: 1 };
+    },
+    createContext() {
+      return new MyContext({ pubsub });
     },
   });
 
@@ -89,11 +92,7 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
   });
 
   wsServer.on("connection", (socket, req) => {
-    const gqlSocket = gqlWsServer.handleConnection(
-      socket,
-      req,
-      new MyContext({ pubsub })
-    );
+    const gqlSocket = gqlWsServer.handleConnection(socket, req);
 
     // just for testing disconnections
     setTimeout(() => {
