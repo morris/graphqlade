@@ -2,11 +2,7 @@ import * as assert from "assert";
 import got from "got";
 import { ExecutionResult } from "graphql";
 import WebSocket from "ws";
-import {
-  GraphQLClientWebSocket,
-  GraphQLReader,
-  GraphQLWebSocketClient,
-} from "../../src";
+import { GraphQLReader, GraphQLWebSocketClient } from "../../src";
 import { requireExampleServer, wsClosed } from "../util";
 
 describe("The example (ws)", () => {
@@ -88,11 +84,11 @@ describe("The example (ws)", () => {
   it("should close a socket immediately if it is not acknowledged", async () => {
     const client = new GraphQLWebSocketClient({
       url: "ws://localhost:4999/graphql",
-      connect(url, protocol) {
-        return new GraphQLClientWebSocket({
-          socket: new WebSocket(url, protocol),
-          connectionAckTimeout: 3000,
-        }).init({ thief: true });
+      createWebSocket(url, protocol) {
+        return new WebSocket(url, protocol);
+      },
+      connectionInitPayload: {
+        thief: true,
       },
     });
 
@@ -107,11 +103,11 @@ describe("The example (ws)", () => {
   it("should reject invalid operations with an error message", async () => {
     const client = new GraphQLWebSocketClient({
       url: "ws://localhost:4999/graphql",
-      connect(url, protocol) {
-        return new GraphQLClientWebSocket({
-          socket: new WebSocket(url, protocol),
-          connectionAckTimeout: 3000,
-        }).init({ keys: ["MASTER_KEY"] });
+      createWebSocket(url, protocol) {
+        return new WebSocket(url, protocol);
+      },
+      connectionInitPayload: {
+        keys: ["MASTER_KEY"],
       },
     });
 
@@ -138,11 +134,11 @@ describe("The example (ws)", () => {
   it("should serve GraphQL subscriptions over web sockets", async () => {
     const client = new GraphQLWebSocketClient({
       url: "ws://localhost:4999/graphql",
-      connect(url, protocol) {
-        return new GraphQLClientWebSocket({
-          socket: new WebSocket(url, protocol),
-          connectionAckTimeout: 3000,
-        }).init({ keys: ["MASTER_KEY"] });
+      createWebSocket(url, protocol) {
+        return new WebSocket(url, protocol);
+      },
+      connectionInitPayload: {
+        keys: ["MASTER_KEY"],
       },
     });
 
@@ -208,7 +204,7 @@ describe("The example (ws)", () => {
     client.close();
 
     assert.deepStrictEqual(
-      await wsClosed(client.gqlSocket?.socket as WebSocket),
+      await wsClosed(client.graphqlSocket?.socket as WebSocket),
       [1000, "Normal Closure"]
     );
 
@@ -264,11 +260,11 @@ describe("The example (ws)", () => {
   it("should reconnect on non-error closures", async () => {
     const client = new GraphQLWebSocketClient({
       url: "ws://localhost:4999/graphql",
-      connect(url, protocol) {
-        return new GraphQLClientWebSocket({
-          socket: new WebSocket(url, protocol),
-          connectionAckTimeout: 3000,
-        }).init({ keys: ["MASTER_KEY"] });
+      createWebSocket(url, protocol) {
+        return new WebSocket(url, protocol);
+      },
+      connectionInitPayload: {
+        keys: ["MASTER_KEY"],
       },
     });
 
@@ -307,7 +303,7 @@ describe("The example (ws)", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    client.gqlSocket?.socket.close(1000);
+    client.graphqlSocket?.socket.close(1000);
 
     await new Promise((resolve) => setTimeout(resolve, 800));
 
@@ -335,7 +331,7 @@ describe("The example (ws)", () => {
     await complete;
 
     assert.deepStrictEqual(
-      await wsClosed(client.gqlSocket?.socket as WebSocket),
+      await wsClosed(client.graphqlSocket?.socket as WebSocket),
       [1000, "Normal Closure"]
     );
 

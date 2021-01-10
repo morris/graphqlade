@@ -2,6 +2,7 @@ set -ex
 
 # server
 node examples/server/gql2ts.js
+cp dist/*.umd.* examples/server/public/graphql
 
 # client
 npm install --prefix examples/client

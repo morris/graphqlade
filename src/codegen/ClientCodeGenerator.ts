@@ -32,7 +32,8 @@ import {
 } from "graphql";
 import { ImportCodeGenerator } from "./ImportCodeGenerator";
 import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
-import { getDirective, assertDefined } from "../util";
+import { assertDefined } from "../util/assert";
+import { getDirective } from "../util/directives";
 
 export interface ClientCodeGeneratorOptions {
   schema: GraphQLSchema;

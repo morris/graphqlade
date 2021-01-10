@@ -1,7 +1,6 @@
 import { Stats, promises as fsPromises } from "fs";
 import { join } from "path";
 import { buildSchema, GraphQLError, parse } from "graphql";
-import { compare } from "../util/misc";
 
 const { readdir, readFile, stat } = fsPromises;
 
@@ -41,7 +40,7 @@ export class GraphQLReader {
         .filter((it) => it.isFile())
         .filter((it) => this.isGraphQLFile(it.name))
         .map((it) => join(dirname, it.name))
-        .sort(compare)
+        .sort((a, b) => this.comparePaths(a, b))
         .map((it) => this.readFile(it))
     );
 
@@ -49,7 +48,7 @@ export class GraphQLReader {
       filenames
         .filter((it) => it.isDirectory())
         .map((it) => join(dirname, it.name))
-        .sort(compare)
+        .sort((a, b) => this.comparePaths(a, b))
         .map((it) => this.readDir(it))
     );
 
@@ -99,5 +98,11 @@ export class GraphQLReader {
 
   isGraphQLFile(filename: string) {
     return filename.match(/\.g(raph)?ql$/i);
+  }
+
+  comparePaths(a: string, b: string) {
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
   }
 }

@@ -18,7 +18,7 @@ import {
 } from "graphql";
 import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
 import { ImportCodeGenerator } from "./ImportCodeGenerator";
-import { getDirective } from "../util";
+import { getDirective } from "../util/directives";
 
 export interface ServerCodeGeneratorOptions {
   schema: GraphQLSchema;

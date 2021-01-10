@@ -1,5 +1,5 @@
 import { DocumentNode, ExecutionArgs, parse } from "graphql";
-import { assertType, assertRecord } from "../util";
+import { assertType, assertRecord } from "../util/assert";
 import { cleanOperations } from "../util/cleanOperations";
 
 export interface GraphQLExecutionArgsParserOptions {

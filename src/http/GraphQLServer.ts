@@ -6,14 +6,21 @@ import {
   GraphQLSchema,
   validate,
 } from "graphql";
-import { assertRecord } from "../util";
+import { assertRecord } from "../util/assert";
 import {
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
-} from "./GraphQLExecutionArgsParser";
+} from "../server/GraphQLExecutionArgsParser";
 
 export interface GraphQLServerOptions {
+  /**
+   * Executable GraphQLSchema instance.
+   */
   schema: GraphQLSchema;
+
+  /**
+   * Overrides execution args parser.
+   */
   parser?: GraphQLExecutionArgsParser;
 }
 
@@ -41,16 +48,6 @@ export class GraphQLServer<TContext> {
   constructor(options: GraphQLServerOptions) {
     this.schema = options.schema;
     this.parser = options.parser ?? new GraphQLExecutionArgsParser();
-  }
-
-  // classification
-
-  isNonGraphQLRequest(request: GraphQLServerRequest) {
-    const accept = Array.isArray(request.headers.accept)
-      ? request.headers.accept
-      : [request.headers.accept ?? ""];
-
-    return !!accept.find((it) => it.match(/text\/html/));
   }
 
   // execution

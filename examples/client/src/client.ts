@@ -39,13 +39,10 @@ export class MyClient extends AbstractClient {
     operationName: string,
     variables: TVariables
   ) {
-    return this.socketClient.subscribe<TExecutionResult>(
-      {
-        query,
-        operationName,
-        variables: variables as Record<string, unknown>,
-      },
-      { maxRetries: Infinity }
-    );
+    return this.socketClient.subscribe<TExecutionResult>({
+      query,
+      operationName,
+      variables: variables as Record<string, unknown>,
+    });
   }
 }

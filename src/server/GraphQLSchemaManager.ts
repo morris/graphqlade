@@ -18,7 +18,7 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
-import { assertDefined } from "../util";
+import { assertDefined } from "../util/assert";
 
 export type AnyResolverMap<TContext> =
   | CustomResolverMap<TContext>

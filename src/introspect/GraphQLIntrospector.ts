@@ -5,7 +5,7 @@ import {
   IntrospectionOptions,
   IntrospectionQuery,
 } from "graphql";
-import { assertType, assertRecord } from "../util";
+import { assertType, assertRecord } from "../util/assert";
 
 export interface GraphQLIntrospectorOptions {
   request: IntrospectionRequestFn;

@@ -8,10 +8,10 @@ import type {
   SubscribeMessage,
 } from "./GraphQLWebSocketMessage";
 import type { RawExecutionArgs } from "../server/GraphQLExecutionArgsParser";
-import { isAsyncIterator } from "../util/misc";
+import { isAsyncIterator } from "../util/isAsyncIterator";
 import { DeferredPromise } from "../util/DeferredPromise";
 import { assertType, assertRecord, assertDefined } from "../util/assert";
-import { LoggerLike } from "../util/logging";
+import type { LoggerLike } from "../util/logging";
 
 export interface GraphQLServerWebSocketOptions {
   socket: WebSocket;

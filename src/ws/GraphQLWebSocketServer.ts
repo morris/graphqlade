@@ -51,7 +51,7 @@ export type CreateContextFn<TContext> = (
 export class GraphQLWebSocketServer<TContext> {
   public readonly schema: GraphQLSchema;
   public readonly executionArgsParser: GraphQLExecutionArgsParser;
-  public readonly gqlSockets = new Set<GraphQLServerWebSocket>();
+  public readonly graphqlSockets = new Set<GraphQLServerWebSocket>();
   protected connectionInitWaitTimeout: number;
   protected acknowledge: AcknowledgeFn;
   protected createContext: CreateContextFn<TContext>;
@@ -66,7 +66,7 @@ export class GraphQLWebSocketServer<TContext> {
   }
 
   handleConnection(socket: WebSocket, req: IncomingMessage) {
-    const gqlSocket = new GraphQLServerWebSocket({
+    const graphqlSocket = new GraphQLServerWebSocket({
       socket,
       req,
       subscribe: (args, connectionInitPayload) =>
@@ -75,20 +75,24 @@ export class GraphQLWebSocketServer<TContext> {
       acknowledge: this.acknowledge,
     });
 
-    this.gqlSockets.add(gqlSocket);
+    this.graphqlSockets.add(graphqlSocket);
 
-    gqlSocket.socket.on("close", () => this.gqlSockets.delete(gqlSocket));
-    gqlSocket.socket.on("error", () => this.gqlSockets.delete(gqlSocket));
+    graphqlSocket.socket.on("close", () =>
+      this.graphqlSockets.delete(graphqlSocket)
+    );
+    graphqlSocket.socket.on("error", () =>
+      this.graphqlSockets.delete(graphqlSocket)
+    );
 
-    return gqlSocket;
+    return graphqlSocket;
   }
 
   close(code?: number, reason?: string) {
-    for (const gqlSocket of this.gqlSockets) {
-      gqlSocket.close(code ?? 1000, reason ?? "Normal Closure");
+    for (const graphqlSocket of this.graphqlSockets) {
+      graphqlSocket.close(code ?? 1000, reason ?? "Normal Closure");
     }
 
-    this.gqlSockets.clear();
+    this.graphqlSockets.clear();
   }
 
   async subscribe(

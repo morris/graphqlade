@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import * as path from "path";
 import { createServer, Server } from "http";
 import * as ws from "ws";
 import { resolvers } from "./resolvers";
@@ -11,7 +10,7 @@ import {
   buildExecutableSchema,
   GraphQLServer,
   GraphQLWebSocketServer,
-} from "../../../src"; // graphqlade/server in your app
+} from "../../../src"; // graphqlade/dist/server in your app
 import { AddressInfo } from "net";
 import { Subscription } from "./resolvers/Subscription";
 import { EventEmitter } from "events";
@@ -20,6 +19,9 @@ dotenv.config({ path: __dirname + "/../.env" });
 dotenv.config({ path: __dirname + "/../default.env" });
 
 export async function bootstrap(env: NodeJS.ProcessEnv) {
+  // basic pubsub
+  const pubsub = new EventEmitter();
+
   // build executable schema
   const schema = await buildExecutableSchema<MyContext>({
     root: __dirname + "/..",
@@ -34,19 +36,12 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
   // build graphql server
   const gqlServer = new GraphQLServer<MyContext>({ schema });
 
-  // basic pubsub
-  const pubsub = new EventEmitter();
-
   // backend framework-dependent logic
   async function serveGraphQL(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) {
-    if (gqlServer.isNonGraphQLRequest(req)) {
-      return res.sendFile(path.resolve(`${__dirname}/../public/graphiql.html`));
-    }
-
     try {
       const response = await gqlServer.execute(req, new MyContext({ pubsub }));
 
@@ -81,6 +76,7 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
 
   app.use(cors());
   app.use("/", express.static(`${__dirname}/../../client/public`));
+  app.use("/graphql", express.static(`${__dirname}/../public/graphql`));
   app.get("/graphql", serveGraphQL);
   app.post("/graphql", bodyParser.json(), serveGraphQL);
 

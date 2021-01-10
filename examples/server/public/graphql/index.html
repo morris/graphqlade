@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GraphiQL</title>
+    <link href="https://unpkg.com/graphiql/graphiql.min.css" rel="stylesheet" />
+    <style type="text/css">
+      body {
+        margin: 0;
+      }
+
+      #graphiql {
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="graphiql"></div>
+
+    <script
+      crossorigin
+      src="https://unpkg.com/react/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/graphiql/graphiql.min.js"
+    ></script>
+    <script src="graphqlade.umd.js"></script>
+    <script>
+      window.process = {
+        env: {},
+      };
+    </script>
+    <script type="module" src="graphiql.js"></script>
+  </body>
+</html>

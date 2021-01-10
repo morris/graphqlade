@@ -1,7 +1,7 @@
-import type { ExecutionResult } from "graphql";
 import {
   GraphQLClientWebSocket,
   SubscribePayload,
+  WebSocketLike,
 } from "./GraphQLClientWebSocket";
 import { AsyncPushIterator } from "../util/AsyncPushIterator";
 
@@ -31,11 +31,11 @@ export interface GraphQLWebSocketClientOptions {
   connectionAckTimeout?: number;
 
   /**
-   * Overrides the basic connection function.
-   * For example, when GraphQLWebSocketClient on server-side, you'd need
+   * Overrides web socket creation.
+   * For example, when using GraphQLWebSocketClient on server-side, you'll need
    * to create a WebSocket from "ws" instead of a standard WebSocket.
    */
-  connect?: ConnectFn;
+  createWebSocket?: CreateWebSocketFn;
 
   /**
    * Should the client automatically reconnect on normal socket closure?
@@ -65,25 +65,19 @@ export interface GraphQLWebSocketClientOptions {
   reconnectDelayMultiplier?: number;
 }
 
-export type ConnectFn = (
+export type CreateWebSocketFn = (
   url: string,
-  protocol: string,
-  connectionInitPayload?: Record<string, unknown>
-) => GraphQLClientWebSocket;
-
-export interface SubscriptionRef {
-  payload: SubscribePayload;
-  iterator: AsyncPushIterator<ExecutionResult>;
-}
+  protocol: string
+) => WebSocketLike;
 
 export class GraphQLWebSocketClient {
   public readonly url: string;
   public readonly protocol: string;
-  public gqlSocket?: GraphQLClientWebSocket;
+  public graphqlSocket?: GraphQLClientWebSocket;
+  protected createWebSocket: CreateWebSocketFn;
   protected connectionInitPayload?: Record<string, unknown>;
   protected connectionAckTimeout: number;
   protected connectionAckPayload?: Record<string, unknown>;
-  protected connect: ConnectFn;
   protected autoReconnect: boolean;
   protected minReconnectDelay: number;
   protected maxReconnectDelay: number;
@@ -100,19 +94,19 @@ export class GraphQLWebSocketClient {
     this.connectionInitPayload = options.connectionInitPayload;
     this.connectionAckTimeout = options.connectionAckTimeout ?? 3000;
 
-    this.connect =
-      options.connect ??
-      ((url, protocol, connectionInitPayload?) =>
-        new GraphQLClientWebSocket({
-          socket: new WebSocket(url, protocol),
-          connectionAckTimeout: this.connectionAckTimeout,
-        }).init(connectionInitPayload));
+    this.createWebSocket =
+      options.createWebSocket ??
+      ((url, protocol) => new WebSocket(url, protocol));
 
     this.autoReconnect = options.autoReconnect !== false;
     this.minReconnectDelay = Math.max(options.minReconnectDelay ?? 500, 10);
     this.maxReconnectDelay = options.maxReconnectDelay ?? 30000;
     this.reconnectDelayMultiplier = options.reconnectDelayMultiplier ?? 2;
     this.reconnectDelay = 0;
+  }
+
+  setConnectionInitPayload(connectionInitPayload: Record<string, unknown>) {
+    this.connectionInitPayload = connectionInitPayload;
   }
 
   subscribe<TExecutionResult>(payload: SubscribePayload) {
@@ -151,39 +145,39 @@ export class GraphQLWebSocketClient {
       subscription.finish();
     }
 
-    this.gqlSocket?.close(code ?? 1000, reason ?? "Normal Closure");
+    this.graphqlSocket?.close(code ?? 1000, reason ?? "Normal Closure");
   }
 
   shouldRetry(err: Error & { code?: number }) {
     switch (err.code) {
-      case 1002:
-      case 1011:
-      case 4400:
-      case 4401:
-      case 4409:
-      case 4429:
-        return false;
+      case 1000:
+      case 1005:
+      case 1006:
+      case 1012:
+      case 1013:
+      case 1014:
+      case -1:
+        return true;
     }
 
-    return typeof err.code === "number";
+    return false;
   }
 
   async requireConnection() {
-    await this.maybeDelayReconnect();
+    await this.awaitReconnectDelay();
 
-    if (!this.gqlSocket || !this.gqlSocket.isOpenOrConnecting()) {
-      this.gqlSocket = this.connect(
-        this.url,
-        this.protocol,
-        this.connectionInitPayload
-      );
+    if (!this.graphqlSocket || !this.graphqlSocket.isOpenOrConnecting()) {
+      this.graphqlSocket = new GraphQLClientWebSocket({
+        socket: this.createWebSocket(this.url, this.protocol),
+        connectionAckTimeout: this.connectionAckTimeout,
+      }).init(this.connectionInitPayload);
     }
 
     try {
-      this.connectionAckPayload = await this.gqlSocket.requireAck();
+      this.connectionAckPayload = await this.graphqlSocket.requireAck();
       this.resetReconnectDelay();
 
-      return this.gqlSocket;
+      return this.graphqlSocket;
     } catch (err) {
       this.increaseReconnectDelay();
 
@@ -191,8 +185,8 @@ export class GraphQLWebSocketClient {
     }
   }
 
-  protected async maybeDelayReconnect() {
-    if (this.gqlSocket?.isOpenOrConnecting()) return;
+  protected async awaitReconnectDelay() {
+    if (this.graphqlSocket?.isOpenOrConnecting()) return;
     if (this.reconnectDelay === 0) return;
 
     if (!this.reconnectDelayPromise) {
