@@ -1,6 +1,7 @@
 import { Server } from "http";
 import WebSocket from "ws";
 import { bootstrap } from "../examples/server/src/server";
+import { LoggerLike } from "../src/util/logging";
 
 export function requireExampleServer(env?: NodeJS.ProcessEnv) {
   let server: Server;
@@ -26,13 +27,19 @@ export function wsClosed(socket: WebSocket): Promise<[number, string]> {
   });
 }
 
-export class TestLogger {
+export class TestLogger implements LoggerLike {
   public readonly logs: string[] = [];
   public readonly errors: string[] = [];
 
   log(message: string) {
     // eslint-disable-next-line no-console
     console.log(message);
+    this.logs.push(message);
+  }
+
+  warn(message: string) {
+    // eslint-disable-next-line no-console
+    console.warn(message);
     this.logs.push(message);
   }
 

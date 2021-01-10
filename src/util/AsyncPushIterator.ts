@@ -2,6 +2,14 @@ type AsyncPushIteratorSetup<T> = (
   iterator: AsyncPushIterator<T>
 ) => Promise<(() => unknown) | undefined> | (() => unknown) | undefined;
 
+/**
+ * An AsyncPushIterator is an AsyncIterator that allows pushing
+ * data asynchronously. The constructor accepts a setup function
+ * which is responsible for setting up the pushing logic (e.g. event listeners)
+ * and may return a teardown function which should clean up anything that
+ * was done during setup (e.g. removing event listeners).
+ * The setup function is called once when the iterator is actually iterated.
+ */
 export class AsyncPushIterator<T> implements AsyncIterator<T> {
   protected setup: AsyncPushIteratorSetup<T>;
   protected initialized = false;
@@ -77,6 +85,11 @@ export class AsyncPushIterator<T> implements AsyncIterator<T> {
 
   //
 
+  /**
+   * Push a value to the iterator.
+   *
+   * @param value
+   */
   push(value: T) {
     if (this.finished) return;
 
@@ -84,6 +97,11 @@ export class AsyncPushIterator<T> implements AsyncIterator<T> {
     this.continue();
   }
 
+  /**
+   * Let the iterator finish, i.e. already pushed values will be
+   * iterated, but new values are not accepted. After all pushed values
+   * are iterated, the iterator returns (stops).
+   */
   finish() {
     if (!this.finished) {
       this.finished = true;

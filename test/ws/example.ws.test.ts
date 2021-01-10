@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as assert from "assert";
 import got from "got";
 import { ExecutionResult } from "graphql";
@@ -101,10 +100,7 @@ describe("The example (ws)", () => {
       await client.requireConnection();
       assert.ok(false, "should not have connected");
     } catch (err) {
-      assert.strictEqual(
-        err.message,
-        "Web socket closed: 4401 Unauthorized: It appears to be locked"
-      );
+      assert.strictEqual(err.message, "Unauthorized: It appears to be locked");
     }
   });
 
@@ -150,6 +146,7 @@ describe("The example (ws)", () => {
       },
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const results: ExecutionResult<any, any>[] = [];
 
     const iterator = client.subscribe<ExecutionResult>({
@@ -210,10 +207,10 @@ describe("The example (ws)", () => {
 
     client.close();
 
-    assert.deepStrictEqual(await wsClosed((client as any).socket.socket), [
-      1000,
-      "Normal Closure",
-    ]);
+    assert.deepStrictEqual(
+      await wsClosed(client.gqlSocket?.socket as WebSocket),
+      [1000, "Normal Closure"]
+    );
 
     assert.strictEqual(results.length, 2);
     assert.deepStrictEqual(
@@ -275,15 +272,13 @@ describe("The example (ws)", () => {
       },
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const results: ExecutionResult<any, any>[] = [];
 
-    const iterator = client.subscribe<ExecutionResult>(
-      {
-        query: operations,
-        operationName: "NewReviews",
-      },
-      { maxRetries: 1 }
-    );
+    const iterator = client.subscribe<ExecutionResult>({
+      query: operations,
+      operationName: "NewReviews",
+    });
 
     const complete = (async () => {
       for await (const result of iterator) {
@@ -312,7 +307,7 @@ describe("The example (ws)", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    (client as any).socket.socket.close(1000);
+    client.gqlSocket?.socket.close(1000);
 
     await new Promise((resolve) => setTimeout(resolve, 800));
 
@@ -339,10 +334,10 @@ describe("The example (ws)", () => {
 
     await complete;
 
-    assert.deepStrictEqual(await wsClosed((client as any).socket.socket), [
-      1000,
-      "Normal Closure",
-    ]);
+    assert.deepStrictEqual(
+      await wsClosed(client.gqlSocket?.socket as WebSocket),
+      [1000, "Normal Closure"]
+    );
 
     assert.strictEqual(results.length, 2);
     assert.deepStrictEqual(

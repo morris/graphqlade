@@ -1,4 +1,5 @@
 import * as path from "path";
+import { validate } from "graphql";
 import { ClientCodeGenerator } from "./ClientCodeGenerator";
 import { ServerCodeGenerator } from "./ServerCodeGenerator";
 import { GraphQLReader } from "../read/GraphQLReader";
@@ -6,33 +7,81 @@ import {
   GraphQLIntrospector,
   IntrospectionRequestFn,
 } from "../introspect/GraphQLIntrospector";
-import { watchRecursive, writeTypeScript } from "../util";
-import { validate } from "graphql";
+import { watchRecursive } from "../util/watchRecursive";
+import { writeTypeScript } from "../util/writeTypeScript";
 import { cleanOperations } from "../util/cleanOperations";
+import { LoggerLike } from "../util/logging";
 
 export interface CodeGeneratorOptions {
+  /**
+   * Path to root directory for code generation.
+   * It's recommended to use a root relative to __dirname.
+   * Defaults to the current working dir.
+   */
   root?: string;
+
+  /**
+   * Path to directory of GraphQL schema documents, relative to root.
+   * Defaults to "schema".
+   */
   schema?: string;
+
+  /**
+   * Path to directory of GraphQL operation documents, relative to root.
+   * Defaults to "operations".
+   */
   operations?: string;
+
+  /**
+   * Introspection options (only required for client-code generation)
+   */
   introspection?: IntrospectionOptions;
+
+  /**
+   * Path to directory to place generated code, relative to root.
+   * Defaults to "src/generated".
+   */
   out?: string;
 }
 
 export interface IntrospectionOptions {
+  /**
+   * URL of GraphQL API to fetch introspection from.
+   */
   url: string;
+
+  /**
+   * Request function to use for introspection.
+   * Can also be used to run e.g. authentication beforehand.
+   */
   request: IntrospectionRequestFn;
 }
 
 export interface CodeGeneratorCliOptions {
+  /**
+   * Should server types be generated? Defaults to false.
+   */
   server?: boolean;
-  client?: boolean;
-  watch?: boolean;
-  logger?: CodeGeneratorLogger;
-}
 
-export interface CodeGeneratorLogger {
-  log: (message: string) => void;
-  error: (message: string) => void;
+  /**
+   * Should client types be generated? Defaults to false.
+   */
+  client?: boolean;
+
+  /**
+   * Should the CLI run in watch mode? Defaults to false.
+   */
+  watch?: boolean;
+
+  /**
+   * Set command-line arguments. Defaults to process.argv.
+   */
+  argv?: string[];
+
+  /**
+   * The logger used in the CLI. Defaults to console.
+   */
+  logger?: LoggerLike;
 }
 
 export class CodeGenerator {
@@ -57,7 +106,7 @@ export class CodeGenerator {
       : undefined;
   }
 
-  async cli(options: CodeGeneratorCliOptions & { argv?: string[] }) {
+  async cli(options: CodeGeneratorCliOptions) {
     const argv =
       !options.argv || options.argv === process.argv
         ? process.argv.slice(2)

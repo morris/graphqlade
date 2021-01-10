@@ -11,6 +11,7 @@ import type { RawExecutionArgs } from "../server/GraphQLExecutionArgsParser";
 import { isAsyncIterator } from "../util/misc";
 import { DeferredPromise } from "../util/DeferredPromise";
 import { assertType, assertRecord, assertDefined } from "../util/assert";
+import { LoggerLike } from "../util/logging";
 
 export interface GraphQLServerWebSocketOptions {
   socket: WebSocket;
@@ -18,6 +19,7 @@ export interface GraphQLServerWebSocketOptions {
   subscribe: SubscribeFn;
   connectionInitWaitTimeout: number;
   acknowledge: AcknowledgeFn;
+  logger?: LoggerLike;
 }
 
 export type AcknowledgeFn = (
@@ -50,6 +52,7 @@ export class GraphQLServerWebSocket {
     string,
     Promise<AsyncIterableIterator<ExecutionResult>>
   >();
+  protected logger: LoggerLike;
 
   constructor(options: GraphQLServerWebSocketOptions) {
     this.socket = options.socket;
@@ -57,6 +60,7 @@ export class GraphQLServerWebSocket {
     this.connectionInitWaitTimeout = options.connectionInitWaitTimeout;
     this.acknowledge = options.acknowledge;
     this.subscribe = options.subscribe;
+    this.logger = options.logger ?? console;
 
     // prevent uncaught exceptions
     this.connectionInitPayloadPromise.catch(() => {
@@ -71,10 +75,10 @@ export class GraphQLServerWebSocket {
       case "graphql-transport-ws":
       case "graphql-ws": // legacy
         this.socket.on("close", (code, reason) =>
-          this.handleClose(code, reason)
+          this.handleCloseEvent(code, reason)
         );
-        this.socket.on("error", (error) => this.handleError(error));
-        this.socket.on("message", (data) => this.handleMessage(data));
+        this.socket.on("error", (error) => this.handleErrorEvent(error));
+        this.socket.on("message", (data) => this.handleMessageEvent(data));
 
         this.connectionInitWaitTimeoutId = setTimeout(() => {
           this.close(4408, "Connection initialization timeout");
@@ -91,21 +95,20 @@ export class GraphQLServerWebSocket {
   // event handlers
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleClose(code: number, reason: string) {
+  async handleCloseEvent(code: number, reason: string) {
     if (this.connectionInitWaitTimeoutId) {
       clearTimeout(this.connectionInitWaitTimeoutId);
     }
 
     this.connectionInitPayloadPromise.reject(
-      new Error(`Web socket closed: ${code} ${reason}`)
+      this.makeClosingError(code, reason)
     );
 
     for (const [, subscription] of this.subscriptions) {
       try {
         (await subscription).return?.();
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(
+        this.logger.error(
           `Could not return subscription iterator (on close): ${err.stack}`
         );
       }
@@ -113,7 +116,7 @@ export class GraphQLServerWebSocket {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleError(err: Error) {
+  async handleErrorEvent(err: Error) {
     if (this.connectionInitWaitTimeoutId) {
       clearTimeout(this.connectionInitWaitTimeoutId);
     }
@@ -124,15 +127,14 @@ export class GraphQLServerWebSocket {
       try {
         (await subscription).return?.();
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(
+        this.logger.error(
           `Could not return subscription iterator (on error): ${err.stack}`
         );
       }
     }
   }
 
-  async handleMessage(data: WebSocket.Data) {
+  async handleMessageEvent(data: WebSocket.Data) {
     try {
       const message = JSON.parse(data.toString());
 
@@ -341,14 +343,9 @@ export class GraphQLServerWebSocket {
     } else if (err instanceof TypeError) {
       this.close(4400, `Invalid message: ${err.message}`);
     } else {
-      // eslint-disable-next-line no-console
-      console.error(err.stack);
+      this.logger.error(err.stack ? err.stack : err.message);
       this.close(1011, `Internal server error: ${err.message}`);
     }
-  }
-
-  makeClosingError(code: number, reason: string) {
-    return Object.assign(new Error(reason), { code });
   }
 
   send(message: GraphQLWebSocketServerMessage) {
@@ -363,5 +360,9 @@ export class GraphQLServerWebSocket {
 
   isOpen() {
     return this.socket.readyState === this.socket.OPEN;
+  }
+
+  makeClosingError(code: number, reason: string) {
+    return Object.assign(new Error(reason), { code });
   }
 }

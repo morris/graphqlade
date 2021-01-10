@@ -9,12 +9,46 @@ import {
 } from "./GraphQLSchemaManager";
 
 export interface BuildExecutableSchemaOptions<TContext> {
+  /**
+   * Path to root directory for code generation.
+   * It's recommended to use a root relative to __dirname.
+   * Defaults to the current working dir.
+   */
   root?: string;
+
+  /**
+   * Path to directory of GraphQL schema documents, relative to root,
+   * OR a GraphQLSchema instance.
+   * Defaults to "schema".
+   */
   schema?: string | GraphQLSchema;
+
+  /**
+   * Map of resolvers.
+   */
   resolvers: AnyResolverMap<TContext>;
+
+  /**
+   * Subscription resolver.
+   */
   subscriptionResolver?: SubscriptionResolver<TContext>;
+
+  /**
+   * Default field resolver.
+   */
   defaultFieldResolver?: GraphQLFieldResolver<unknown, TContext>;
+
+  /**
+   * Error handler to be applied for each resolver.
+   * Useful for logging and monitoring.
+   * May return a new Error instance to throw.
+   * Cannot "prevent" an error.
+   */
   resolverErrorHandler?: ResolverErrorHandler<TContext>;
+
+  /**
+   * GraphQLReader instance.
+   */
   reader?: GraphQLReader;
 }
 

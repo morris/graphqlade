@@ -3,8 +3,11 @@
 ## vNEXT
 
 - Allow creating a context per web socket subscription (breaking change)
+- Refactor auto-reconnect API in client web sockets (breaking change)
+- Improve auto-reconnection in client web sockets
 - Fix UMD build
 - Improved types for resolver maps
+- Add some doc-block comments
 
 ## v0.1.2
 
@@ -13,7 +16,7 @@
 
 ## v0.1.1
 
-- Turned optional dependencies into peer dependencies
+- Turn optional dependencies into peer dependencies
 
 ## v0.1.0
 

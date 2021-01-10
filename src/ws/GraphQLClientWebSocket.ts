@@ -86,13 +86,13 @@ export class GraphQLClientWebSocket {
 
   // event handlers
 
-  async handleClose(event: CloseEvent) {
+  async handleCloseEvent(event: CloseEvent) {
     if (this.connectionAckWaitTimeoutId) {
       clearTimeout(this.connectionAckWaitTimeoutId);
     }
 
     this.connectionAckPayloadPromise.reject(
-      new Error(`Web socket closed: ${event.code} ${event.reason}`)
+      this.makeClosingError(event.code, event.reason)
     );
 
     for (const [, subscription] of this.subscriptions) {
@@ -101,19 +101,21 @@ export class GraphQLClientWebSocket {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleError(event: Event) {
+  async handleErrorEvent(event: Event) {
     if (this.connectionAckWaitTimeoutId) {
       clearTimeout(this.connectionAckWaitTimeoutId);
     }
 
-    this.connectionAckPayloadPromise.reject(new Error("Web socket error"));
+    this.connectionAckPayloadPromise.reject(
+      this.makeClosingError(-1, "Web socket error")
+    );
 
     for (const [, subscription] of this.subscriptions) {
-      subscription.throw(new Error("Web socket error"));
+      subscription.throw(this.makeClosingError(-1, "Web socket error"));
     }
   }
 
-  async handleMessage(event: MessageEvent) {
+  async handleMessageEvent(event: MessageEvent) {
     try {
       const message = JSON.parse(event.data.toString());
 
@@ -244,9 +246,9 @@ export class GraphQLClientWebSocket {
   // low-level
 
   protected setup() {
-    this.socket.addEventListener("close", (e) => this.handleClose(e));
-    this.socket.addEventListener("error", (e) => this.handleError(e));
-    this.socket.addEventListener("message", (e) => this.handleMessage(e));
+    this.socket.addEventListener("close", (e) => this.handleCloseEvent(e));
+    this.socket.addEventListener("error", (e) => this.handleErrorEvent(e));
+    this.socket.addEventListener("message", (e) => this.handleMessageEvent(e));
   }
 
   closeByError(err: Error & { code?: number }) {
@@ -255,7 +257,8 @@ export class GraphQLClientWebSocket {
     } else if (err instanceof TypeError) {
       this.close(4400, `Invalid message: ${err.message}`);
     } else {
-      this.close(1011, `Internal server error: ${err.message}`);
+      // TODO 4500 is non-standard, need alignment here
+      this.close(4500, `Client error: ${err.message}`);
     }
   }
 

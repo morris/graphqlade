@@ -1,13 +1,16 @@
 import { Stats, Dirent, promises as fsPromises } from "fs";
 import { join } from "path";
 import { canImportModule } from "./canImportModule";
+import { LoggerLike } from "./logging";
 
 const { readdir, stat } = fsPromises;
 
 export async function watchRecursive(
   dirname: string,
-  callback: (path: string) => unknown
+  callback: (path: string) => unknown,
+  logger?: LoggerLike
 ) {
+  const _logger = logger ?? console;
   const { watchDirectory, watchFile } = await importWatchFunctions();
 
   watchDirectory(
@@ -17,8 +20,7 @@ export async function watchRecursive(
         const stats = await stat(path);
         await watchFileOrDirectory(path, stats, callback);
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn(err.stack);
+        _logger.warn(err.stack);
       }
 
       callback(path);

@@ -12,11 +12,36 @@ import {
 } from "./GraphQLServerWebSocket";
 
 export interface GraphQLWebSocketServerOptions<TContext> {
+  /**
+   * Executable GraphQLSchema instance.
+   */
   schema: GraphQLSchema;
-  executionArgsParser?: GraphQLExecutionArgsParser;
+
+  /**
+   * Timeout until receiving initialization message, in milliseconds.
+   * Defaults to 3000.
+   */
   connectionInitWaitTimeout?: number;
+
+  /**
+   * Acknowledgement function.
+   * Called once per connection with the initialization message payload.
+   * May throw an error to cause socket closure (4401 Unauthorized).
+   */
   acknowledge?: AcknowledgeFn;
+
+  /**
+   * Context factory function.
+   * Called once per subscription with the original initialization payload.
+   * The returned context is used for execution during the lifetime
+   * of the subscription.
+   */
   createContext: CreateContextFn<TContext>;
+
+  /**
+   * Overrides execution args parser.
+   */
+  executionArgsParser?: GraphQLExecutionArgsParser;
 }
 
 export type CreateContextFn<TContext> = (
@@ -26,6 +51,7 @@ export type CreateContextFn<TContext> = (
 export class GraphQLWebSocketServer<TContext> {
   public readonly schema: GraphQLSchema;
   public readonly executionArgsParser: GraphQLExecutionArgsParser;
+  public readonly gqlSockets = new Set<GraphQLServerWebSocket>();
   protected connectionInitWaitTimeout: number;
   protected acknowledge: AcknowledgeFn;
   protected createContext: CreateContextFn<TContext>;
@@ -40,7 +66,7 @@ export class GraphQLWebSocketServer<TContext> {
   }
 
   handleConnection(socket: WebSocket, req: IncomingMessage) {
-    return new GraphQLServerWebSocket({
+    const gqlSocket = new GraphQLServerWebSocket({
       socket,
       req,
       subscribe: (args, connectionInitPayload) =>
@@ -48,6 +74,21 @@ export class GraphQLWebSocketServer<TContext> {
       connectionInitWaitTimeout: this.connectionInitWaitTimeout,
       acknowledge: this.acknowledge,
     });
+
+    this.gqlSockets.add(gqlSocket);
+
+    gqlSocket.socket.on("close", () => this.gqlSockets.delete(gqlSocket));
+    gqlSocket.socket.on("error", () => this.gqlSockets.delete(gqlSocket));
+
+    return gqlSocket;
+  }
+
+  close(code?: number, reason?: string) {
+    for (const gqlSocket of this.gqlSockets) {
+      gqlSocket.close(code ?? 1000, reason ?? "Normal Closure");
+    }
+
+    this.gqlSockets.clear();
   }
 
   async subscribe(
