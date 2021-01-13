@@ -1,6 +1,6 @@
 # Changelog
 
-## vNEXT
+## v0.2.0
 
 - Refactor web socket package
   - Allow creating a context per web socket subscription (breaking change)
