@@ -9,6 +9,7 @@
   - Operation name to data type (interface)
   - Operation name types
 - Rename `certain` helper to `typeRef` (breaking change)
+- Ignore non-GraphQL files in watch mode
 
 ## v0.2.0
 

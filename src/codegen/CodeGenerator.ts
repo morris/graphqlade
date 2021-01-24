@@ -158,7 +158,12 @@ export class CodeGenerator {
         try {
           if (!this.reader.isGraphQLFile(filename)) return;
 
-          logger.log(`Change detected (${filename}), regenerating...`);
+          logger.log(
+            `Change detected (${path.relative(
+              schema,
+              filename
+            )}), regenerating...`
+          );
           await this.write(options);
           logger.log("Done. Watching for changes...");
         } catch (err) {
@@ -168,11 +173,21 @@ export class CodeGenerator {
     };
 
     if (options.server || (options.client && !this.introspection)) {
-      await watchRecursive(schema, callback);
+      await watchRecursive({
+        dirname: schema,
+        callback,
+        match: (path, stats) =>
+          stats.isDirectory() || this.reader.isGraphQLFile(path),
+      });
     }
 
     if (options.client) {
-      await watchRecursive(operations, callback);
+      await watchRecursive({
+        dirname: operations,
+        callback,
+        match: (path, stats) =>
+          stats.isDirectory() || this.reader.isGraphQLFile(path),
+      });
     }
   }
 

@@ -1,46 +1,72 @@
 import { Stats, Dirent, promises as fsPromises } from "fs";
 import { join } from "path";
+import type { FileWatcher } from "typescript";
 import { canImportModule } from "./canImportModule";
 import { LoggerLike } from "./logging";
 
 const { readdir, stat } = fsPromises;
 
-export async function watchRecursive(
-  dirname: string,
-  callback: (path: string) => unknown,
-  logger?: LoggerLike
-) {
-  const _logger = logger ?? console;
+// TODO the watchers set actually leaks memory (non-critical for now)
+
+export interface WatchRecursiveOptions {
+  dirname: string;
+  callback: (path: string) => unknown;
+  match?: (path: string, stats: Stats | Dirent) => boolean;
+  logger?: LoggerLike;
+  watchers?: Set<FileWatcher>;
+}
+
+export async function watchRecursive(options: WatchRecursiveOptions) {
+  const {
+    dirname,
+    callback,
+    match,
+    logger = console,
+    watchers = new Set(),
+  } = options;
+
   const { watchDirectory, watchFile } = await importWatchFunctions();
 
-  watchDirectory(
-    dirname,
-    async (path) => {
-      try {
-        const stats = await stat(path);
-        await watchFileOrDirectory(path, stats, callback);
-      } catch (err) {
-        _logger.warn(err.stack);
-      }
+  watchers.add(
+    watchDirectory(
+      dirname,
+      async (path) => {
+        try {
+          const stats = await stat(path);
+          await watchFileOrDirectory(path, stats);
+        } catch (err) {
+          logger.warn(err.message);
+        }
 
-      callback(path);
-    },
-    false
+        callback(path);
+      },
+      false
+    )
   );
 
   for (const entry of await readdir(dirname, { withFileTypes: true })) {
-    await watchFileOrDirectory(join(dirname, entry.name), entry, callback);
+    await watchFileOrDirectory(join(dirname, entry.name), entry);
   }
 
-  async function watchFileOrDirectory(
-    path: string,
-    stats: Stats | Dirent,
-    callback: (path: string) => unknown
-  ) {
+  return () => {
+    for (const watcher of watchers) {
+      watcher.close();
+    }
+  };
+
+  async function watchFileOrDirectory(path: string, stats: Stats | Dirent) {
+    if (match && !match(path, stats)) return;
+
     if (stats.isFile()) {
-      watchFile(path, () => callback(path));
+      watchers.add(watchFile(path, () => callback(path)));
     } else if (stats.isDirectory()) {
-      await watchRecursive(path, callback);
+      await watchRecursive({
+        dirname: path,
+        callback,
+        match,
+        logger,
+        watchers,
+      });
     }
   }
 }

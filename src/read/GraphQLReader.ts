@@ -97,7 +97,7 @@ export class GraphQLReader {
   }
 
   isGraphQLFile(filename: string) {
-    return filename.match(/\.g(raph)?ql$/i);
+    return !!filename.match(/\.g(raph)?ql$/i);
   }
 
   comparePaths(a: string, b: string) {
