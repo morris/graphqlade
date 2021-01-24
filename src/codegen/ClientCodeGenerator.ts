@@ -115,6 +115,13 @@ export class ClientCodeGenerator {
       this.generateOperationTypes(),
       this.generateFragmentTypes(),
       this.generateInputTypes(),
+      this.generateOperationNameToDocument(),
+      this.generateOperationNameToVariables(),
+      this.generateOperationNameToData(),
+      this.generateOperationNames(),
+      this.generateQueryNames(),
+      this.generateMutationNames(),
+      this.generateSubscriptionNames(),
     ]);
   }
 
@@ -138,7 +145,7 @@ export class ClientCodeGenerator {
   generateHelpers() {
     return this.join([
       this.commonCodeGenerator.generateHelpers(),
-      `export function certain<T>(value: T | null | undefined): T {
+      `export function typeRef<T>(value: T | null | undefined = null): T {
         return value as T;
       }`,
     ]);
@@ -257,6 +264,109 @@ export class ClientCodeGenerator {
     return `V${node.name.value}`;
   }
 
+  // operation tables
+
+  generateOperationNames() {
+    return `export type OperationName =
+      QueryName | MutationName | SubscriptionName`;
+  }
+
+  generateQueryNames() {
+    const parts: string[] = [];
+
+    visit(this.operations, {
+      OperationDefinition: (node) => {
+        this.assertNamedOperationDefinition(node);
+
+        if (node.operation === "query") {
+          parts.push(JSON.stringify(node.name.value));
+        }
+      },
+    });
+
+    return `export type QueryName = ${this.join(parts, " | ")}`;
+  }
+
+  generateMutationNames() {
+    const parts: string[] = [];
+
+    visit(this.operations, {
+      OperationDefinition: (node) => {
+        this.assertNamedOperationDefinition(node);
+
+        if (node.operation === "mutation") {
+          parts.push(JSON.stringify(node.name.value));
+        }
+      },
+    });
+
+    return `export type MutationName = ${this.join(parts, " | ")}`;
+  }
+
+  generateSubscriptionNames() {
+    const parts: string[] = [];
+
+    visit(this.operations, {
+      OperationDefinition: (node) => {
+        this.assertNamedOperationDefinition(node);
+
+        if (node.operation === "subscription") {
+          parts.push(JSON.stringify(node.name.value));
+        }
+      },
+    });
+
+    return `export type SubscriptionName = ${this.join(parts, " | ")}`;
+  }
+
+  generateOperationNameToDocument() {
+    const parts: string[] = [];
+
+    visit(this.operations, {
+      OperationDefinition: (node) => {
+        this.assertNamedOperationDefinition(node);
+
+        parts.push(`${node.name.value}: ${node.name.value}Document,`);
+      },
+    });
+
+    return `export const OperationNameToDocument = {
+      ${this.join(parts, "\n")}
+    }`;
+  }
+
+  generateOperationNameToVariables() {
+    const parts: string[] = [];
+
+    visit(this.operations, {
+      OperationDefinition: (node) => {
+        this.assertNamedOperationDefinition(node);
+
+        parts.push(`${node.name.value}: ${this.generateVariablesRef(node)};`);
+      },
+    });
+
+    return `export interface OperationNameToVariables {
+      ${this.join(parts, "\n")}
+    }`;
+  }
+
+  generateOperationNameToData() {
+    const parts: string[] = [];
+
+    visit(this.operations, {
+      OperationDefinition: (node) => {
+        this.assertNamedOperationDefinition(node);
+
+        parts.push(`${node.name.value}: D${node.name.value};`);
+      },
+    });
+
+    return `export interface OperationNameToData {
+      ${this.join(parts, "\n")}
+    }`;
+  }
+
   // operation types
 
   generateOperationTypes() {
@@ -275,8 +385,6 @@ export class ClientCodeGenerator {
 
     return this.join(parts);
   }
-
-  // operation document
 
   generateOperationDocument(node: NamedOperationDefinitionNode) {
     return `export const ${node.name.value}Document =

@@ -1,5 +1,15 @@
 # Changelog
 
+## vNEXT
+
+- Add generation of client operation tables
+  - Operation name to document (const)
+  - Operation name to variables type (interface)
+  - Operation name to data type (interface)
+  - Operation name to data type (interface)
+  - Operation name types
+- Rename `certain` helper to `typeRef` (breaking change)
+
 ## v0.2.0
 
 - Refactor web socket package

@@ -4,7 +4,7 @@ import {
   DLocations,
   DReviews,
   Maybe,
-  certain,
+  typeRef,
 } from "./generated/operations";
 
 export interface AppState {
@@ -69,9 +69,9 @@ export function App(el: Element) {
   // we'd like to have the types of nested data objects of operations
   // typescript does not allow "typeof" with optional chaining
   // therefore we create some variables with the "certain" helper
-  const Boss = certain(state.bossData?.bosses?.[0]);
-  const Location = certain(state.locationData?.locations?.[0]);
-  const Review = certain(state.reviewData?.reviews?.[0]);
+  const Boss = typeRef(state.bossData?.bosses?.[0]);
+  const Location = typeRef(state.locationData?.locations?.[0]);
+  const Review = typeRef(state.reviewData?.reviews?.[0]);
 
   function renderBoss(data: typeof Boss) {
     return `<p>${data.name} (${data.location.name})</p>`;

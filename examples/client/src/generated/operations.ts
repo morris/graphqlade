@@ -4,7 +4,7 @@ import { ExecutionResult } from "graphql";
 
 export type Maybe<T> = T | null | undefined;
 
-export function certain<T>(value: T | null | undefined): T {
+export function typeRef<T>(value: T | null | undefined = null): T {
   return value as T;
 }
 
@@ -500,3 +500,49 @@ export enum T__DirectiveLocation {
    */
   INPUT_FIELD_DEFINITION = "INPUT_FIELD_DEFINITION",
 }
+
+export const OperationNameToDocument = {
+  Bosses: BossesDocument,
+  CompareBossDifficulty: CompareBossDifficultyDocument,
+  CreateBossReview: CreateBossReviewDocument,
+  CreateLocationReview: CreateLocationReviewDocument,
+  Locations: LocationsDocument,
+  Reviews: ReviewsDocument,
+  NewReviews: NewReviewsDocument,
+  Search: SearchDocument,
+};
+
+export interface OperationNameToVariables {
+  Bosses: undefined;
+  CompareBossDifficulty: VCompareBossDifficulty;
+  CreateBossReview: VCreateBossReview;
+  CreateLocationReview: VCreateLocationReview;
+  Locations: undefined;
+  Reviews: undefined;
+  NewReviews: VNewReviews;
+  Search: VSearch;
+}
+
+export interface OperationNameToData {
+  Bosses: DBosses;
+  CompareBossDifficulty: DCompareBossDifficulty;
+  CreateBossReview: DCreateBossReview;
+  CreateLocationReview: DCreateLocationReview;
+  Locations: DLocations;
+  Reviews: DReviews;
+  NewReviews: DNewReviews;
+  Search: DSearch;
+}
+
+export type OperationName = QueryName | MutationName | SubscriptionName;
+
+export type QueryName =
+  | "Bosses"
+  | "CompareBossDifficulty"
+  | "Locations"
+  | "Reviews"
+  | "Search";
+
+export type MutationName = "CreateBossReview" | "CreateLocationReview";
+
+export type SubscriptionName = "NewReviews";
