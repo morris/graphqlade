@@ -145,8 +145,8 @@ export class ClientCodeGenerator {
   generateHelpers() {
     return this.join([
       this.commonCodeGenerator.generateHelpers(),
-      `export function typeRef<T>(value: T | null | undefined = null): T {
-        return value as T;
+      `export function typeRef<T>(value?: T | null): T {
+        return {} as T;
       }`,
     ]);
   }

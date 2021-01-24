@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.2
+
+- Make `typeRef<T>` always return an object for chaining
+
+## v0.3.1
+
+- Fix generation of operation names if some type of operation is unused
+
 ## v0.3.0
 
 - Add generation of client operation tables
