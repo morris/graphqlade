@@ -284,6 +284,8 @@ export class ClientCodeGenerator {
       },
     });
 
+    if (parts.length === 0) parts.push("never");
+
     return `export type QueryName = ${this.join(parts, " | ")}`;
   }
 
@@ -300,6 +302,8 @@ export class ClientCodeGenerator {
       },
     });
 
+    if (parts.length === 0) parts.push("never");
+
     return `export type MutationName = ${this.join(parts, " | ")}`;
   }
 
@@ -315,6 +319,8 @@ export class ClientCodeGenerator {
         }
       },
     });
+
+    if (parts.length === 0) parts.push("never");
 
     return `export type SubscriptionName = ${this.join(parts, " | ")}`;
   }
