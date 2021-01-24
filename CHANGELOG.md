@@ -1,6 +1,6 @@
 # Changelog
 
-## vNEXT
+## v0.3.0
 
 - Add generation of client operation tables
   - Operation name to document (const)
