@@ -1,5 +1,5 @@
 import { DocumentNode, ExecutionArgs, parse } from "graphql";
-import { assertType, assertRecord } from "../util/assert";
+import { assert, assertRecord } from "../util/assert";
 import { cleanOperations } from "../util/cleanOperations";
 
 export interface GraphQLExecutionArgsParserOptions {
@@ -43,7 +43,7 @@ export class GraphQLExecutionArgsParser {
   }
 
   parseQuery(query: unknown): DocumentNode {
-    assertType(typeof query === "string", "Invalid query, expected string");
+    assert(typeof query === "string", "Invalid query, expected string");
 
     const cached = this.cache.get(query);
 
@@ -80,7 +80,7 @@ export class GraphQLExecutionArgsParser {
       return undefined;
     }
 
-    assertType(
+    assert(
       typeof operationName === "string",
       "Invalid operationName, expected string"
     );
@@ -113,5 +113,9 @@ export class GraphQLExecutionArgsParser {
     assertRecord(parsed, "Invalid variables, expected object");
 
     return parsed;
+  }
+
+  getCache() {
+    return this.cache;
   }
 }

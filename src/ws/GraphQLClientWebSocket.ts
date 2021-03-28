@@ -7,7 +7,7 @@ import type {
   SubscribeMessage,
 } from "./GraphQLWebSocketMessage";
 import { DeferredPromise } from "../util/DeferredPromise";
-import { assertType, assertRecord } from "../util/assert";
+import { assert, assertRecord } from "../util/assert";
 import { AsyncPushIterator } from "../util/AsyncPushIterator";
 
 export interface GraphQLClientWebSocketOptions {
@@ -191,7 +191,7 @@ export class GraphQLClientWebSocket {
   }
 
   parseNextMessage(message: Record<string, unknown>): NextMessage {
-    assertType(typeof message.id === "string");
+    assert(typeof message.id === "string");
     assertRecord(message.payload);
 
     return {
@@ -202,11 +202,11 @@ export class GraphQLClientWebSocket {
   }
 
   parseErrorMessage(message: Record<string, unknown>): ErrorMessage {
-    assertType(typeof message.id === "string");
-    assertType(Array.isArray(message.payload));
+    assert(typeof message.id === "string");
+    assert(Array.isArray(message.payload));
 
     for (const error of message.payload) {
-      assertType(typeof error.message === "string");
+      assert(typeof error.message === "string");
     }
 
     return {
@@ -217,7 +217,7 @@ export class GraphQLClientWebSocket {
   }
 
   parseCompleteMessage(message: Record<string, unknown>): CompleteMessage {
-    assertType(typeof message.id === "string");
+    assert(typeof message.id === "string");
 
     return {
       type: "complete",

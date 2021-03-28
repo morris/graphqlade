@@ -76,7 +76,7 @@ combination of dependencies.
   - Supports [subscription-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)
     (e.g. [Apollo Client](https://www.apollographql.com/docs/react/))
 
-**[Learn more about GraphQLade's server-side workflow →](./docs/server-side.md)**
+**[Learn more about GraphQLade's server-side workflow →](./wiki/Server-Side-Usage)**
 
 ### Client-Side
 
@@ -95,7 +95,7 @@ combination of dependencies.
   - Contains a reconnecting GraphQL web socket client.
   - Subscriptions implement `AsyncIterableIterator` correctly.
 
-**[Learn more about GraphQLade's client-side workflow →](./docs/client-side.md)**
+**[Learn more about GraphQLade's client-side workflow →](./wiki/Client-Side-Usage)**
 
 ### General
 

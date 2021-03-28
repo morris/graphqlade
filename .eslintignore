@@ -2,4 +2,5 @@
 /coverage
 /dist
 /examples/client/public
+/examples/server/public/graphql/*.umd.*
 node_modules

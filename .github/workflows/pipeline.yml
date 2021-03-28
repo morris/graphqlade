@@ -17,12 +17,13 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: npm install
       - run: npm run lint
+      - run: npm run format-check
       - run: npm run build
       - run: npm run build-examples
       - run: npm test
         env:
           CI: true
       - run: npm run maybe-publish
-        if: ${{ matrix.node-version == '14.x' }}
+        if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == '14.x' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

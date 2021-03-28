@@ -4,8 +4,8 @@ import { ExecutionResult } from "graphql";
 
 export type Maybe<T> = T | null | undefined;
 
-export function typeRef<T>(value: T | null | undefined = null): T {
-  return value as T;
+export function typeRef<T>(value?: T | null): T {
+  return {} as T;
 }
 
 export abstract class AbstractClient<

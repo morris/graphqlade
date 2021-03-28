@@ -1,5 +1,11 @@
 # Changelog
 
+## NEXT
+
+- Move documentation to GitHub wikis
+- Add tests
+- Chores and clean-ups
+
 ## v0.3.2
 
 - Make `typeRef<T>` always return an object for chaining

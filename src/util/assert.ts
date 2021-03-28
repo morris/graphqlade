@@ -4,22 +4,22 @@ export function assertRecord(
 ): asserts value is Record<string, unknown> {
   const m = message ?? "Expected record";
 
-  assertType(value !== null, m);
-  assertType(typeof value === "object", m);
-  assertType(!Array.isArray(value), m);
+  assert(value !== null, m);
+  assert(typeof value === "object", m);
+  assert(!Array.isArray(value), m);
 }
 
 export function assertDefined<T>(
   input: T | null | undefined,
   message?: string
 ): asserts input is T {
-  assertType(
+  assert(
     input !== null && typeof input !== "undefined",
     message ?? "Unexpected null/undefined value"
   );
 }
 
-export function assertType(
+export function assert(
   condition: boolean,
   message?: string
 ): asserts condition {

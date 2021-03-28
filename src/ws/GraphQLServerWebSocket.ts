@@ -10,7 +10,7 @@ import type {
 import type { RawExecutionArgs } from "../server/GraphQLExecutionArgsParser";
 import { isAsyncIterator } from "../util/isAsyncIterator";
 import { DeferredPromise } from "../util/DeferredPromise";
-import { assertType, assertRecord, assertDefined } from "../util/assert";
+import { assert, assertRecord, assertDefined } from "../util/assert";
 import type { LoggerLike } from "../util/logging";
 
 export interface GraphQLServerWebSocketOptions {
@@ -274,18 +274,18 @@ export class GraphQLServerWebSocket {
   }
 
   parseSubscribeMessage(message: Record<string, unknown>): SubscribeMessage {
-    assertType(typeof message.id === "string");
+    assert(typeof message.id === "string");
     assertRecord(message.payload);
 
     const payload = message.payload;
 
-    assertType(typeof payload.query === "string");
+    assert(typeof payload.query === "string");
 
     if (
       typeof payload.operationName !== "undefined" &&
       payload.operationName !== null
     ) {
-      assertType(typeof payload.operationName === "string");
+      assert(typeof payload.operationName === "string");
     }
 
     if (
@@ -307,7 +307,7 @@ export class GraphQLServerWebSocket {
   }
 
   parseCompleteMessage(message: Record<string, unknown>): CompleteMessage {
-    assertType(typeof message.id === "string");
+    assert(typeof message.id === "string");
 
     return {
       type: "complete",
