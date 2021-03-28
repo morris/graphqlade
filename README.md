@@ -1,8 +1,10 @@
-# GraphQLade
+<img src="./logo.png" alt="GraphQLade" width="400">
 
-![NPM version](https://img.shields.io/npm/v/graphqlade?style=flat-square)
-![Build status](https://img.shields.io/github/workflow/status/morris/graphqlade/Pipeline?style=flat-square)
-![Coverage](https://img.shields.io/codecov/c/github/morris/graphqlade?style=flat-square&token=5GBOZPEJW0)
+---
+
+[![NPM version](https://img.shields.io/npm/v/graphqlade?style=flat-square)](https://www.npmjs.com/package/graphqlade)
+[![Build status](https://img.shields.io/github/workflow/status/morris/graphqlade/Pipeline?style=flat-square)](https://github.com/morris/graphqlade/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/morris/graphqlade?style=flat-square&token=5GBOZPEJW0)](https://app.codecov.io/gh/morris/graphqlade)
 
 GraphQLade is a lightweight but **complete** library for
 **GraphQL + TypeScript** development on both server- and client-side.
