@@ -1,4 +1,4 @@
-<img src="./logo.png" alt="GraphQLade" width="400">
+<img src="https://raw.githubusercontent.com/morris/graphqlade/main/img/logo.png" alt="GraphQLade" width="672">
 
 [![NPM version](https://img.shields.io/npm/v/graphqlade?style=flat-square)](https://www.npmjs.com/package/graphqlade)
 [![Build status](https://img.shields.io/github/workflow/status/morris/graphqlade/Pipeline?style=flat-square)](https://github.com/morris/graphqlade/actions)
