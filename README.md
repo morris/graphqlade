@@ -2,6 +2,7 @@
 
 ![NPM version](https://img.shields.io/npm/v/graphqlade?style=flat-square)
 ![Build status](https://img.shields.io/github/workflow/status/morris/graphqlade/Pipeline?style=flat-square)
+![Coverage](https://img.shields.io/codecov/c/github/morris/graphqlade?style=flat-square&token=5GBOZPEJW0)
 
 GraphQLade is a lightweight but **complete** library for
 **GraphQL + TypeScript** development on both server- and client-side.
@@ -26,7 +27,6 @@ combination of dependencies.
 
 ## Status
 
-- 90% test coverage
 - Most features are fully tested through a complete example server and client.
 - Minor API changes may occur in the future.
 - Internals may change a bit in the future.
