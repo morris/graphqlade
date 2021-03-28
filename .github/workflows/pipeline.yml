@@ -23,6 +23,7 @@ jobs:
       - run: npm test
         env:
           CI: true
+      - run: npx codecov
       - run: npm run maybe-publish
         if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == '14.x' }}
         env:

@@ -43,21 +43,6 @@
     "pipeline": "bash scripts/pipeline.sh",
     "test": "nyc mocha test"
   },
-  "nyc": {
-    "extension": [
-      ".ts"
-    ],
-    "include": [
-      "src"
-    ],
-    "exclude": [
-      "**/*.d.ts"
-    ],
-    "reporter": [
-      "html"
-    ],
-    "cache": true
-  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged && npm run build && npm run test"
