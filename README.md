@@ -11,7 +11,7 @@ interface/type generation from GraphQL schemata and GraphQL client operations.
 
 With a rich feature set and zero dependencies besides
 [GraphQL.js](https://github.com/graphql/graphql-js), it provides a highly
-integrated foundation for GraphQL servers and clients at currently under
+integrated foundation for GraphQL servers and clients at around
 4000 lines of readable, tested code&mdash;all in **one place**.
 
 ## Why?
@@ -26,14 +26,14 @@ Issues are spread across many packages and maintainers, making it hard to reason
 about fitness of a particular combination of dependencies and stalling
 improvements to the ecosystem.
 
-## Design Principles
+## Design principles
 
-### GraphQL First
+### GraphQL first
 
 GraphQL schemata and operations are defined through spec-compliant,
 **plain GraphQL files**.
 
-### Type-safety through Code Generation
+### Type-safety through code generation
 
 GraphQLade generates a complete set of **TypeScript types and interfaces** from
 GraphQL sources, both for schemata and operations, including type tables mapping
@@ -41,14 +41,14 @@ operation names to their variable and result interfaces.
 
 ### Enhance and integrate with GraphQL.js
 
-GraphQlade provides a library of **type-safe runtime helpers** for building HTTP
-and WebSocket servers, resolvers, and clients. They tightly integrate with
+GraphQLade provides a library of **type-safe runtime helpers** for building HTTP
+and WebSocket servers, resolvers and clients. They transparently integrate with
 [GraphQL.js](https://github.com/graphql/graphql-js), introducing very few
 additional concepts and staying close to the "language" used by GraphQL.js.
 
 ## Features
 
-### Server-Side
+### Server-side
 
 - Server-side code generation from GraphQL schemata
   - Generates types for
@@ -78,7 +78,7 @@ additional concepts and staying close to the "language" used by GraphQL.js.
 
 **[Learn more about GraphQLade's server-side workflow →](https://github.com/morris/graphqlade/wiki/Server-Side-Usage)**
 
-### Client-Side
+### Client-side
 
 - Client-side code generation from GraphQL operations and remote schemata.
   - Generates interfaces for variables and results of named operations.
@@ -112,16 +112,16 @@ additional concepts and staying close to the "language" used by GraphQL.js.
 - Class-based implementation with granular methods
   - Customization is easily possible through inheritance and method overrides.
 
-## Missing Features
+## Missing features
 
-- Automatic persisted queries are more or less planned. There's no
-  clear/emerging standard but it seems viable to add APQs in an opt-in
-  fashion and make the protocol compatible with the Apollo stack.
+- Federation compatible with the
+  [Apollo Federation specification](https://www.apollographql.com/docs/federation/federation-spec/)
+  is planned, including a gateway implementation.
+- Automatic persisted queries are planned. There's no clear/emerging standard
+  but it seems viable to add APQs in an opt-in fashion and make the protocol
+  compatible with the Apollo stack.
 - Caching was ignored so far. Apollo's `@cacheControl` style is viable but the
-  benefit seems questionable. Will revisit soon.
-- Remote schemata, stitching, merging, federation etc. look like they should be
-  solved at build time and/or resolver level (plus directives) for now.
-  Will revisit if there's high demand.
+  benefit seems questionable.
 - Writing operations inline (with e.g. template strings tagged `gql`) are not
   planned. The current approach of separate and named operations in pure
   GraphQL, combined with interface/client generation, requires the least tooling
