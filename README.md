@@ -17,7 +17,7 @@ integrated foundation for GraphQL servers and clients at around
 ## Why?
 
 Existing stacks (e.g. Apollo, GraphQL Tools, TypeGraphQL) are obtrusive in
-some ways (high lock-in, missing features) and over-engineered in others
+some ways (high lock-in, missing features) and over-engineered in others,
 while **type-safety** is often a secondary concern rather than a design principle.
 
 Additionally, most stacks suffer from
