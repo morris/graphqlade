@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/morris/graphqlade/main/img/logo.png" alt="GraphQLade" width="672">
+<img src="https://raw.githubusercontent.com/morris/graphqlade/main/img/logo.png" alt="GraphQLade" width="336">
 
 [![NPM version](https://img.shields.io/npm/v/graphqlade?style=flat-square)](https://www.npmjs.com/package/graphqlade)
 [![Build status](https://img.shields.io/github/workflow/status/morris/graphqlade/Pipeline?style=flat-square)](https://github.com/morris/graphqlade/actions)
@@ -17,34 +17,34 @@ integrated foundation for GraphQL servers and clients at currently under
 ## Why?
 
 Existing stacks (e.g. Apollo, GraphQL Tools, TypeGraphQL) are obtrusive in
-some ways (high lock-in, missing features) and over-engineered in others,
-and type-safety is often a secondary concern rather than a design principle.
+some ways (high lock-in, missing features) and over-engineered in others
+while **type-safety** is often a secondary concern rather than a design principle.
 
-Additionally, most stacks suffer from significant fragmentation. A lot of issues
-are spread across many dependencies and maintainers, making improvements
-difficult, and making it hard to reason about fitness of a particular
-combination of dependencies.
-
-## Status
-
-- Most features are fully tested through a complete example server and client.
-- Minor API changes may occur in the future.
-- Internals may change a bit in the future.
-- Missing a lot of documentation.
-- No production usage so far
-- All the bugs in one place!
-- Looking for feedback, contributions and testers.
+Additionally, most stacks suffer from
+[significant fragmentation](https://httptoolkit.tech/blog/simple-graphql-server-without-apollo/).
+Issues are spread across many packages and maintainers, making it hard to reason
+about fitness of a particular combination of dependencies and stalling
+improvements to the ecosystem.
 
 ## Design Principles
 
-- GraphQL first
-  1. Write schemata and/or (named) operations.
-  2. Generate types & interfaces from GraphQL sources.
-  3. Use runtime library to build type-safe servers/resolvers/clients/etc.
-- GraphQL standard features only
-- Builds upon and integrates tightly with [GraphQL.js](https://github.com/graphql/graphql-js).
-  - Introduces very few additional concepts.
-  - Stays close to the "language" used by GraphQL.js.
+### GraphQL First
+
+GraphQL schemata and operations are defined through spec-compliant,
+**plain GraphQL files**.
+
+### Type-safety through Code Generation
+
+GraphQLade generates a complete set of **TypeScript types and interfaces** from
+GraphQL sources, both for schemata and operations, including type tables mapping
+operation names to their variable and result interfaces.
+
+### Enhance and integrate with GraphQL.js
+
+GraphQlade provides a library of **type-safe runtime helpers** for building HTTP
+and WebSocket servers, resolvers, and clients. They tightly integrate with
+[GraphQL.js](https://github.com/graphql/graphql-js), introducing very few
+additional concepts and staying close to the "language" used by GraphQL.js.
 
 ## Features
 
@@ -76,14 +76,14 @@ combination of dependencies.
   - Supports [subscription-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)
     (e.g. [Apollo Client](https://www.apollographql.com/docs/react/))
 
-**[Learn more about GraphQLade's server-side workflow →](./wiki/Server-Side-Usage)**
+**[Learn more about GraphQLade's server-side workflow →](https://github.com/morris/graphqlade/wiki/Server-Side-Usage)**
 
 ### Client-Side
 
 - Client-side code generation from GraphQL operations and remote schemata.
-  - Generates types for execution results of named operations.
-  - Generates an abstract class with methods for all named operations.
-    - Users only need to provide some `fetch`-like implementation.
+  - Generates interfaces for variables and results of named operations.
+  - Generates tables mapping operation names to their respective variable and
+    result interfaces.
   - Validates operations against a GraphQL API at build time.
   - Type mapping for scalars
   - Watch mode
@@ -95,7 +95,7 @@ combination of dependencies.
   - Contains a reconnecting GraphQL web socket client.
   - Subscriptions implement `AsyncIterableIterator` correctly.
 
-**[Learn more about GraphQLade's client-side workflow →](./wiki/Client-Side-Usage)**
+**[Learn more about GraphQLade's client-side workflow →](https://github.com/morris/graphqlade/wiki/Client-Side-Usage)**
 
 ### General
 
@@ -111,7 +111,6 @@ combination of dependencies.
     introspection during client-side code generation)
 - Class-based implementation with granular methods
   - Customization is easily possible through inheritance and method overrides.
-  - Classes as config, so to say
 
 ## Missing Features
 
