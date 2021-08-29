@@ -27,6 +27,15 @@ export const queryResolvers: ResolverMap<MyContext> = {
 
       return context.search(args.q);
     },
+    isFinite(_, args) {
+      return {
+        input: args.input,
+        result: isFinite(args.input),
+      };
+    },
+    divide(_, args) {
+      return args.dividend / args.divisor;
+    },
   },
 
   Boss: {

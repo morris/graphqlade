@@ -45,6 +45,8 @@ export interface ResolverMap<TContext> {
 
   SearchResult?: RSearchResult<TContext>;
 
+  IsFiniteResult?: RIsFiniteResult<TContext>;
+
   Subscription?: RSubscription<TContext>;
 
   Int?: GraphQLScalarType;
@@ -58,6 +60,8 @@ export interface ResolverMap<TContext> {
   UUID?: GraphQLScalarType;
 
   JSON?: GraphQLScalarType;
+
+  ESNumber?: GraphQLScalarType;
 
   __Schema?: R__Schema<TContext>;
 
@@ -185,6 +189,23 @@ export interface RQuery<TContext> {
     context: TContext,
     info: GraphQLResolveInfo
   ) => AsyncResult<Maybe<Array<TSearchResult>>>;
+
+  isFinite?: (
+    source: TQuery,
+    args: QueryIsFiniteArgs,
+    context: TContext,
+    info: GraphQLResolveInfo
+  ) => AsyncResult<Maybe<TIsFiniteResult>>;
+
+  /**
+   * (ESNumber)
+   */
+  divide?: (
+    source: TQuery,
+    args: QueryDivideArgs,
+    context: TContext,
+    info: GraphQLResolveInfo
+  ) => AsyncResult<Maybe<number>>;
 }
 
 export interface RBoss<TContext> {
@@ -468,6 +489,33 @@ export interface RSearchResult<TContext> {
     context: TContext,
     info: GraphQLResolveInfo
   ) => string;
+}
+
+export interface RIsFiniteResult<TContext> {
+  __isTypeOf?: (
+    source: TIsFiniteResult,
+    context: TContext,
+    info: GraphQLResolveInfo
+  ) => boolean;
+  /**
+   * (ESNumber)
+   */
+  input?: (
+    source: TIsFiniteResult,
+    args: Record<string, never>,
+    context: TContext,
+    info: GraphQLResolveInfo
+  ) => AsyncResult<number>;
+
+  /**
+   * (Boolean)
+   */
+  result?: (
+    source: TIsFiniteResult,
+    args: Record<string, never>,
+    context: TContext,
+    info: GraphQLResolveInfo
+  ) => AsyncResult<boolean>;
 }
 
 export interface RSubscription<TContext> {
@@ -1095,6 +1143,13 @@ export interface TQuery {
   reviews?: Array<ReviewData>;
 
   search?: Array<TSearchResult>;
+
+  isFinite?: TIsFiniteResult;
+
+  /**
+   * (ESNumber)
+   */
+  divide?: number;
 }
 
 export interface TBoss {
@@ -1228,6 +1283,18 @@ export interface TLocationReview {
 }
 
 export type TSearchResult = BossData | LocationData;
+
+export interface TIsFiniteResult {
+  /**
+   * (ESNumber)
+   */
+  input: number;
+
+  /**
+   * (Boolean)
+   */
+  result: boolean;
+}
 
 export interface TSubscription {
   /**
@@ -1460,6 +1527,25 @@ export interface QuerySearchArgs {
   q: string;
 
   types?: Array<TSearchType>;
+}
+
+export interface QueryIsFiniteArgs {
+  /**
+   * (ESNumber)
+   */
+  input: number;
+}
+
+export interface QueryDivideArgs {
+  /**
+   * (ESNumber)
+   */
+  dividend: number;
+
+  /**
+   * (ESNumber)
+   */
+  divisor: number;
 }
 
 export interface SubscriptionNewReviewArgs {

@@ -6,6 +6,8 @@ type Query {
   location(id: ID!): Location
   reviews(after: DateTime, before: DateTime): [Review!]
   search(q: String!, types: [SearchType!]): [SearchResult!]
+  isFinite(input: ESNumber!): IsFiniteResult
+  divide(dividend: ESNumber!, divisor: ESNumber!): ESNumber
 }
 
 type Boss @ts(type: "BossData", from: "../types") {
@@ -68,3 +70,8 @@ enum SearchType {
 }
 
 union SearchResult = Boss | Location
+
+type IsFiniteResult {
+  input: ESNumber!
+  result: Boolean!
+}

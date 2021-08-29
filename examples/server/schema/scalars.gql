@@ -3,3 +3,4 @@ scalar Time @ts(type: "string | number | Date", inputType: "Date")
 scalar DateTime @ts(type: "string | number | Date", inputType: "Date")
 scalar UUID
 scalar JSON @ts(type: "any")
+scalar ESNumber @ts(type: "number")
