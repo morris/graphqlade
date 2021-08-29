@@ -79,7 +79,7 @@ export class GraphQLIntrospector {
     assert(!!body.data, "Introspection failed: No data");
     assertRecord(body.data, "Introspection failed: Invalid data");
 
-    return (body.data as unknown) as IntrospectionQuery;
+    return body.data as unknown as IntrospectionQuery;
   }
 
   getHeaders(headers?: Record<string, string>): Record<string, string> {
