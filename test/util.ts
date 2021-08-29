@@ -28,22 +28,23 @@ export function wsClosed(socket: WebSocket): Promise<[number, string]> {
 }
 
 export class TestLogger implements LoggerLike {
-  public readonly logs: string[] = [];
-  public readonly errors: string[] = [];
+  public readonly logs: Array<string | Error> = [];
+  public readonly warnings: Array<string | Error> = [];
+  public readonly errors: Array<string | Error> = [];
 
-  log(message: string) {
+  log(message: string | Error) {
     // eslint-disable-next-line no-console
     console.log(message);
     this.logs.push(message);
   }
 
-  warn(message: string) {
+  warn(message: string | Error) {
     // eslint-disable-next-line no-console
     console.warn(message);
-    this.logs.push(message);
+    this.warnings.push(message);
   }
 
-  error(message: string) {
+  error(message: string | Error) {
     // eslint-disable-next-line no-console
     console.error(message);
     this.errors.push(message);

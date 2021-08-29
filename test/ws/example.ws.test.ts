@@ -3,6 +3,7 @@ import got from "got";
 import { ExecutionResult } from "graphql";
 import WebSocket from "ws";
 import { GraphQLReader, GraphQLWebSocketClient } from "../../src";
+import { toError } from "../../src/util/toError";
 import { requireExampleServer, wsClosed } from "../util";
 
 describe("The example (ws)", () => {
@@ -96,7 +97,10 @@ describe("The example (ws)", () => {
       await client.requireConnection();
       assert.ok(false, "should not have connected");
     } catch (err) {
-      assert.strictEqual(err.message, "Unauthorized: It appears to be locked");
+      assert.strictEqual(
+        toError(err).message,
+        "Unauthorized: It appears to be locked"
+      );
     }
   });
 
@@ -123,7 +127,7 @@ describe("The example (ws)", () => {
       assert.ok(false, "should have thrown");
     } catch (err) {
       assert.strictEqual(
-        err.message,
+        toError(err).message,
         'Subscription error: Cannot query field "hello" on type "Subscription".'
       );
     }

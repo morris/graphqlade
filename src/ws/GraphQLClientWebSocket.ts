@@ -9,6 +9,7 @@ import type {
 import { DeferredPromise } from "../util/DeferredPromise";
 import { assert, assertRecord } from "../util/assert";
 import { AsyncPushIterator } from "../util/AsyncPushIterator";
+import { toError } from "../util/toError";
 
 export interface GraphQLClientWebSocketOptions {
   socket: WebSocketLike;
@@ -142,7 +143,7 @@ export class GraphQLClientWebSocket {
           this.close(4400, `Invalid message type ${message.type}`);
       }
     } catch (err) {
-      this.closeByError(err);
+      this.closeByError(toError(err));
     }
   }
 

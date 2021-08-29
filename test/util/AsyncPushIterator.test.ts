@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import { EventEmitter } from "events";
 import { AsyncPushIterator } from "../../src";
+import { toError } from "../../src/util/toError";
 
 describe("An AsyncPushIterator", () => {
   it("should iterate over asynchronously pushed data", async () => {
@@ -134,7 +135,7 @@ describe("An AsyncPushIterator", () => {
 
       assert.ok(false, "should have thrown");
     } catch (err) {
-      assert.strictEqual(err.message, "test");
+      assert.strictEqual(toError(err).message, "test");
     }
 
     assert.deepStrictEqual(results, [1, 2, 3, 4, 5]);

@@ -11,6 +11,7 @@ import { watchRecursive } from "../util/watchRecursive";
 import { writeTypeScript } from "../util/writeTypeScript";
 import { cleanOperations } from "../util/cleanOperations";
 import { LoggerLike } from "../util/logging";
+import { toError } from "../util/toError";
 
 export interface CodeGeneratorOptions {
   /**
@@ -137,7 +138,7 @@ export class CodeGenerator {
     } catch (err) {
       if (!options.watch) throw err;
 
-      logger.error(err.stack);
+      logger.error(toError(err));
       logger.log("Initial generation failed. Watching for changes...");
     }
 
@@ -164,10 +165,12 @@ export class CodeGenerator {
               filename
             )}), regenerating...`
           );
+
           await this.write(options);
+
           logger.log("Done. Watching for changes...");
         } catch (err) {
-          logger.error(err.stack);
+          logger.error(toError(err));
         }
       }, 100);
     };

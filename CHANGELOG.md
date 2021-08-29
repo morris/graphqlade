@@ -5,6 +5,8 @@
 - Move documentation to GitHub wikis
 - Add tests
 - Chores and clean-ups
+- Update dependencies
+- Normalize error handling (thanks TypeScript!)
 
 ## v0.3.2
 

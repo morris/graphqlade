@@ -12,6 +12,7 @@ import { isAsyncIterator } from "../util/isAsyncIterator";
 import { DeferredPromise } from "../util/DeferredPromise";
 import { assert, assertRecord, assertDefined } from "../util/assert";
 import type { LoggerLike } from "../util/logging";
+import { toError } from "../util/toError";
 
 export interface GraphQLServerWebSocketOptions {
   socket: WebSocket;
@@ -108,9 +109,7 @@ export class GraphQLServerWebSocket {
       try {
         (await subscription).return?.();
       } catch (err) {
-        this.logger.error(
-          `Could not return subscription iterator (on close): ${err.stack}`
-        );
+        this.logger.error(toError(err));
       }
     }
   }
@@ -127,9 +126,7 @@ export class GraphQLServerWebSocket {
       try {
         (await subscription).return?.();
       } catch (err) {
-        this.logger.error(
-          `Could not return subscription iterator (on error): ${err.stack}`
-        );
+        this.logger.error(toError(err));
       }
     }
   }
@@ -160,7 +157,7 @@ export class GraphQLServerWebSocket {
           this.close(4400, `Invalid message type: ${message.type}`);
       }
     } catch (err) {
-      this.closeByError(err);
+      this.closeByError(toError(err));
     }
   }
 
@@ -188,7 +185,7 @@ export class GraphQLServerWebSocket {
     } catch (err) {
       const unauthorized = this.makeClosingError(
         4401,
-        `Unauthorized: ${err.message}`
+        `Unauthorized: ${toError(err).message}`
       );
       this.connectionInitPayloadPromise.reject(unauthorized);
 
@@ -220,7 +217,7 @@ export class GraphQLServerWebSocket {
               this.send({
                 type: "error",
                 id: message.id,
-                payload: [{ message: err.message } as GraphQLError],
+                payload: [{ message: toError(err).message } as GraphQLError],
               });
             } finally {
               setTimeout(() => {

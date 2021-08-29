@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import { GraphQLReader } from "../../src";
+import { toError } from "../../src/util/toError";
 
 describe("A GraphQLReader object", () => {
   it("should be able to build the example schema", async () => {
@@ -46,11 +47,13 @@ describe("A GraphQLReader object", () => {
 
       throw new Error("Did not parse check");
     } catch (err) {
+      const error = toError(err);
+
       assert.ok(
-        err.message.match(
+        error.message.match(
           /^Syntax Error: Expected ":", found "\)"\. at .*invalid.gql:2:13$/
         ),
-        err.message
+        error.message
       );
     }
   });

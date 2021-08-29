@@ -105,7 +105,7 @@ export class GraphQLExecutionArgsParser {
         parsed = JSON.parse(parsed);
       } catch (err) {
         throw new TypeError(
-          `Invalid variables, failed to parse JSON: ${err.message}`
+          `Invalid variables, failed to parse JSON: ${(err as Error).message}`
         );
       }
     }

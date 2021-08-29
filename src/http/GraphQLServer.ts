@@ -11,6 +11,7 @@ import {
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
 } from "../server/GraphQLExecutionArgsParser";
+import { toError } from "../util/toError";
 
 export interface GraphQLServerOptions {
   /**
@@ -59,8 +60,12 @@ export class GraphQLServer<TContext> {
     try {
       return this.executeParsed(request, this.parse(request), contextValue);
     } catch (err) {
+      const errWithStatus = toError(err) as Error & { status?: number };
+      const status =
+        typeof errWithStatus.status === "number" ? errWithStatus.status : 500;
+
       return {
-        status: err.status ?? 500,
+        status,
         headers: {},
         body: {
           errors: [this.serializeError(err)],
@@ -140,9 +145,10 @@ export class GraphQLServer<TContext> {
             `Unsupported method: ${request.method.toUpperCase()}`
           );
         } catch (err) {
-          err.status = 405;
+          const errWithStatus = toError(err) as Error & { status?: number };
+          errWithStatus.status = 405;
 
-          throw err;
+          throw errWithStatus;
         }
     }
   }

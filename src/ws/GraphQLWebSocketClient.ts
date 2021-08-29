@@ -4,6 +4,7 @@ import {
   WebSocketLike,
 } from "./GraphQLClientWebSocket";
 import { AsyncPushIterator } from "../util/AsyncPushIterator";
+import { toError } from "../util/toError";
 
 export interface GraphQLWebSocketClientOptions {
   /**
@@ -124,7 +125,7 @@ export class GraphQLWebSocketClient {
 
           it.finish();
         } catch (err) {
-          if (this.shouldRetry(err)) {
+          if (this.shouldRetry(toError(err))) {
             run();
           } else {
             it.throw(err);
@@ -158,9 +159,9 @@ export class GraphQLWebSocketClient {
       case 1014:
       case -1:
         return true;
+      default:
+        return false;
     }
-
-    return false;
   }
 
   async requireConnection() {

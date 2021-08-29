@@ -3,6 +3,7 @@ import { join } from "path";
 import type { FileWatcher } from "typescript";
 import { canImportModule } from "./canImportModule";
 import { LoggerLike } from "./logging";
+import { toError } from "./toError";
 
 const { readdir, stat } = fsPromises;
 
@@ -35,7 +36,7 @@ export async function watchRecursive(options: WatchRecursiveOptions) {
           const stats = await stat(path);
           await watchFileOrDirectory(path, stats);
         } catch (err) {
-          logger.warn(err.message);
+          logger.warn(toError(err));
         }
 
         callback(path);

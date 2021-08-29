@@ -19,6 +19,7 @@ import {
   isUnionType,
 } from "graphql";
 import { assertDefined } from "../util/assert";
+import { toError } from "../util/toError";
 
 export type AnyResolverMap<TContext> =
   | CustomResolverMap<TContext>
@@ -303,7 +304,7 @@ export class GraphQLSchemaManager<TContext> {
           try {
             return await originalResolve(data, args, context, info);
           } catch (err) {
-            const newErr = handler(err, data, args, context, info);
+            const newErr = handler(toError(err), data, args, context, info);
 
             throw newErr ?? err;
           }
