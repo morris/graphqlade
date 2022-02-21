@@ -67,3 +67,7 @@ export function cleanJson(json: unknown): unknown {
 
   return json;
 }
+
+export async function sleep(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}

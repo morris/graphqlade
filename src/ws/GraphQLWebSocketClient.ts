@@ -1,10 +1,10 @@
+import { AsyncPushIterator } from "../util/AsyncPushIterator";
+import { toError } from "../util/toError";
 import {
   GraphQLClientWebSocket,
   SubscribePayload,
   WebSocketLike,
 } from "./GraphQLClientWebSocket";
-import { AsyncPushIterator } from "../util/AsyncPushIterator";
-import { toError } from "../util/toError";
 
 export interface GraphQLWebSocketClientOptions {
   /**
@@ -113,29 +113,33 @@ export class GraphQLWebSocketClient {
   subscribe<TExecutionResult>(payload: SubscribePayload) {
     return new AsyncPushIterator<TExecutionResult>(async (it) => {
       this.subscriptions.add(it);
+      let innerIt: AsyncPushIterator<TExecutionResult> | undefined;
 
       const run = async () => {
         try {
           const socket = await this.requireConnection();
-          const results = socket.subscribe<TExecutionResult>(payload);
+          innerIt = socket.subscribe<TExecutionResult>(payload);
 
-          for await (const result of results) {
+          for await (const result of innerIt) {
             it.push(result);
           }
 
           it.finish();
         } catch (err) {
           if (this.shouldRetry(toError(err))) {
-            run();
+            setTimeout(run, 1);
           } else {
             it.throw(err);
           }
+        } finally {
+          innerIt?.return();
         }
       };
 
       run();
 
       return () => {
+        innerIt?.return();
         this.subscriptions.delete(it);
       };
     });

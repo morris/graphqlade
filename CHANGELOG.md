@@ -1,12 +1,14 @@
 # Changelog
 
-## NEXT
+## v0.3.3
 
 - Move documentation to GitHub wikis
 - Add tests
 - Chores and clean-ups
 - Update dependencies
 - Normalize error handling (thanks TypeScript!)
+- Export `AsyncPushIterator` in browser build
+- Fix bug where subscriptions where not closed when returned client-side
 
 ## v0.3.2
 
