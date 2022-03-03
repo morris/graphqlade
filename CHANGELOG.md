@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.4
+
+- Include `src` in NPM package for better source map support
+
 ## v0.3.3
 
 - Move documentation to GitHub wikis

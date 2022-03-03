@@ -1,4 +1,4 @@
-Copyright (c) 2019-2021 Morris Brodersen <mb@morrisbrodersen.de>
+Copyright (c) 2019-2022 Morris Brodersen <mb@morrisbrodersen.de>
 Copyright (c) 2019 mobilcom-debitel GmbH
 
 Permission to use, copy, modify, and/or distribute this software for any

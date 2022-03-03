@@ -1,6 +1,6 @@
 {
   "name": "graphqlade",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A complete library for GraphQL + TypeScript development on server- and client-side",
   "keywords": [
     "graphql",
@@ -29,7 +29,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "bash scripts/build.sh",
