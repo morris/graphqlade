@@ -928,7 +928,7 @@ export interface R__Directive<TContext> {
 
   args?: (
     source: T__Directive,
-    args: Record<string, never>,
+    args: __DirectiveArgsArgs,
     context: TContext,
     info: GraphQLResolveInfo
   ) => AsyncResult<Array<T__InputValue>>;
@@ -1577,6 +1577,13 @@ export interface __TypeInputFieldsArgs {
 }
 
 export interface __FieldArgsArgs {
+  /**
+   * (Boolean)
+   */
+  includeDeprecated?: boolean;
+}
+
+export interface __DirectiveArgsArgs {
   /**
    * (Boolean)
    */
