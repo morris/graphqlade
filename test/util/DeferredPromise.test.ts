@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import { DeferredPromise } from "../../src";
 
 describe("A DeferredPromise", () => {
@@ -7,7 +6,7 @@ describe("A DeferredPromise", () => {
 
     deferred.resolve("test");
 
-    assert.strictEqual(await deferred, "test");
+    expect(await deferred).toEqual("test");
   });
 
   it("should be resolvable externally later", async () => {
@@ -15,6 +14,6 @@ describe("A DeferredPromise", () => {
 
     setTimeout(() => deferred.resolve("test"), 100);
 
-    assert.strictEqual(await deferred, "test");
+    expect(await deferred).toEqual("test");
   });
 });

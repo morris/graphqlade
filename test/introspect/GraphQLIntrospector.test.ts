@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import got from "got";
 import { GraphQLIntrospector } from "../../src";
 import { requireExampleServer } from "../util";
@@ -23,6 +22,6 @@ describe("A GraphQLIntrospector object", () => {
       { Authorization: "Bearer of a ring" }
     );
 
-    assert.ok(schema.getType("Boss"));
+    expect(schema.getType("Boss")).toBeDefined();
   });
 });

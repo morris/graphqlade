@@ -1,8 +1,6 @@
-import * as assert from "assert";
 import { execute, GraphQLEnumType, parse } from "graphql";
-import { buildExecutableSchema } from "../../src";
-import { cleanJson } from "../util";
 import { GraphQLDateTime } from "graphql-iso-date";
+import { buildExecutableSchema } from "../../src";
 
 describe("The buildExecutableSchema function", () => {
   it("should build an executable schema", async () => {
@@ -24,7 +22,7 @@ describe("The buildExecutableSchema function", () => {
       `)
     );
 
-    assert.deepStrictEqual(cleanJson(result), {
+    expect(result).toEqual({
       data: {
         praise: "the sun!",
       },
@@ -66,8 +64,8 @@ describe("The buildExecutableSchema function", () => {
 
     const enumType = schema.getType("Rating") as GraphQLEnumType;
 
-    assert.strictEqual(enumType.parseValue("TERRIBLE"), 1);
-    assert.strictEqual(enumType.serialize(1), "TERRIBLE");
+    expect(enumType.parseValue("TERRIBLE")).toEqual(1);
+    expect(enumType.serialize(1)).toEqual("TERRIBLE");
 
     const result = execute(
       schema,
@@ -76,7 +74,7 @@ describe("The buildExecutableSchema function", () => {
       `)
     );
 
-    assert.deepStrictEqual(cleanJson(result), {
+    expect(result).toEqual({
       data: {
         reviews: [
           {

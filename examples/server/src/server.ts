@@ -1,19 +1,19 @@
-import dotenv from "dotenv";
-import express from "express";
-import cors from "cors";
 import bodyParser from "body-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import { EventEmitter } from "events";
+import express from "express";
 import { createServer, Server } from "http";
+import { AddressInfo } from "net";
 import * as ws from "ws";
-import { resolvers } from "./resolvers";
-import { MyContext } from "./context";
 import {
   buildExecutableSchema,
   GraphQLServer,
   GraphQLWebSocketServer,
 } from "../../../src"; // graphqlade/dist/server in your app
-import { AddressInfo } from "net";
+import { MyContext } from "./context";
+import { resolvers } from "./resolvers";
 import { Subscription } from "./resolvers/Subscription";
-import { EventEmitter } from "events";
 
 dotenv.config({ path: __dirname + "/../.env" });
 dotenv.config({ path: __dirname + "/../default.env" });
@@ -87,14 +87,9 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
     path: "/graphql",
   });
 
-  wsServer.on("connection", (socket, req) => {
-    const gqlSocket = gqlWsServer.handleConnection(socket, req);
-
-    // just for testing disconnections
-    setTimeout(() => {
-      gqlSocket.close(1000, "WS_MAX_TIME");
-    }, parseInt(process.env.WS_MAX_TIME ?? "10000", 10));
-  });
+  wsServer.on("connection", (socket, req) =>
+    gqlWsServer.handleConnection(socket, req)
+  );
 
   server.listen(env.PORT ? parseInt(env.PORT, 10) : 4000);
 

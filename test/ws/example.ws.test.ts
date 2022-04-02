@@ -1,9 +1,7 @@
-import * as assert from "assert";
 import got from "got";
 import { ExecutionResult } from "graphql";
 import WebSocket from "ws";
 import { GraphQLReader, GraphQLWebSocketClient } from "../../src";
-import { toError } from "../../src/util/toError";
 import { requireExampleServer, sleep, wsClosed } from "../util";
 
 describe("The example (ws)", () => {
@@ -17,7 +15,7 @@ describe("The example (ws)", () => {
     return new WebSocket(url, protocol);
   }
 
-  before(async () => {
+  beforeAll(async () => {
     const reader = new GraphQLReader();
     operations = await reader.readDir(
       `${__dirname}/../../examples/client/operations`
@@ -27,7 +25,7 @@ describe("The example (ws)", () => {
   it("should close a socket with invalid an protocol immediately", async () => {
     const socket = new WebSocket(url, "foo-bar-baz");
 
-    assert.deepStrictEqual(await wsClosed(socket), [
+    expect(await wsClosed(socket)).toEqual([
       1002,
       "Unsupported web socket protocol foo-bar-baz",
     ]);
@@ -36,7 +34,7 @@ describe("The example (ws)", () => {
   it("should close a socket when not receiving a connection_init message in time", async () => {
     const socket = new WebSocket(url, "graphql-transport-ws");
 
-    assert.deepStrictEqual(await wsClosed(socket), [
+    expect(await wsClosed(socket)).toEqual([
       4408,
       "Connection initialization timeout",
     ]);
@@ -60,7 +58,7 @@ describe("The example (ws)", () => {
       );
     });
 
-    assert.deepStrictEqual(await wsClosed(socket), [
+    expect(await wsClosed(socket)).toEqual([
       4429,
       "Too many initialization requests",
     ]);
@@ -73,7 +71,7 @@ describe("The example (ws)", () => {
       socket.send(JSON.stringify({ type: "hello" }));
     });
 
-    assert.deepStrictEqual(await wsClosed(socket), [
+    expect(await wsClosed(socket)).toEqual([
       4400,
       "Invalid message type: hello",
     ]);
@@ -88,15 +86,11 @@ describe("The example (ws)", () => {
       },
     });
 
-    try {
-      await client.requireConnection();
-      assert.ok(false, "should not have connected");
-    } catch (err) {
-      assert.strictEqual(
-        toError(err).message,
-        "Unauthorized: It appears to be locked"
-      );
-    }
+    await expect(client.requireConnection()).rejects.toThrowError(
+      "Unauthorized: It appears to be locked"
+    );
+
+    client.close();
   });
 
   it("should reject invalid operations with an error message", async () => {
@@ -108,22 +102,19 @@ describe("The example (ws)", () => {
       },
     });
 
-    try {
-      for await (const result of client.subscribe({
-        query: `subscription DoesNotExist {
-          hello
-        }`,
-      })) {
-        assert.ok(result);
-      }
-
-      assert.ok(false, "should have thrown");
-    } catch (err) {
-      assert.strictEqual(
-        toError(err).message,
-        'Subscription error: Cannot query field "hello" on type "Subscription".'
-      );
-    }
+    await expect(
+      (async () => {
+        for await (const result of client.subscribe({
+          query: `subscription DoesNotExist {
+            hello
+          }`,
+        })) {
+          expect(result).toBeDefined();
+        }
+      })()
+    ).rejects.toThrow(
+      'Subscription error: Cannot query field "hello" on type "Subscription".'
+    );
 
     client.close();
   });
@@ -198,13 +189,14 @@ describe("The example (ws)", () => {
 
     client.close();
 
-    assert.deepStrictEqual(
-      await wsClosed(client.graphqlSocket?.socket as WebSocket),
-      [1000, "Normal Closure"]
-    );
+    expect(await wsClosed(client.graphqlSocket?.socket as WebSocket)).toEqual([
+      1000,
+      "Normal Closure",
+    ]);
 
-    assert.strictEqual(results.length, 2);
-    assert.deepStrictEqual(
+    expect(results.length).toEqual(2);
+
+    expect(
       results.map((it) => ({
         ...it,
         data: {
@@ -214,42 +206,41 @@ describe("The example (ws)", () => {
             id: "test",
           },
         },
-      })),
-      [
-        {
-          data: {
-            newReview: {
-              __typename: "BossReview",
-              author: "tester",
-              boss: {
-                id: "1",
-                name: "Asylum Demon",
-              },
-              createdAt: "test",
-              difficulty: "IMPOSSIBLE",
-              id: "test",
-              theme: "ALRIGHT",
+      }))
+    ).toEqual([
+      {
+        data: {
+          newReview: {
+            __typename: "BossReview",
+            author: "tester",
+            boss: {
+              id: "1",
+              name: "Asylum Demon",
             },
+            createdAt: "test",
+            difficulty: "IMPOSSIBLE",
+            id: "test",
+            theme: "ALRIGHT",
           },
         },
-        {
-          data: {
-            newReview: {
-              __typename: "LocationReview",
-              author: "tester",
-              location: {
-                id: "13",
-                name: "Undead Parish",
-              },
-              createdAt: "test",
-              difficulty: "HARD",
-              id: "test",
-              design: "STELLAR",
+      },
+      {
+        data: {
+          newReview: {
+            __typename: "LocationReview",
+            author: "tester",
+            location: {
+              id: "13",
+              name: "Undead Parish",
             },
+            createdAt: "test",
+            difficulty: "HARD",
+            id: "test",
+            design: "STELLAR",
           },
         },
-      ]
-    );
+      },
+    ]);
   });
 
   it("should reconnect on non-error closures", async () => {
@@ -323,13 +314,14 @@ describe("The example (ws)", () => {
 
     await complete;
 
-    assert.deepStrictEqual(
-      await wsClosed(client.graphqlSocket?.socket as WebSocket),
-      [1000, "Normal Closure"]
-    );
+    expect(await wsClosed(client.graphqlSocket?.socket as WebSocket)).toEqual([
+      1000,
+      "Normal Closure",
+    ]);
 
-    assert.strictEqual(results.length, 2);
-    assert.deepStrictEqual(
+    expect(results.length).toEqual(2);
+
+    expect(
       results.map((it) => ({
         ...it,
         data: {
@@ -339,42 +331,40 @@ describe("The example (ws)", () => {
             id: "test",
           },
         },
-      })),
-      //
-      [
-        {
-          data: {
-            newReview: {
-              __typename: "BossReview",
-              author: "tester",
-              boss: {
-                id: "1",
-                name: "Asylum Demon",
-              },
-              createdAt: "test",
-              difficulty: "IMPOSSIBLE",
-              id: "test",
-              theme: "ALRIGHT",
+      }))
+    ).toEqual([
+      {
+        data: {
+          newReview: {
+            __typename: "BossReview",
+            author: "tester",
+            boss: {
+              id: "1",
+              name: "Asylum Demon",
             },
+            createdAt: "test",
+            difficulty: "IMPOSSIBLE",
+            id: "test",
+            theme: "ALRIGHT",
           },
         },
-        {
-          data: {
-            newReview: {
-              __typename: "LocationReview",
-              author: "tester",
-              location: {
-                id: "13",
-                name: "Undead Parish",
-              },
-              createdAt: "test",
-              difficulty: "HARD",
-              id: "test",
-              design: "STELLAR",
+      },
+      {
+        data: {
+          newReview: {
+            __typename: "LocationReview",
+            author: "tester",
+            location: {
+              id: "13",
+              name: "Undead Parish",
             },
+            createdAt: "test",
+            difficulty: "HARD",
+            id: "test",
+            design: "STELLAR",
           },
         },
-      ]
-    );
+      },
+    ]);
   });
 });

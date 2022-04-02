@@ -6,14 +6,14 @@ import { LoggerLike } from "../src/util/logging";
 export function requireExampleServer(env?: NodeJS.ProcessEnv) {
   let server: Server;
 
-  before(async () => {
+  beforeAll(async () => {
     server = await bootstrap({ PORT: "4999", ...env });
   });
 
-  after(async () => {
+  afterAll(async () => {
     if (!server) return;
 
-    return new Promise((resolve, reject) =>
+    return new Promise<void>((resolve, reject) =>
       server.close((err) => (err ? reject(err) : resolve()))
     );
   });
@@ -49,23 +49,6 @@ export class TestLogger implements LoggerLike {
     console.error(message);
     this.errors.push(message);
   }
-}
-
-export function cleanJson(json: unknown): unknown {
-  if (Array.isArray(json)) {
-    return json.map((it) => cleanJson(it));
-  }
-
-  if (json && typeof json === "object") {
-    const input = json as Record<string, unknown>;
-
-    return Object.keys(input).reduce<Record<string, unknown>>(
-      (output, key) => Object.assign(output, { [key]: cleanJson(input[key]) }),
-      {}
-    );
-  }
-
-  return json;
 }
 
 export async function sleep(ms: number) {

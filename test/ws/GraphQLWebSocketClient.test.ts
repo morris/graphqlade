@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import WebSocket from "ws";
 import { GraphQLWebSocketClient } from "../../src";
 import { requireExampleServer, sleep } from "../util";
@@ -41,7 +40,7 @@ describe("The GraphQLWebSocketClient", () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const socket = client.graphqlSocket?.socket as any;
-    assert.ok(socket, "No socket open");
+    expect(socket).toBeDefined();
 
     const messages: Record<string, unknown>[] = [];
     const originalSend = socket.send;
@@ -54,8 +53,8 @@ describe("The GraphQLWebSocketClient", () => {
 
     await complete;
 
-    assert.deepStrictEqual(messages, [{ type: "complete", id: "1" }]);
-    assert.deepStrictEqual(results, []);
+    expect(messages).toEqual([{ type: "complete", id: "1" }]);
+    expect(results).toEqual([]);
 
     client.close();
   });

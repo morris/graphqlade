@@ -1,13 +1,11 @@
-import * as assert from "assert";
 import { GraphQLSchema } from "graphql";
-import { buildExecutableSchema, GraphQLServer } from "../../src";
-import { cleanJson } from "../util";
 import { resolvers } from "../../examples/server/src/resolvers";
+import { buildExecutableSchema, GraphQLServer } from "../../src";
 
 describe("The example server", () => {
   let schema: GraphQLSchema;
 
-  before(async () => {
+  beforeAll(async () => {
     schema = await buildExecutableSchema({
       root: `${__dirname}/../../examples/server`,
       resolvers,
@@ -35,7 +33,7 @@ describe("The example server", () => {
       undefined
     );
 
-    assert.deepStrictEqual(cleanJson(response), {
+    expect(response).toEqual({
       status: 200,
       headers: {},
       body: {
@@ -68,7 +66,7 @@ describe("The example server", () => {
       undefined
     );
 
-    assert.deepStrictEqual(cleanJson(response), {
+    expect(response).toEqual({
       status: 200,
       headers: {},
       body: {

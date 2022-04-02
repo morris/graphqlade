@@ -1,14 +1,12 @@
-import * as assert from "assert";
 import { GraphQLSchema } from "graphql";
-import { buildExecutableSchema, GraphQLServer } from "../../src";
-import { cleanJson } from "../util";
 import { resolvers } from "../../examples/server/src/resolvers";
+import { buildExecutableSchema, GraphQLServer } from "../../src";
 
 describe("A GraphQLServer object", () => {
   let schema: GraphQLSchema;
   let operations: string;
 
-  before(async () => {
+  beforeAll(async () => {
     schema = await buildExecutableSchema({
       root: `${__dirname}/../../examples/server`,
       resolvers,
@@ -29,7 +27,7 @@ describe("A GraphQLServer object", () => {
       undefined
     );
 
-    assert.deepStrictEqual(cleanJson(response), {
+    expect(response).toEqual({
       status: 200,
       headers: {},
       body: {
@@ -66,7 +64,7 @@ describe("A GraphQLServer object", () => {
       undefined
     );
 
-    assert.deepStrictEqual(cleanJson(response), {
+    expect(response).toEqual({
       status: 200,
       headers: {},
       body: {
@@ -92,7 +90,7 @@ describe("A GraphQLServer object", () => {
       undefined
     );
 
-    assert.deepStrictEqual(cleanJson(response), {
+    expect(response).toEqual({
       status: 405,
       headers: {},
       body: {
@@ -120,7 +118,7 @@ describe("A GraphQLServer object", () => {
       undefined
     );
 
-    assert.deepStrictEqual(cleanJson(response), {
+    expect(response).toEqual({
       status: 400,
       headers: {},
       body: {
@@ -147,7 +145,7 @@ describe("A GraphQLServer object", () => {
       undefined
     );
 
-    assert.deepStrictEqual(cleanJson(response), {
+    expect(response).toEqual({
       status: 400,
       headers: {},
       body: {

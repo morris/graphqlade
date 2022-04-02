@@ -1,5 +1,11 @@
 # Changelog
 
+## NEXT
+
+- Update dependencies
+- Fix audit
+- Switch to Jest
+
 ## v0.3.4
 
 - Include `src` in NPM package for better source map support

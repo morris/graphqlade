@@ -1,14 +1,13 @@
 import got from "got";
-import * as assert from "assert";
-import { requireExampleServer } from "./util";
 import { GraphQLReader } from "../src";
+import { requireExampleServer } from "./util";
 
 describe("The example", () => {
   let operations: string;
 
   requireExampleServer();
 
-  before(async () => {
+  beforeAll(async () => {
     const reader = new GraphQLReader();
     operations = await reader.readDir(
       `${__dirname}/../examples/client/operations`
@@ -25,7 +24,7 @@ describe("The example", () => {
       responseType: "json",
     });
 
-    assert.deepStrictEqual(r.body, {
+    expect(r.body).toEqual({
       data: {
         bosses: [
           {

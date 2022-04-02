@@ -1,3 +1,7 @@
+import { assert, assertRecord } from "../util/assert";
+import { AsyncPushIterator } from "../util/AsyncPushIterator";
+import { DeferredPromise } from "../util/DeferredPromise";
+import { toError } from "../util/toError";
 import type {
   CompleteMessage,
   ConnectionAckMessage,
@@ -6,10 +10,6 @@ import type {
   NextMessage,
   SubscribeMessage,
 } from "./GraphQLWebSocketMessage";
-import { DeferredPromise } from "../util/DeferredPromise";
-import { assert, assertRecord } from "../util/assert";
-import { AsyncPushIterator } from "../util/AsyncPushIterator";
-import { toError } from "../util/toError";
 
 export interface GraphQLClientWebSocketOptions {
   socket: WebSocketLike;
@@ -268,6 +268,10 @@ export class GraphQLClientWebSocket {
   }
 
   close(code: number, reason: string) {
+    if (this.connectionAckWaitTimeoutId) {
+      clearTimeout(this.connectionAckWaitTimeoutId);
+    }
+
     if (this.isOpenOrConnecting()) this.socket.close(code, reason);
   }
 

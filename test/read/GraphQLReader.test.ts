@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import { GraphQLReader } from "../../src";
 import { toError } from "../../src/util/toError";
 
@@ -10,7 +9,7 @@ describe("A GraphQLReader object", () => {
       `${__dirname}/../../examples/server/schema`
     );
 
-    assert.ok(schema.getType("Query"));
+    expect(schema.getType("Query")).toBeDefined();
   });
 
   it("should be able to parse the example operations", async () => {
@@ -20,10 +19,10 @@ describe("A GraphQLReader object", () => {
       `${__dirname}/../../examples/client/operations`
     );
 
-    assert.ok(
+    expect(
       document.definitions.filter((it) => it.kind === "OperationDefinition")
-        .length > 0
-    );
+        .length
+    ).toBeGreaterThan(0);
   });
 
   it("should cache reads", async () => {
@@ -49,11 +48,8 @@ describe("A GraphQLReader object", () => {
     } catch (err) {
       const error = toError(err);
 
-      assert.ok(
-        error.message.match(
-          /^Syntax Error: Expected ":", found "\)"\. at .*invalid.gql:2:13$/
-        ),
-        error.message
+      expect(error.message).toMatch(
+        /^Syntax Error: Expected ":", found "\)"\. at .*invalid.gql:2:13$/
       );
     }
   });
@@ -63,9 +59,9 @@ describe("A GraphQLReader object", () => {
 
     const merged = await reader.readDir(`${__dirname}/../fixtures`);
 
-    assert.ok(merged.match(/Mutation/));
-    assert.ok(merged.match(/Query/));
-    assert.ok(merged.match(/Junk/));
-    assert.ok(merged.match(/Stuff/));
+    expect(merged).toMatch(/Mutation/);
+    expect(merged).toMatch(/Query/);
+    expect(merged).toMatch(/Junk/);
+    expect(merged).toMatch(/Stuff/);
   });
 });

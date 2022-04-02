@@ -1,10 +1,9 @@
-import * as assert from "assert";
+import { mkdirSync, rmdirSync, writeFileSync } from "fs";
 import { join } from "path";
-import { mkdirSync, writeFileSync, rmdirSync } from "fs";
 import { GraphQLReader, watchRecursive } from "../../src";
 
 describe("The watchRecursive function", () => {
-  before(() => {
+  beforeAll(() => {
     rmdirSync(join(__dirname, "watchRecursive"), { recursive: true });
     mkdirSync(join(__dirname, "watchRecursive"), { recursive: true });
   });
@@ -49,13 +48,12 @@ describe("The watchRecursive function", () => {
     if (process.env.CI) {
       // watching may work differently in CI
       // only do a basic check
-      return assert.ok(callbacks.length > 10);
+      return expect(callbacks.length).toBeGreaterThan(10);
     }
 
     // TODO this used to be a strict array check but it was flaky;
     // switched to checking unique entries for now
-    assert.deepStrictEqual(
-      Array.from(new Set(callbacks)).sort(),
+    expect(Array.from(new Set(callbacks)).sort()).toEqual(
       [
         "/watchRecursive/bar",
         "/watchRecursive/foo",

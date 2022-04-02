@@ -1,5 +1,4 @@
-import * as assert from "assert";
-import { print, parse } from "graphql";
+import { parse, print } from "graphql";
 import { GraphQLExecutionArgsParser } from "../../src";
 
 describe("A GraphQLExecutionArgsParserExecutionArgsParser object", () => {
@@ -9,9 +8,9 @@ describe("A GraphQLExecutionArgsParserExecutionArgsParser object", () => {
     const query = "{ praise }";
     const args = gqlExecutionArgsParser.parse({ query });
 
-    assert.deepStrictEqual(print(args.document), print(parse(query)));
-    assert.deepStrictEqual(args.operationName, undefined);
-    assert.deepStrictEqual(args.variableValues, undefined);
+    expect(print(args.document)).toEqual(print(parse(query)));
+    expect(args.operationName).toBeUndefined();
+    expect(args.variableValues).toBeUndefined();
   });
 
   it("should be able to parse a query with variables", async () => {
@@ -23,9 +22,9 @@ describe("A GraphQLExecutionArgsParserExecutionArgsParser object", () => {
       variables: { baz: "test" },
     });
 
-    assert.deepStrictEqual(print(args.document), print(parse(query)));
-    assert.deepStrictEqual(args.operationName, undefined);
-    assert.deepStrictEqual(args.variableValues, { baz: "test" });
+    expect(print(args.document)).toEqual(print(parse(query)));
+    expect(args.operationName).toBeUndefined();
+    expect(args.variableValues).toEqual({ baz: "test" });
   });
 
   it("should be able to parse a named query with variables", async () => {
@@ -41,9 +40,9 @@ describe("A GraphQLExecutionArgsParserExecutionArgsParser object", () => {
       operationName: "Foo",
     });
 
-    assert.deepStrictEqual(print(args.document), print(parse(query)));
-    assert.deepStrictEqual(args.operationName, "Foo");
-    assert.deepStrictEqual(args.variableValues, { baz: "test" });
+    expect(print(args.document)).toEqual(print(parse(query)));
+    expect(args.operationName).toEqual("Foo");
+    expect(args.variableValues).toEqual({ baz: "test" });
   });
 
   it("should cache parsed documents", async () => {
@@ -55,16 +54,16 @@ describe("A GraphQLExecutionArgsParserExecutionArgsParser object", () => {
     `;
 
     const cache = gqlExecutionArgsParser.getCache();
-    assert.strictEqual(cache.size, 0);
+    expect(cache.size).toEqual(0);
 
     gqlExecutionArgsParser.parse({ query });
-    assert.ok(cache.get(query));
+    expect(cache.get(query)).toBeDefined();
 
     gqlExecutionArgsParser.parse({ query });
-    assert.strictEqual(cache.size, 1);
+    expect(cache.size).toEqual(1);
 
     gqlExecutionArgsParser.parse({ query: `${query} # ignored` });
-    assert.strictEqual(cache.size, 2);
+    expect(cache.size).toEqual(2);
   });
 
   it("should release cached documents in an LRU fashion", async () => {
@@ -78,16 +77,16 @@ describe("A GraphQLExecutionArgsParserExecutionArgsParser object", () => {
     const queryD = "{ d }";
 
     const cache = gqlExecutionArgsParser.getCache();
-    assert.strictEqual(cache.size, 0);
+    expect(cache.size).toEqual(0);
 
     gqlExecutionArgsParser.parse({ query: queryA });
     gqlExecutionArgsParser.parse({ query: queryB });
     gqlExecutionArgsParser.parse({ query: queryC });
-    assert.strictEqual(cache.size, 3);
+    expect(cache.size).toEqual(3);
 
     gqlExecutionArgsParser.parse({ query: queryD });
-    assert.strictEqual(cache.size, 3);
-    assert.ok(!cache.get(queryA));
+    expect(cache.size).toEqual(3);
+    expect(cache.get(queryA)).toBeUndefined();
 
     gqlExecutionArgsParser.parse({ query: queryA });
     gqlExecutionArgsParser.parse({ query: queryB });
@@ -97,7 +96,7 @@ describe("A GraphQLExecutionArgsParserExecutionArgsParser object", () => {
     gqlExecutionArgsParser.parse({ query: queryC });
     gqlExecutionArgsParser.parse({ query: queryA });
     gqlExecutionArgsParser.parse({ query: queryD });
-    assert.strictEqual(cache.size, 3);
-    assert.ok(!cache.get(queryB));
+    expect(cache.size).toEqual(3);
+    expect(cache.get(queryB)).toBeUndefined();
   });
 });
