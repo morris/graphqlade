@@ -1,5 +1,10 @@
 # Changelog
 
+## NEXT
+
+- BREAKING: Upgrade to `graphql@16`
+- BREAKING: Upgrade to `ws@8`
+
 ## v0.3.5
 
 - Update dependencies

@@ -56,6 +56,33 @@ describe("The example", () => {
     });
   });
 
+  it("should reject invalid queries", async () => {
+    const response = await got("http://localhost:4999/graphql", {
+      method: "POST",
+      headers: {},
+      json: {
+        query: `{ invalid }`,
+      },
+      responseType: "json",
+      throwHttpErrors: false,
+    });
+
+    expect(response.statusCode).toEqual(400);
+    expect(response.body).toEqual({
+      errors: [
+        {
+          locations: [
+            {
+              column: 3,
+              line: 1,
+            },
+          ],
+          message: 'Cannot query field "invalid" on type "Query".',
+        },
+      ],
+    });
+  });
+
   it("should respect @skip directives", async () => {
     const r = await got("http://localhost:4999/graphql", {
       method: "POST",

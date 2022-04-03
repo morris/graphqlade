@@ -608,7 +608,7 @@ export interface R__Schema<TContext> {
 /**
  * The fundamental unit of any GraphQL Schema is the type. There are many kinds of types in GraphQL as represented by the `__TypeKind` enum.
  *
- * Depending on the kind of a type, certain fields describe information about that type. Scalar types provide no information beyond a name, description and optional `specifiedByUrl`, while Enum types provide their values. Object and Interface types provide the fields they describe. Abstract types, Union and Interface, provide the Object types possible at runtime. List and NonNull types compose other types.
+ * Depending on the kind of a type, certain fields describe information about that type. Scalar types provide no information beyond a name, description and optional `specifiedByURL`, while Enum types provide their values. Object and Interface types provide the fields they describe. Abstract types, Union and Interface, provide the Object types possible at runtime. List and NonNull types compose other types.
  */
 export interface R__Type<TContext> {
   __isTypeOf?: (
@@ -647,7 +647,7 @@ export interface R__Type<TContext> {
   /**
    * (String)
    */
-  specifiedByUrl?: (
+  specifiedByURL?: (
     source: T__Type,
     args: Record<string, never>,
     context: TContext,
@@ -1341,7 +1341,7 @@ export interface T__Schema {
 /**
  * The fundamental unit of any GraphQL Schema is the type. There are many kinds of types in GraphQL as represented by the `__TypeKind` enum.
  *
- * Depending on the kind of a type, certain fields describe information about that type. Scalar types provide no information beyond a name, description and optional `specifiedByUrl`, while Enum types provide their values. Object and Interface types provide the fields they describe. Abstract types, Union and Interface, provide the Object types possible at runtime. List and NonNull types compose other types.
+ * Depending on the kind of a type, certain fields describe information about that type. Scalar types provide no information beyond a name, description and optional `specifiedByURL`, while Enum types provide their values. Object and Interface types provide the fields they describe. Abstract types, Union and Interface, provide the Object types possible at runtime. List and NonNull types compose other types.
  */
 export interface T__Type {
   kind: T__TypeKind;
@@ -1359,7 +1359,7 @@ export interface T__Type {
   /**
    * (String)
    */
-  specifiedByUrl?: string;
+  specifiedByURL?: string;
 
   fields?: Array<T__Field>;
 
@@ -1820,7 +1820,7 @@ export interface DeprecatedDirective {
 
 export interface SpecifiedByDirective {
   /**
-   * (String) The URL that specifies the behaviour of this scalar.
+   * (String) The URL that specifies the behavior of this scalar.
    */
   url: string;
 }

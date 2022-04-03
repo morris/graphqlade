@@ -22,7 +22,8 @@ export function requireExampleServer(env?: NodeJS.ProcessEnv) {
 export function wsClosed(socket: WebSocket): Promise<[number, string]> {
   return new Promise((resolve) => {
     socket.on("close", (code, reason) => {
-      resolve([code, reason]);
+      // reason may be a Buffer?!
+      resolve([code, reason.toString()]);
     });
   });
 }

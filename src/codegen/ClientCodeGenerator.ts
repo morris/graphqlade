@@ -22,8 +22,10 @@ import {
   isListType,
   isNonNullType,
   isObjectType,
+  Kind,
   NameNode,
   OperationDefinitionNode,
+  OperationTypeNode,
   print,
   SelectionSetNode,
   TypeNode,
@@ -206,11 +208,11 @@ export class ClientCodeGenerator {
 
   generateOperation(node: NamedOperationDefinitionNode) {
     switch (node.operation) {
-      case "query":
+      case OperationTypeNode.QUERY:
         return this.generateQuery(node);
-      case "mutation":
+      case OperationTypeNode.MUTATION:
         return this.generateMutation(node);
-      case "subscription":
+      case OperationTypeNode.SUBSCRIPTION:
         return this.generateSubscription(node);
     }
   }
@@ -698,11 +700,11 @@ export class ClientCodeGenerator {
 
   requireTypeFromNode(node: TypeNode): GraphQLType {
     switch (node.kind) {
-      case "NonNullType":
+      case Kind.NON_NULL_TYPE:
         return new GraphQLNonNull(this.requireTypeFromNode(node.type));
-      case "ListType":
+      case Kind.LIST_TYPE:
         return new GraphQLList(this.requireTypeFromNode(node.type));
-      case "NamedType":
+      case Kind.NAMED_TYPE:
         return this.requireType(node.name.value);
     }
   }

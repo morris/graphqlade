@@ -76,7 +76,7 @@ export class GraphQLServerWebSocket {
       case "graphql-transport-ws":
       case "graphql-ws": // legacy
         this.socket.on("close", (code, reason) =>
-          this.handleCloseEvent(code, reason)
+          this.handleCloseEvent(code, reason.toString())
         );
         this.socket.on("error", (error) => this.handleErrorEvent(error));
         this.socket.on("message", (data) => this.handleMessageEvent(data));

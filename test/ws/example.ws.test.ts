@@ -1,7 +1,11 @@
 import got from "got";
 import { ExecutionResult } from "graphql";
 import WebSocket from "ws";
-import { GraphQLReader, GraphQLWebSocketClient } from "../../src";
+import {
+  GraphQLReader,
+  GraphQLWebSocketClient,
+  WebSocketLike,
+} from "../../src";
 import { requireExampleServer, sleep, wsClosed } from "../util";
 
 describe("The example (ws)", () => {
@@ -11,8 +15,8 @@ describe("The example (ws)", () => {
 
   const url = "ws://localhost:4999/graphql";
 
-  function createWebSocket(url: string, protocol: string) {
-    return new WebSocket(url, protocol);
+  function createWebSocket(url: string, protocol: string): WebSocketLike {
+    return new WebSocket(url, protocol) as unknown as WebSocketLike;
   }
 
   beforeAll(async () => {
@@ -189,10 +193,9 @@ describe("The example (ws)", () => {
 
     client.close();
 
-    expect(await wsClosed(client.graphqlSocket?.socket as WebSocket)).toEqual([
-      1000,
-      "Normal Closure",
-    ]);
+    expect(
+      await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket)
+    ).toEqual([1000, "Normal Closure"]);
 
     expect(results.length).toEqual(2);
 
@@ -314,10 +317,9 @@ describe("The example (ws)", () => {
 
     await complete;
 
-    expect(await wsClosed(client.graphqlSocket?.socket as WebSocket)).toEqual([
-      1000,
-      "Normal Closure",
-    ]);
+    expect(
+      await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket)
+    ).toEqual([1000, "Normal Closure"]);
 
     expect(results.length).toEqual(2);
 

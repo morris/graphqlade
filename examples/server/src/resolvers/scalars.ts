@@ -1,5 +1,5 @@
 import { GraphQLScalarType } from "graphql";
-import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-iso-date";
+import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-scalars";
 import { MyContext } from "../context";
 import { ResolverMap } from "../generated/schema";
 
@@ -7,14 +7,22 @@ export const scalarResolvers: ResolverMap<MyContext> = {
   Date: GraphQLDate,
   Time: GraphQLTime,
   DateTime: GraphQLDateTime,
-  ESNumber: new GraphQLScalarType({
+  ESNumber: new GraphQLScalarType<number, number | string>({
     name: "ESNumber",
     serialize(value) {
       if (value === Number.NEGATIVE_INFINITY) return "-Infinity";
-      if (isNaN(value)) return "NaN";
-      if (!isFinite(value)) return "Infinity";
+      if (value === Number.POSITIVE_INFINITY) return "Infinity";
+      if (typeof value === "number" && isNaN(value)) return "NaN";
 
-      return parseFloat(value);
+      if (typeof value === "string") {
+        return parseFloat(value);
+      }
+
+      if (typeof value === "number") {
+        return value;
+      }
+
+      throw new Error(`Could not serialize ${value} to ESNumber`);
     },
     parseValue(value) {
       switch (value) {
@@ -25,7 +33,15 @@ export const scalarResolvers: ResolverMap<MyContext> = {
         case "NaN":
           return NaN;
         default:
-          return parseFloat(value);
+          if (typeof value === "number") {
+            return value;
+          }
+
+          if (typeof value === "string") {
+            return parseFloat(value);
+          }
+
+          throw new Error(`Could not parse ${value} to ESNumber`);
       }
     },
   }),

@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import { GraphQLWebSocketClient } from "../../src";
+import { GraphQLWebSocketClient, WebSocketLike } from "../../src";
 import { requireExampleServer, sleep } from "../util";
 
 describe("The GraphQLWebSocketClient", () => {
@@ -8,7 +8,7 @@ describe("The GraphQLWebSocketClient", () => {
   const url = "ws://localhost:4999/graphql";
 
   function createWebSocket(url: string, protocol: string) {
-    return new WebSocket(url, protocol);
+    return new WebSocket(url, protocol) as unknown as WebSocketLike;
   }
 
   it("should be able to cancel subscriptions client-side (return)", async () => {

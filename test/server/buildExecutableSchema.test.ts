@@ -1,5 +1,5 @@
 import { execute, GraphQLEnumType, parse } from "graphql";
-import { GraphQLDateTime } from "graphql-iso-date";
+import { GraphQLDateTime } from "graphql-scalars";
 import { buildExecutableSchema } from "../../src";
 
 describe("The buildExecutableSchema function", () => {
@@ -15,12 +15,12 @@ describe("The buildExecutableSchema function", () => {
       },
     });
 
-    const result = execute(
+    const result = execute({
       schema,
-      parse(`
+      document: parse(`
         { praise }
-      `)
-    );
+      `),
+    });
 
     expect(result).toEqual({
       data: {
@@ -43,7 +43,7 @@ describe("The buildExecutableSchema function", () => {
             return "BossReview";
           },
           createdAt() {
-            return 1;
+            return 1000;
           },
         },
         BossReview: {
@@ -67,18 +67,18 @@ describe("The buildExecutableSchema function", () => {
     expect(enumType.parseValue("TERRIBLE")).toEqual(1);
     expect(enumType.serialize(1)).toEqual("TERRIBLE");
 
-    const result = execute(
+    const result = execute({
       schema,
-      parse(`
+      document: parse(`
         { reviews { createdAt ... on BossReview { theme } } }
-      `)
-    );
+      `),
+    });
 
     expect(result).toEqual({
       data: {
         reviews: [
           {
-            createdAt: "1970-01-01T00:00:01.000Z",
+            createdAt: new Date("1970-01-01T00:00:01.000Z"),
             theme: "TERRIBLE",
           },
         ],

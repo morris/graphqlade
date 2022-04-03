@@ -1,4 +1,4 @@
-import { GraphQLSchema } from "graphql";
+import { GraphQLError, GraphQLSchema } from "graphql";
 import { resolvers } from "../../examples/server/src/resolvers";
 import { buildExecutableSchema, GraphQLServer } from "../../src";
 
@@ -150,15 +150,7 @@ describe("A GraphQLServer object", () => {
       headers: {},
       body: {
         errors: [
-          {
-            locations: [
-              {
-                column: 3,
-                line: 1,
-              },
-            ],
-            message: 'Cannot query field "invalid" on type "Query".',
-          },
+          new GraphQLError('Cannot query field "invalid" on type "Query".', {}),
         ],
       },
     });
