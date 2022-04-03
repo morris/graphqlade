@@ -1,8 +1,8 @@
-import { Stats, Dirent, promises as fsPromises } from "fs";
+import { Dirent, promises as fsPromises, Stats } from "fs";
 import { join } from "path";
 import type { FileWatcher } from "typescript";
 import { canImportModule } from "./canImportModule";
-import { LoggerLike } from "./logging";
+import { LoggerLike } from "./LoggerLike";
 import { toError } from "./toError";
 
 const { readdir, stat } = fsPromises;

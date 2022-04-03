@@ -1,7 +1,7 @@
 import { Server } from "http";
 import WebSocket from "ws";
 import { bootstrap } from "../examples/server/src/server";
-import { LoggerLike } from "../src/util/logging";
+import { LoggerLike } from "../src/util/LoggerLike";
 
 export function requireExampleServer(env?: NodeJS.ProcessEnv) {
   let server: Server;

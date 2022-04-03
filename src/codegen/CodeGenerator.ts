@@ -1,17 +1,17 @@
-import * as path from "path";
 import { validate } from "graphql";
-import { ClientCodeGenerator } from "./ClientCodeGenerator";
-import { ServerCodeGenerator } from "./ServerCodeGenerator";
-import { GraphQLReader } from "../read/GraphQLReader";
+import * as path from "path";
 import {
   GraphQLIntrospector,
   IntrospectionRequestFn,
 } from "../introspect/GraphQLIntrospector";
+import { GraphQLReader } from "../read/GraphQLReader";
+import { cleanOperations } from "../util/cleanOperations";
+import { LoggerLike } from "../util/LoggerLike";
+import { toError } from "../util/toError";
 import { watchRecursive } from "../util/watchRecursive";
 import { writeTypeScript } from "../util/writeTypeScript";
-import { cleanOperations } from "../util/cleanOperations";
-import { LoggerLike } from "../util/logging";
-import { toError } from "../util/toError";
+import { ClientCodeGenerator } from "./ClientCodeGenerator";
+import { ServerCodeGenerator } from "./ServerCodeGenerator";
 
 export interface CodeGeneratorOptions {
   /**

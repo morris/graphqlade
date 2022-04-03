@@ -2,10 +2,10 @@ import { GraphQLFieldResolver, GraphQLSchema, isSchema } from "graphql";
 import { join } from "path";
 import { GraphQLReader } from "../read/GraphQLReader";
 import {
-  GraphQLSchemaManager,
-  SubscriptionResolver,
   AnyResolverMap,
+  GraphQLSchemaManager,
   ResolverErrorHandler,
+  SubscriptionResolver,
 } from "./GraphQLSchemaManager";
 
 export interface BuildExecutableSchemaOptions<TContext> {

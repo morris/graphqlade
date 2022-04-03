@@ -1,6 +1,6 @@
-import { Stats, promises as fsPromises } from "fs";
-import { join } from "path";
+import { promises as fsPromises, Stats } from "fs";
 import { buildSchema, GraphQLError, parse } from "graphql";
+import { join } from "path";
 
 const { readdir, readFile, stat } = fsPromises;
 

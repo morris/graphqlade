@@ -1,5 +1,5 @@
-import { AbstractClient } from "./generated/operations";
 import { GraphQLWebSocketClient } from "graphqlade/dist/browser";
+import { AbstractClient } from "./generated/operations";
 
 export class MyClient extends AbstractClient {
   protected socketClient: GraphQLWebSocketClient;

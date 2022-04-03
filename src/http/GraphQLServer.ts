@@ -6,11 +6,11 @@ import {
   GraphQLSchema,
   validate,
 } from "graphql";
-import { assertRecord } from "../util/assert";
 import {
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
 } from "../server/GraphQLExecutionArgsParser";
+import { assertRecord } from "../util/assert";
 import { toError } from "../util/toError";
 
 export interface GraphQLServerOptions {

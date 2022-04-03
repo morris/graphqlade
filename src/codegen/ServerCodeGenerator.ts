@@ -1,24 +1,24 @@
 import {
-  GraphQLField,
-  GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
-  isObjectType,
-  isInterfaceType,
-  isScalarType,
-  isUnionType,
-  isInputObjectType,
-  isEnumType,
-  isNonNullType,
-  GraphQLSchema,
   GraphQLEnumType,
   GraphQLEnumValue,
+  GraphQLField,
+  GraphQLInterfaceType,
   GraphQLNamedType,
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLUnionType,
   isCompositeType,
+  isEnumType,
+  isInputObjectType,
+  isInterfaceType,
+  isNonNullType,
+  isObjectType,
+  isScalarType,
+  isUnionType,
 } from "graphql";
+import { getDirective } from "../util/directives";
 import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
 import { ImportCodeGenerator } from "./ImportCodeGenerator";
-import { getDirective } from "../util/directives";
 
 export interface ServerCodeGeneratorOptions {
   schema: GraphQLSchema;

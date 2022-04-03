@@ -1,8 +1,8 @@
 import { toError } from "../util/toError";
 import {
   CodeGenerator,
-  CodeGeneratorOptions,
   CodeGeneratorCliOptions,
+  CodeGeneratorOptions,
 } from "./CodeGenerator";
 
 export interface Gql2TsOptions

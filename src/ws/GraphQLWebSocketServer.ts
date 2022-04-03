@@ -7,8 +7,8 @@ import {
   RawExecutionArgs,
 } from "../server/GraphQLExecutionArgsParser";
 import {
-  GraphQLServerWebSocket,
   AcknowledgeFn,
+  GraphQLServerWebSocket,
 } from "./GraphQLServerWebSocket";
 
 export interface GraphQLWebSocketServerOptions<TContext> {
