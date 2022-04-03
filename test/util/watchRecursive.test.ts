@@ -4,7 +4,14 @@ import { GraphQLReader, watchRecursive } from "../../src";
 
 describe("The watchRecursive function", () => {
   beforeAll(() => {
-    rmdirSync(join(__dirname, "watchRecursive"), { recursive: true });
+    try {
+      rmdirSync(join(__dirname, "watchRecursive"), { recursive: true });
+    } catch (err) {
+      if (!err.message.match(/no such file or directory/)) {
+        throw err;
+      }
+    }
+
     mkdirSync(join(__dirname, "watchRecursive"), { recursive: true });
   });
 
