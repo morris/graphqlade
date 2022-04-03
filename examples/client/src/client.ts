@@ -1,12 +1,18 @@
+import type { ExecutionResult } from "graphql";
 import { GraphQLWebSocketClient } from "graphqlade/dist/browser";
-import { AbstractClient } from "./generated/operations";
+import {
+  MutationName,
+  OperationNameToData,
+  OperationNameToDocument,
+  OperationNameToVariables,
+  QueryName,
+  SubscriptionName,
+} from "./generated/operations";
 
-export class MyClient extends AbstractClient {
+export class MyClient {
   protected socketClient: GraphQLWebSocketClient;
 
   constructor() {
-    super();
-
     this.socketClient = new GraphQLWebSocketClient({
       url: "ws://localhost:4000/graphql",
       connectionInitPayload: {
@@ -15,32 +21,48 @@ export class MyClient extends AbstractClient {
     });
   }
 
-  // implement raw query method to be used by the generated methods
-  async query<TVariables, TExecutionResult>(
-    query: string,
-    operationName: string,
-    variables: TVariables
-  ): Promise<TExecutionResult> {
+  async query<TQueryName extends QueryName>(
+    operationName: TQueryName,
+    variables: OperationNameToVariables[TQueryName]
+  ): Promise<ExecutionResult<OperationNameToData[TQueryName]>> {
     return fetch("http://localhost:4000/graphql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query,
+        query: OperationNameToDocument[operationName],
         operationName,
         variables,
       }),
     }).then((r) => r.json());
   }
 
-  subscribe<TVariables, TExecutionResult>(
-    query: string,
-    operationName: string,
-    variables: TVariables
+  async mutate<TMutationName extends MutationName>(
+    operationName: TMutationName,
+    variables: OperationNameToVariables[TMutationName]
+  ): Promise<ExecutionResult<OperationNameToData[TMutationName]>> {
+    return fetch("http://localhost:4000/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: OperationNameToDocument[operationName],
+        operationName,
+        variables,
+      }),
+    }).then((r) => r.json());
+  }
+
+  subscribe<TSubscriptionName extends SubscriptionName>(
+    operationName: SubscriptionName,
+    variables: OperationNameToVariables[TSubscriptionName]
   ) {
-    return this.socketClient.subscribe<TExecutionResult>({
-      query,
+    return this.socketClient.subscribe<
+      ExecutionResult<OperationNameToData[TSubscriptionName]>
+    >({
+      query: OperationNameToDocument[operationName],
       operationName,
       variables: variables as Record<string, unknown>,
     });

@@ -25,7 +25,6 @@ import {
   Kind,
   NameNode,
   OperationDefinitionNode,
-  OperationTypeNode,
   print,
   SelectionSetNode,
   TypeNode,
@@ -113,7 +112,6 @@ export class ClientCodeGenerator {
       this.generateHeader(),
       this.generateImports(),
       this.generateHelpers(),
-      this.generateAbstractClient(),
       this.generateOperationTypes(),
       this.generateFragmentTypes(),
       this.generateInputTypes(),
@@ -151,119 +149,6 @@ export class ClientCodeGenerator {
         return {} as T;
       }`,
     ]);
-  }
-
-  // abstract client
-
-  generateAbstractClient() {
-    return `export abstract class AbstractClient<
-      TExtensions = Record<string, unknown>,
-      TOperationExtra = unknown,
-      TExecutionResultExtra = unknown
-    > {
-      async query<TVariables, TExecutionResult>(
-        document: string,
-        operationName: string,
-        variables: TVariables,
-        extra?: TOperationExtra
-      ): Promise<TExecutionResult & TExecutionResultExtra> {
-        throw new Error("AbstractClient.query not implemented");
-      }
-
-      async mutate<TVariables, TExecutionResult>(
-        document: string,
-        operationName: string,
-        variables: TVariables,
-        extra?: TOperationExtra
-      ): Promise<TExecutionResult & TExecutionResultExtra> {
-        return this.query(document, operationName, variables, extra);
-      }
-
-      subscribe<TVariables, TExecutionResult>(
-        document: string,
-        operationName: string,
-        variables: TVariables,
-        extra?: TOperationExtra
-      ): AsyncIterableIterator<TExecutionResult & TExecutionResultExtra> {
-        throw new Error("AbstractClient.subscribe not implemented");
-      }
-
-      ${this.generateOperations()}
-    }`;
-  }
-
-  generateOperations() {
-    const parts: string[] = [];
-
-    visit(this.operations, {
-      OperationDefinition: (node) => {
-        this.assertNamedOperationDefinition(node);
-
-        parts.push(this.generateOperation(node));
-      },
-    });
-
-    return this.join(parts);
-  }
-
-  generateOperation(node: NamedOperationDefinitionNode) {
-    switch (node.operation) {
-      case OperationTypeNode.QUERY:
-        return this.generateQuery(node);
-      case OperationTypeNode.MUTATION:
-        return this.generateMutation(node);
-      case OperationTypeNode.SUBSCRIPTION:
-        return this.generateSubscription(node);
-    }
-  }
-
-  generateQuery(node: NamedOperationDefinitionNode) {
-    const name = node.name.value;
-    const safeName = JSON.stringify(name);
-    const variablesArg = this.generateVariablesArg(node);
-
-    return `async query${name}(${variablesArg}, extra?: TOperationExtra):
-        Promise<X${name}<TExtensions> & TExecutionResultExtra> {
-      return this.query(${name}Document, ${safeName}, variables, extra);
-    }`;
-  }
-
-  generateMutation(node: NamedOperationDefinitionNode) {
-    const name = node.name.value;
-    const safeName = JSON.stringify(name);
-    const variablesArg = this.generateVariablesArg(node);
-
-    return `async mutate${name}(${variablesArg}, extra?: TOperationExtra):
-        Promise<X${name}<TExtensions> & TExecutionResultExtra> {
-      return this.mutate(${name}Document, ${safeName}, variables, extra);
-    }`;
-  }
-
-  generateSubscription(node: NamedOperationDefinitionNode) {
-    const name = node.name.value;
-    const safeName = JSON.stringify(name);
-    const variablesArg = this.generateVariablesArg(node);
-
-    return `subscribe${name}(${variablesArg}, extra?: TOperationExtra):
-        AsyncIterableIterator<X${name}<TExtensions> & TExecutionResultExtra> {
-      return this.subscribe(${name}Document, ${safeName}, variables, extra);
-    }`;
-  }
-
-  generateVariablesArg(node: NamedOperationDefinitionNode) {
-    const variablesRef = this.generateVariablesRef(node);
-
-    return variablesRef === "undefined"
-      ? `variables?: undefined`
-      : `variables: ${variablesRef}`;
-  }
-
-  generateVariablesRef(node: NamedOperationDefinitionNode) {
-    if (!node.variableDefinitions || node.variableDefinitions.length === 0) {
-      return "undefined";
-    }
-
-    return `V${node.name.value}`;
   }
 
   // operation tables
@@ -357,6 +242,14 @@ export class ClientCodeGenerator {
     return `export interface OperationNameToVariables {
       ${this.join(parts, "\n")}
     }`;
+  }
+
+  generateVariablesRef(node: NamedOperationDefinitionNode) {
+    if (!node.variableDefinitions || node.variableDefinitions.length === 0) {
+      return "undefined";
+    }
+
+    return `V${node.name.value}`;
   }
 
   generateOperationNameToData() {

@@ -4,6 +4,8 @@ import {
   DLocations,
   DReviews,
   Maybe,
+  TDifficulty,
+  TRating,
   typeRef,
 } from "./generated/operations";
 
@@ -23,18 +25,54 @@ export function App(el: Element) {
     <h2>Locations</h2>
     <div class="locations"></div>
     <h2>Reviews</h2>
+    <form class="add-review">
+      <h3>Add Boss Review</h3>
+      <p>
+        <label>
+          Boss<br>
+          <select name="bossId"></select>
+        </label>
+      </p>
+      <p>
+        <label>
+          Difficulty<br>
+          <select name="difficulty">
+            <option value="${TDifficulty.OKAYISH}">Okayish</option>
+            <option value="${TDifficulty.HARD}">Hard</option>
+            <option value="${TDifficulty.IMPOSSIBLE}">Impossible</option>
+          </select>
+        </label>
+      </p>
+      <p>
+        <label>
+          Theme<br>
+          <select name="theme">
+            <option value="${TRating.STELLAR}">Stellar</option>
+            <option value="${TRating.AMAZING}">Amazing</option>
+            <option value="${TRating.ALRIGHT}">Alright</option>
+            <option value="${TRating.MEH}">Meh</option>
+            <option value="${TRating.TERRIBLE}">Terrible</option>
+          </select>
+        </label>
+      </p>
+      <p>
+        <button type="submit">Submit</button>
+      </p>
+    </form>
     <div class="reviews"></div>
   `;
 
   const client = new MyClient();
 
-  client.queryBosses().then((x) => update({ bossData: x.data }));
-  client.queryLocations({}).then((x) => update({ locationData: x.data }));
-  client.queryReviews().then((x) => update({ reviewData: x.data }));
+  client.query("Bosses", undefined).then((x) => update({ bossData: x.data }));
+  client.query("Locations", {}).then((x) => update({ locationData: x.data }));
+  client
+    .query("Reviews", undefined)
+    .then((x) => update({ reviewData: x.data }));
 
   setTimeout(async () => {
     try {
-      for await (const review of client.subscribeNewReviews({})) {
+      for await (const review of client.subscribe("NewReviews", {})) {
         if (review.data?.newReview) {
           state.reviewData?.reviews?.push(review.data?.newReview);
           update({});
@@ -46,8 +84,31 @@ export function App(el: Element) {
     }
   }, 100);
 
+  el.querySelector<HTMLFormElement>(".add-review")?.addEventListener(
+    "submit",
+    (e) => {
+      e.preventDefault();
+
+      client.mutate("CreateBossReview", {
+        input: {
+          bossId: el.querySelector<HTMLSelectElement>("[name=bossId]")
+            ?.value as string,
+          difficulty: el.querySelector<HTMLSelectElement>("[name=difficulty]")
+            ?.value as TDifficulty,
+          theme: el.querySelector<HTMLSelectElement>("[name=theme]")
+            ?.value as TRating,
+        },
+      });
+    }
+  );
+
   function update(next: Partial<AppState>) {
     Object.assign(state, next);
+
+    el.querySelectorAll<HTMLElement>("[name=bossId]").forEach((el) => {
+      el.innerHTML =
+        state.bossData?.bosses?.map(renderBossOption).join("") ?? "";
+    });
 
     el.querySelectorAll<HTMLElement>(".bosses").forEach((el) => {
       el.innerHTML =
@@ -72,6 +133,10 @@ export function App(el: Element) {
   const Boss = typeRef(state.bossData?.bosses?.[0]);
   const Location = typeRef(state.locationData?.locations?.[0]);
   const Review = typeRef(state.reviewData?.reviews?.[0]);
+
+  function renderBossOption(data: typeof Boss) {
+    return `<option value="${data.id}">${data.name}</p>`;
+  }
 
   function renderBoss(data: typeof Boss) {
     return `<p>${data.name} (${data.location.name})</p>`;

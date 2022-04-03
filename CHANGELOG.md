@@ -4,6 +4,7 @@
 
 - BREAKING: Upgrade to `graphql@16`
 - BREAKING: Upgrade to `ws@8`
+- BREAKING: Remove `AbstractClient` code generation in favor of operation tables
 
 ## v0.3.5
 
