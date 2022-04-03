@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## v0.3.5
 
 - Update dependencies
 - Fix audit
