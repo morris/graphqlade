@@ -9,11 +9,11 @@ import {
 import {
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
-} from "../server/GraphQLExecutionArgsParser";
+} from "../execute/GraphQLExecutionArgsParser";
 import { assertRecord } from "../util/assert";
 import { toError } from "../util/toError";
 
-export interface GraphQLServerOptions {
+export interface GraphQLHttpServerOptions {
   /**
    * Executable GraphQLSchema instance.
    */
@@ -25,7 +25,7 @@ export interface GraphQLServerOptions {
   parser?: GraphQLExecutionArgsParser;
 }
 
-export interface GraphQLServerRequest {
+export interface GraphQLHttpServerRequest {
   method: string;
   headers: Record<string, string | string[] | undefined>;
   query?: ParsedQs;
@@ -36,17 +36,17 @@ export interface ParsedQs {
   [key: string]: string | string[] | ParsedQs | ParsedQs[] | undefined;
 }
 
-export interface GraphQLServerResponse {
+export interface GraphQLHttpServerResponse {
   status: number;
   headers: Record<string, string>;
   body: ExecutionResult;
 }
 
-export class GraphQLServer<TContext> {
+export class GraphQLHttpServer<TContext> {
   public readonly schema: GraphQLSchema;
   public readonly parser: GraphQLExecutionArgsParser;
 
-  constructor(options: GraphQLServerOptions) {
+  constructor(options: GraphQLHttpServerOptions) {
     this.schema = options.schema;
     this.parser = options.parser ?? new GraphQLExecutionArgsParser();
   }
@@ -54,9 +54,9 @@ export class GraphQLServer<TContext> {
   // execution
 
   async execute(
-    request: GraphQLServerRequest,
+    request: GraphQLHttpServerRequest,
     contextValue: TContext
-  ): Promise<GraphQLServerResponse> {
+  ): Promise<GraphQLHttpServerResponse> {
     try {
       return this.executeParsed(request, this.parse(request), contextValue);
     } catch (err) {
@@ -75,7 +75,7 @@ export class GraphQLServer<TContext> {
   }
 
   async executeParsed(
-    request: GraphQLServerRequest,
+    request: GraphQLHttpServerRequest,
     args: ParsedExecutionArgs,
     contextValue: TContext
   ) {
@@ -95,7 +95,7 @@ export class GraphQLServer<TContext> {
   }
 
   async executeValidated(
-    _: GraphQLServerRequest,
+    _: GraphQLHttpServerRequest,
     args: ParsedExecutionArgs,
     contextValue: TContext
   ) {
@@ -114,7 +114,7 @@ export class GraphQLServer<TContext> {
 
   // validation
 
-  async validate(request: GraphQLServerRequest, args: ParsedExecutionArgs) {
+  async validate(request: GraphQLHttpServerRequest, args: ParsedExecutionArgs) {
     const errors = validate(this.schema, args.document) as GraphQLError[];
     const operation = getOperationAST(args.document, args.operationName);
 
@@ -133,7 +133,7 @@ export class GraphQLServer<TContext> {
 
   // parsing
 
-  parse(request: GraphQLServerRequest): ParsedExecutionArgs {
+  parse(request: GraphQLHttpServerRequest): ParsedExecutionArgs {
     switch (request.method) {
       case "GET":
         return this.parseGet(request);
@@ -153,7 +153,7 @@ export class GraphQLServer<TContext> {
     }
   }
 
-  parseGet(request: GraphQLServerRequest): ParsedExecutionArgs {
+  parseGet(request: GraphQLHttpServerRequest): ParsedExecutionArgs {
     return this.parser.parse({
       query: request.query?.query,
       operationName: request.query?.operationName,
@@ -161,7 +161,7 @@ export class GraphQLServer<TContext> {
     });
   }
 
-  parsePost(request: GraphQLServerRequest): ParsedExecutionArgs {
+  parsePost(request: GraphQLHttpServerRequest): ParsedExecutionArgs {
     const body = this.parseBody(request.body);
 
     return this.parser.parse({

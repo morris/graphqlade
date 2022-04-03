@@ -2,9 +2,12 @@
 
 ## NEXT
 
-- BREAKING: Upgrade to `graphql@16`
-- BREAKING: Upgrade to `ws@8`
-- BREAKING: Remove `AbstractClient` code generation in favor of operation tables
+- BREAKING CHANGES
+  - Upgrade to `graphql@16`
+  - Upgrade to `ws@8`
+  - Remove `AbstractClient` code generation in favor of operation tables
+  - Rename `GraphQLServer` to `GraphQLHttpServer`
+  - Rename `src/server` to `src/execute`
 
 ## v0.3.5
 

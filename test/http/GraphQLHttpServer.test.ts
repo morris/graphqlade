@@ -1,8 +1,8 @@
 import { GraphQLError, GraphQLSchema } from "graphql";
 import { resolvers } from "../../examples/server/src/resolvers";
-import { buildExecutableSchema, GraphQLServer } from "../../src";
+import { buildExecutableSchema, GraphQLHttpServer } from "../../src";
 
-describe("A GraphQLServer object", () => {
+describe("The GraphQLHttpServer", () => {
   let schema: GraphQLSchema;
   let operations: string;
 
@@ -14,7 +14,7 @@ describe("A GraphQLServer object", () => {
   });
 
   it("should be able to handle POST GraphQL requests", async () => {
-    const gqlServer = new GraphQLServer<undefined>({ schema });
+    const gqlServer = new GraphQLHttpServer<undefined>({ schema });
 
     const response = await gqlServer.execute(
       {
@@ -39,7 +39,7 @@ describe("A GraphQLServer object", () => {
   });
 
   it("should be able to handle GET GraphQL requests", async () => {
-    const gqlServer = new GraphQLServer<undefined>({ schema });
+    const gqlServer = new GraphQLHttpServer<undefined>({ schema });
 
     const response = await gqlServer.execute(
       {
@@ -76,7 +76,7 @@ describe("A GraphQLServer object", () => {
   });
 
   it("should reject unsupported methods", async () => {
-    const gqlServer = new GraphQLServer<undefined>({ schema });
+    const gqlServer = new GraphQLHttpServer<undefined>({ schema });
 
     const response = await gqlServer.execute(
       {
@@ -104,7 +104,7 @@ describe("A GraphQLServer object", () => {
   });
 
   it("should reject mutations via GET", async () => {
-    const gqlServer = new GraphQLServer<undefined>({ schema });
+    const gqlServer = new GraphQLHttpServer<undefined>({ schema });
 
     const response = await gqlServer.execute(
       {
@@ -132,7 +132,7 @@ describe("A GraphQLServer object", () => {
   });
 
   it("should reject invalid queries", async () => {
-    const gqlServer = new GraphQLServer<undefined>({ schema });
+    const gqlServer = new GraphQLHttpServer<undefined>({ schema });
 
     const response = await gqlServer.execute(
       {

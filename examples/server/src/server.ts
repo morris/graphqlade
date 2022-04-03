@@ -8,7 +8,7 @@ import { AddressInfo } from "net";
 import * as ws from "ws";
 import {
   buildExecutableSchema,
-  GraphQLServer,
+  GraphQLHttpServer,
   GraphQLWebSocketServer,
 } from "../../../src"; // graphqlade/dist/server in your app
 import { MyContext } from "./context";
@@ -34,7 +34,7 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
   });
 
   // build graphql server
-  const gqlServer = new GraphQLServer<MyContext>({ schema });
+  const gqlServer = new GraphQLHttpServer<MyContext>({ schema });
 
   // backend framework-dependent logic
   async function serveGraphQL(

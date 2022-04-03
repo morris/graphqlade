@@ -1,6 +1,6 @@
 import { GraphQLSchema } from "graphql";
 import { resolvers } from "../../examples/server/src/resolvers";
-import { buildExecutableSchema, GraphQLServer } from "../../src";
+import { buildExecutableSchema, GraphQLHttpServer } from "../../src";
 
 describe("The example server", () => {
   let schema: GraphQLSchema;
@@ -13,7 +13,7 @@ describe("The example server", () => {
   });
 
   it("should support custom scalar parsing and serialization", async () => {
-    const gqlServer = new GraphQLServer<undefined>({ schema });
+    const gqlServer = new GraphQLHttpServer<undefined>({ schema });
 
     const response = await gqlServer.execute(
       {
@@ -50,7 +50,7 @@ describe("The example server", () => {
   });
 
   it("should support custom scalar parsing and serialization (2)", async () => {
-    const gqlServer = new GraphQLServer<undefined>({ schema });
+    const gqlServer = new GraphQLHttpServer<undefined>({ schema });
 
     const response = await gqlServer.execute(
       {

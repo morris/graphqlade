@@ -1,1 +1,1 @@
-export * from "./GraphQLServer";
+export * from "./GraphQLHttpServer";

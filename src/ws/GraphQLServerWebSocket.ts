@@ -1,7 +1,7 @@
 import type { ExecutionResult, GraphQLError } from "graphql";
 import type { IncomingMessage } from "http";
 import type WebSocket from "ws";
-import type { RawExecutionArgs } from "../server/GraphQLExecutionArgsParser";
+import type { RawExecutionArgs } from "../execute/GraphQLExecutionArgsParser";
 import { assert, assertDefined, assertRecord } from "../util/assert";
 import { DeferredPromise } from "../util/DeferredPromise";
 import { isAsyncIterator } from "../util/isAsyncIterator";

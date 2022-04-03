@@ -1,7 +1,7 @@
 import { GraphQLReader } from "../../src";
 import { toError } from "../../src/util/toError";
 
-describe("A GraphQLReader object", () => {
+describe("The GraphQLReader", () => {
   it("should be able to build the example schema", async () => {
     const reader = new GraphQLReader();
 

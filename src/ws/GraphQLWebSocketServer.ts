@@ -5,7 +5,7 @@ import {
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
   RawExecutionArgs,
-} from "../server/GraphQLExecutionArgsParser";
+} from "../execute/GraphQLExecutionArgsParser";
 import {
   AcknowledgeFn,
   GraphQLServerWebSocket,

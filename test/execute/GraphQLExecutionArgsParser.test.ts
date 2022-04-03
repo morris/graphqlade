@@ -1,7 +1,7 @@
 import { parse, print } from "graphql";
 import { GraphQLExecutionArgsParser } from "../../src";
 
-describe("A GraphQLExecutionArgsParserExecutionArgsParser object", () => {
+describe("The GraphQLExecutionArgsParser", () => {
   it("should be able to parse a basic query", async () => {
     const gqlExecutionArgsParser = new GraphQLExecutionArgsParser();
 
