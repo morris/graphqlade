@@ -5,6 +5,8 @@
 - Update dependencies
 - Fix audit
 - Switch to Jest
+- Add tests
+- Add Node.js 16.x to pipeline
 
 ## v0.3.4
 

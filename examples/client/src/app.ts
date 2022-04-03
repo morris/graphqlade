@@ -29,7 +29,7 @@ export function App(el: Element) {
   const client = new MyClient();
 
   client.queryBosses().then((x) => update({ bossData: x.data }));
-  client.queryLocations().then((x) => update({ locationData: x.data }));
+  client.queryLocations({}).then((x) => update({ locationData: x.data }));
   client.queryReviews().then((x) => update({ reviewData: x.data }));
 
   setTimeout(async () => {
