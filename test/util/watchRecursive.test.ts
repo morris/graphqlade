@@ -7,9 +7,7 @@ describe("The watchRecursive function", () => {
     try {
       rmdirSync(join(__dirname, "watchRecursive"), { recursive: true });
     } catch (err) {
-      if (!err.message.match(/no such file or directory/)) {
-        throw err;
-      }
+      // ignore
     }
 
     mkdirSync(join(__dirname, "watchRecursive"), { recursive: true });
