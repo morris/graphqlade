@@ -55,4 +55,146 @@ describe("The example", () => {
       },
     });
   });
+
+  it("should respect @skip directives", async () => {
+    const r = await got("http://localhost:4999/graphql", {
+      method: "POST",
+      json: {
+        query: operations,
+        operationName: "Locations",
+        variables: {
+          skipBosses: true,
+        },
+      },
+      responseType: "json",
+    });
+
+    expect(r.body).toEqual({
+      data: {
+        locations: [
+          {
+            id: "11",
+            name: "Northern Undead Asylum",
+          },
+          {
+            id: "12",
+            name: "Undead Burg",
+          },
+          {
+            id: "13",
+            name: "Undead Parish",
+          },
+        ],
+      },
+    });
+  });
+
+  it("should respect @skip directives (negative case)", async () => {
+    const r = await got("http://localhost:4999/graphql", {
+      method: "POST",
+      json: {
+        query: operations,
+        operationName: "Locations",
+        variables: {
+          skipBosses: false,
+        },
+      },
+      responseType: "json",
+    });
+
+    expect(r.body).toEqual({
+      data: {
+        locations: [
+          {
+            id: "11",
+            name: "Northern Undead Asylum",
+            bosses: [
+              {
+                id: "1",
+                name: "Asylum Demon",
+              },
+            ],
+          },
+          {
+            id: "12",
+            name: "Undead Burg",
+            bosses: [
+              {
+                id: "2",
+                name: "Taurus Demon",
+              },
+            ],
+          },
+          {
+            id: "13",
+            name: "Undead Parish",
+            bosses: [
+              {
+                id: "3",
+                name: "Bell Gargoyles",
+              },
+            ],
+          },
+        ],
+      },
+    });
+  });
+
+  it("should respect @include directives", async () => {
+    const r = await got("http://localhost:4999/graphql", {
+      method: "POST",
+      json: {
+        query: operations,
+        operationName: "Locations",
+        variables: {
+          includeReviews: true,
+        },
+      },
+      responseType: "json",
+    });
+
+    expect(r.body).toEqual({
+      data: {
+        locations: [
+          {
+            id: "11",
+            name: "Northern Undead Asylum",
+            bosses: [
+              {
+                id: "1",
+                name: "Asylum Demon",
+                reviews: [
+                  {
+                    difficulty: "OKAYISH",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: "12",
+            name: "Undead Burg",
+            bosses: [
+              {
+                id: "2",
+                name: "Taurus Demon",
+                reviews: [],
+              },
+            ],
+          },
+          {
+            id: "13",
+            name: "Undead Parish",
+            bosses: [
+              {
+                id: "3",
+                name: "Bell Gargoyles",
+                reviews: [],
+              },
+            ],
+          },
+        ],
+      },
+    });
+  });
 });

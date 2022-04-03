@@ -84,7 +84,7 @@ export abstract class AbstractClient<
   }
 
   async queryLocations(
-    variables?: undefined,
+    variables: VLocations,
     extra?: TOperationExtra
   ): Promise<XLocations<TExtensions> & TExecutionResultExtra> {
     return this.query(LocationsDocument, "Locations", variables, extra);
@@ -189,7 +189,12 @@ export type DCreateLocationReview = {
 };
 
 export const LocationsDocument =
-  "query Locations {\n  locations {\n    id\n    name\n    bosses {\n      id\n      name\n    }\n  }\n}";
+  "query Locations($skipBosses: Boolean = false, $includeReviews: Boolean = false) {\n  locations {\n    id\n    name\n    bosses @skip(if: $skipBosses) {\n      id\n      name\n      reviews @include(if: $includeReviews) {\n        difficulty\n      }\n    }\n  }\n}";
+
+export interface VLocations {
+  skipBosses?: boolean;
+  includeReviews?: boolean;
+}
 
 export type XLocations<TExtensions> = ExecutionResult<DLocations, TExtensions>;
 
@@ -205,6 +210,12 @@ export type DLocations = {
           id: string;
 
           name: string;
+
+          reviews: Maybe<
+            Array<{
+              difficulty: TDifficulty;
+            }>
+          >;
         }>
       >;
     }>
@@ -517,7 +528,7 @@ export interface OperationNameToVariables {
   CompareBossDifficulty: VCompareBossDifficulty;
   CreateBossReview: VCreateBossReview;
   CreateLocationReview: VCreateLocationReview;
-  Locations: undefined;
+  Locations: VLocations;
   Reviews: undefined;
   NewReviews: VNewReviews;
   Search: VSearch;

@@ -1,10 +1,16 @@
-query Locations {
+query Locations(
+  $skipBosses: Boolean = false
+  $includeReviews: Boolean = false
+) {
   locations {
     id
     name
-    bosses {
+    bosses @skip(if: $skipBosses) {
       id
       name
+      reviews @include(if: $includeReviews) {
+        difficulty
+      }
     }
   }
 }
