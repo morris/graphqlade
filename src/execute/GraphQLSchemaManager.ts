@@ -18,8 +18,7 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
-import { assertDefined } from "../util/assert";
-import { toError } from "../util/toError";
+import { assertDefined, toError } from "../util";
 
 export type AnyResolverMap<TContext> =
   | CustomResolverMap<TContext>
@@ -58,18 +57,6 @@ export interface InterfaceResolver<TSource = unknown, TContext = unknown> {
 
 export interface UnionResolver<TSource = unknown, TContext = unknown> {
   __resolveType?: GraphQLTypeResolver<TSource, TContext>;
-}
-
-export type SubscriptionResolver<TContext> =
-  | CustomSubscriptionResolver<TContext>
-  | GeneratedSubscriptionResolver<TContext>;
-
-export interface CustomSubscriptionResolver<TContext> {
-  [fieldName: string]: GraphQLFieldResolver<unknown, TContext>;
-}
-
-export interface GeneratedSubscriptionResolver<TContext> {
-  __isGeneratedSubscriptionResolver?: TContext;
 }
 
 export type ResolverErrorHandler<TContext> = (
@@ -195,8 +182,11 @@ export class GraphQLSchemaManager<TContext> {
         `Cannot set field resolver for undefined field ${type.name}.${fieldName}`
       );
 
-      field.resolve =
-        field.resolve ??
+      const resolveOrSubscribe =
+        type === this.schema.getSubscriptionType() ? "subscribe" : "resolve";
+
+      field[resolveOrSubscribe] =
+        field[resolveOrSubscribe] ??
         (resolver[fieldName] as GraphQLFieldResolver<unknown, TContext>);
     }
   }
@@ -263,24 +253,6 @@ export class GraphQLSchemaManager<TContext> {
     for (const implementedInterface of type.getInterfaces()) {
       const resolver = r[implementedInterface.name];
       this.addResolversToType(type, resolver);
-    }
-  }
-
-  // subscription resolver
-
-  addSubscriptionResolverToSchema(resolver: SubscriptionResolver<TContext>) {
-    const subscriptionType = this.schema.getSubscriptionType();
-
-    assertDefined(
-      subscriptionType,
-      "Cannot add subscription resolver as schema does not define a subscription type"
-    );
-
-    const fields = subscriptionType.getFields();
-    const r = resolver as CustomSubscriptionResolver<TContext>;
-
-    for (const fieldName of Object.keys(r)) {
-      fields[fieldName].subscribe = r[fieldName];
     }
   }
 

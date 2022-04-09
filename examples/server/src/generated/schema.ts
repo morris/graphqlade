@@ -532,7 +532,7 @@ export interface RSubscription<TContext> {
     args: SubscriptionNewReviewArgs,
     context: TContext,
     info: GraphQLResolveInfo
-  ) => AsyncResult<ReviewData>;
+  ) => AsyncResult<AsyncIterableIterator<{ newReview: ReviewData }>>;
 }
 
 /**
@@ -1078,20 +1078,6 @@ export interface E__DirectiveLocation {
    * Location adjacent to an input object field definition.
    */
   INPUT_FIELD_DEFINITION: T__DirectiveLocation;
-}
-
-export interface SSubscription<TContext> {
-  __isGeneratedSubscriptionResolver?: TContext;
-
-  /**
-   * (Review)
-   */
-  newReview?: (
-    source: TSubscription,
-    args: SubscriptionNewReviewArgs,
-    context: TContext,
-    info: GraphQLResolveInfo
-  ) => AsyncResult<AsyncIterableIterator<{ newReview: ReviewData }>>;
 }
 
 export interface TMutation {

@@ -1,15 +1,14 @@
 import { validate } from "graphql";
 import * as path from "path";
+import { GraphQLIntrospector, IntrospectionRequestFn } from "../introspect";
+import { GraphQLReader } from "../read";
 import {
-  GraphQLIntrospector,
-  IntrospectionRequestFn,
-} from "../introspect/GraphQLIntrospector";
-import { GraphQLReader } from "../read/GraphQLReader";
-import { cleanOperations } from "../util/cleanOperations";
-import { LoggerLike } from "../util/LoggerLike";
-import { toError } from "../util/toError";
-import { watchRecursive } from "../util/watchRecursive";
-import { writeTypeScript } from "../util/writeTypeScript";
+  cleanOperations,
+  LoggerLike,
+  toError,
+  watchRecursive,
+  writeTypeScript,
+} from "../util";
 import { ClientCodeGenerator } from "./ClientCodeGenerator";
 import { ServerCodeGenerator } from "./ServerCodeGenerator";
 
@@ -43,6 +42,10 @@ export interface CodeGeneratorOptions {
    * Defaults to "src/generated".
    */
   out?: string;
+
+  reader?: GraphQLReader;
+
+  introspector?: GraphQLIntrospector;
 }
 
 export interface IntrospectionOptions {
@@ -101,10 +104,12 @@ export class CodeGenerator {
     this.introspection = options?.introspection;
     this.out = options?.out ?? "src/generated";
 
-    this.reader = new GraphQLReader();
-    this.introspector = this.introspection
-      ? new GraphQLIntrospector(this.introspection)
-      : undefined;
+    this.reader = options?.reader ?? new GraphQLReader();
+    this.introspector =
+      options?.introspector ??
+      (this.introspection
+        ? new GraphQLIntrospector(this.introspection)
+        : undefined);
   }
 
   async cli(options: CodeGeneratorCliOptions) {
@@ -229,6 +234,7 @@ export class CodeGenerator {
     const schema = this.introspection
       ? await this.buildClientSchemaFromIntrospection()
       : await this.buildSchema();
+
     const operations = await this.parseOperations();
 
     const errors = validate(schema, cleanOperations(operations));

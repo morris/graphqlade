@@ -1,12 +1,16 @@
 import type { ExecutionResult, GraphQLError } from "graphql";
 import type { IncomingMessage } from "http";
 import type WebSocket from "ws";
-import type { RawExecutionArgs } from "../execute/GraphQLExecutionArgsParser";
-import { assert, assertDefined, assertRecord } from "../util/assert";
-import { DeferredPromise } from "../util/DeferredPromise";
-import { isAsyncIterator } from "../util/isAsyncIterator";
-import type { LoggerLike } from "../util/LoggerLike";
-import { toError } from "../util/toError";
+import type { RawExecutionArgs } from "../execute";
+import {
+  assert,
+  assertDefined,
+  assertRecord,
+  DeferredPromise,
+  isAsyncIterator,
+  LoggerLike,
+  toError,
+} from "../util";
 import type {
   CompleteMessage,
   ConnectionInitMessage,
@@ -340,7 +344,7 @@ export class GraphQLServerWebSocket {
     } else if (err instanceof TypeError) {
       this.close(4400, `Invalid message: ${err.message}`);
     } else {
-      this.logger.error(err.stack ? err.stack : err.message);
+      this.logger.error(err);
       this.close(1011, `Internal server error: ${err.message}`);
     }
   }

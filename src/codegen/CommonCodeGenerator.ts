@@ -107,6 +107,26 @@ export class CommonCodeGenerator {
     return `${this.firstToUpper(node.name)}Directive`;
   }
 
+  generateDirectivesMap() {
+    return `export interface DirectivesMap {
+      ${this.join(
+        this.schema
+          .getDirectives()
+          .map((it) => this.generateDirectivesMapEntry(it))
+      )}
+    }`;
+  }
+
+  generateDirectivesMapEntry(node: GraphQLDirective) {
+    return `${node.name}: ${this.generateDirectivesMapValue(node)};`;
+  }
+
+  generateDirectivesMapValue(node: GraphQLDirective) {
+    return node.args.length > 0
+      ? this.generateDirectiveInterfaceName(node)
+      : {};
+  }
+
   // input objects
 
   generateInputObject(node: GraphQLInputObjectType) {

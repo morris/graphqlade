@@ -31,14 +31,14 @@ import {
   VariableDefinitionNode,
   visit,
 } from "graphql";
-import { assertDefined } from "../util/assert";
-import { getDirective } from "../util/directives";
+import { assertDefined, getDirective } from "../util";
 import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
 import { ImportCodeGenerator } from "./ImportCodeGenerator";
 
 export interface ClientCodeGeneratorOptions {
   schema: GraphQLSchema;
   operations: DocumentNode;
+  commonCodeGenerator?: CommonCodeGenerator;
 }
 
 export type NamedOperationDefinitionNode = OperationDefinitionNode & {
@@ -59,7 +59,8 @@ export class ClientCodeGenerator {
   constructor(options: ClientCodeGeneratorOptions) {
     this.schema = options.schema;
     this.operations = options.operations;
-    this.commonCodeGenerator = new CommonCodeGenerator(options);
+    this.commonCodeGenerator =
+      options.commonCodeGenerator ?? new CommonCodeGenerator(options);
 
     this.initScalarMappings();
     this.initFragmentMap();

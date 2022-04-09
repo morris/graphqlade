@@ -12,8 +12,15 @@ describe("The example server", () => {
     });
   });
 
+  function createContext() {
+    return undefined;
+  }
+
   it("should support custom scalar parsing and serialization", async () => {
-    const gqlServer = new GraphQLHttpServer<undefined>({ schema });
+    const gqlServer = new GraphQLHttpServer<undefined>({
+      schema,
+      createContext,
+    });
 
     const response = await gqlServer.execute(
       {
@@ -50,7 +57,10 @@ describe("The example server", () => {
   });
 
   it("should support custom scalar parsing and serialization (2)", async () => {
-    const gqlServer = new GraphQLHttpServer<undefined>({ schema });
+    const gqlServer = new GraphQLHttpServer<undefined>({
+      schema,
+      createContext,
+    });
 
     const response = await gqlServer.execute(
       {

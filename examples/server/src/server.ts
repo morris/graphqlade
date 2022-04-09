@@ -6,14 +6,9 @@ import express from "express";
 import { createServer, Server } from "http";
 import { AddressInfo } from "net";
 import * as ws from "ws";
-import {
-  buildExecutableSchema,
-  GraphQLHttpServer,
-  GraphQLWebSocketServer,
-} from "../../../src"; // graphqlade/dist/server in your app
+import { buildExecutableSchema, GraphQLServer } from "../../../src"; // graphqlade in your app
 import { MyContext } from "./context";
 import { resolvers } from "./resolvers";
-import { Subscription } from "./resolvers/Subscription";
 
 dotenv.config({ path: __dirname + "/../.env" });
 dotenv.config({ path: __dirname + "/../default.env" });
@@ -26,7 +21,6 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
   const schema = await buildExecutableSchema<MyContext>({
     root: __dirname + "/..",
     resolvers,
-    subscriptionResolver: Subscription,
     resolverErrorHandler: (err) => {
       // eslint-disable-next-line no-console
       console.error(err.stack);
@@ -34,31 +28,15 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
   });
 
   // build graphql server
-  const gqlServer = new GraphQLHttpServer<MyContext>({ schema });
-
-  // backend framework-dependent logic
-  async function serveGraphQL(
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) {
-    try {
-      const response = await gqlServer.execute(req, new MyContext({ pubsub }));
-
-      res.status(response.status).set(response.headers).json(response.body);
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  // build graphql web socket server
-  const gqlWsServer = new GraphQLWebSocketServer<MyContext>({
+  const gqlServer = new GraphQLServer<MyContext>({
     schema,
+    createContext() {
+      return new MyContext({ pubsub });
+    },
+    // web socket specific
     connectionInitWaitTimeout: 1000,
-    acknowledge: (socket, payload) => {
-      const keys = Array.isArray(payload?.keys)
-        ? new Set(payload?.keys)
-        : new Set();
+    acknowledge(socket, payload) {
+      const keys = new Set(Array.isArray(payload?.keys) ? payload?.keys : []);
 
       if (!keys.has("MASTER_KEY")) {
         throw new Error("It appears to be locked");
@@ -66,12 +44,23 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
 
       return { version: 1 };
     },
-    createContext() {
-      return new MyContext({ pubsub });
-    },
   });
 
   // setup web server (express in this case)
+  async function serveGraphQL(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
+    try {
+      const response = await gqlServer.http.execute(req);
+
+      res.status(response.status).set(response.headers).json(response.body);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   const app = express();
 
   app.use(cors());
@@ -87,9 +76,7 @@ export async function bootstrap(env: NodeJS.ProcessEnv) {
     path: "/graphql",
   });
 
-  wsServer.on("connection", (socket, req) =>
-    gqlWsServer.handleConnection(socket, req)
-  );
+  wsServer.on("connection", gqlServer.ws.connectionHandler());
 
   server.listen(env.PORT ? parseInt(env.PORT, 10) : 4000);
 

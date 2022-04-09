@@ -1,3 +1,4 @@
+// keep specifically targeted imports here fore browser build
 import { assert, assertRecord } from "../util/assert";
 import { AsyncPushIterator } from "../util/AsyncPushIterator";
 import { DeferredPromise } from "../util/DeferredPromise";

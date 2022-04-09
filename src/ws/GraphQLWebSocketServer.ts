@@ -5,7 +5,8 @@ import {
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
   RawExecutionArgs,
-} from "../execute/GraphQLExecutionArgsParser";
+} from "../execute";
+import { CreateContextFn } from "../server";
 import {
   AcknowledgeFn,
   GraphQLServerWebSocket,
@@ -44,10 +45,6 @@ export interface GraphQLWebSocketServerOptions<TContext> {
   executionArgsParser?: GraphQLExecutionArgsParser;
 }
 
-export type CreateContextFn<TContext> = (
-  connectionInitPayload?: Record<string, unknown> | null
-) => TContext;
-
 export class GraphQLWebSocketServer<TContext> {
   public readonly schema: GraphQLSchema;
   public readonly executionArgsParser: GraphQLExecutionArgsParser;
@@ -63,6 +60,11 @@ export class GraphQLWebSocketServer<TContext> {
     this.connectionInitWaitTimeout = options.connectionInitWaitTimeout ?? 3000;
     this.acknowledge = options.acknowledge ?? (() => null);
     this.createContext = options.createContext;
+  }
+
+  connectionHandler() {
+    return (socket: WebSocket, req: IncomingMessage) =>
+      this.handleConnection(socket, req);
   }
 
   handleConnection(socket: WebSocket, req: IncomingMessage) {
@@ -102,7 +104,7 @@ export class GraphQLWebSocketServer<TContext> {
     try {
       return await this.subscribeParsed(
         this.parse(args),
-        this.createContext(connectionInitPayload)
+        this.createContext({ connectionInitPayload })
       );
     } catch (err) {
       return {

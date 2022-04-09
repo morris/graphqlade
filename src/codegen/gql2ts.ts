@@ -1,4 +1,4 @@
-import { toError } from "../util/toError";
+import { toError } from "../util";
 import {
   CodeGenerator,
   CodeGeneratorCliOptions,

@@ -1,5 +1,4 @@
 import {
-  DirectiveNode,
   EnumTypeDefinitionNode,
   EnumValueDefinitionNode,
   FieldDefinitionNode,
@@ -15,8 +14,8 @@ import {
   ScalarTypeDefinitionNode,
   SchemaDefinitionNode,
   UnionTypeDefinitionNode,
-  valueFromASTUntyped,
 } from "graphql";
+import { parseDirective } from "./parseDirective";
 
 export function getDirective<T>(
   node: // ExecutableDirectiveLocation:
@@ -41,14 +40,4 @@ export function getDirective<T>(
   const directiveNode = node.directives?.find((it) => it.name.value === name);
 
   if (directiveNode) return parseDirective(directiveNode);
-}
-
-export function parseDirective<T>(node: DirectiveNode): T {
-  const directive: Record<string, unknown> = {};
-
-  for (const arg of node.arguments ?? []) {
-    directive[arg.name.value] = valueFromASTUntyped(arg.value);
-  }
-
-  return directive as T;
 }

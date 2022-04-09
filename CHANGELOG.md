@@ -7,7 +7,11 @@
   - Upgrade to `ws@8`
   - Remove `AbstractClient` code generation in favor of operation tables
   - Rename `GraphQLServer` to `GraphQLHttpServer`
+  - `GraphQLHttpServer` now requires a context type and a `createContext` function
   - Rename `src/server` to `src/execute`
+  - Remove specific subscription resolver options (add subscription resolvers to regular resolver map)
+- Add `GraphQLServer` class, combining HTTP and web socket server setup
+- Add `DirectivesMap` (maps directive names to their arguments) to code generation
 
 ## v0.3.5
 

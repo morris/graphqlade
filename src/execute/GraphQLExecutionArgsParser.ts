@@ -1,6 +1,5 @@
 import { DocumentNode, ExecutionArgs, parse } from "graphql";
-import { assert, assertRecord } from "../util/assert";
-import { cleanOperations } from "../util/cleanOperations";
+import { assert, assertRecord, cleanOperations } from "../util";
 
 export interface GraphQLExecutionArgsParserOptions {
   cacheSize?: number;

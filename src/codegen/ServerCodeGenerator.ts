@@ -16,12 +16,13 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
-import { getDirective } from "../util/directives";
+import { getDirective } from "../util";
 import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
 import { ImportCodeGenerator } from "./ImportCodeGenerator";
 
 export interface ServerCodeGeneratorOptions {
   schema: GraphQLSchema;
+  commonCodeGenerator?: CommonCodeGenerator;
 }
 
 export class ServerCodeGenerator {
@@ -30,7 +31,8 @@ export class ServerCodeGenerator {
 
   constructor(options: ServerCodeGeneratorOptions) {
     this.schema = options.schema;
-    this.commonCodeGenerator = new CommonCodeGenerator(options);
+    this.commonCodeGenerator =
+      options.commonCodeGenerator ?? new CommonCodeGenerator(options);
 
     this.initTypeMappings();
   }
@@ -98,7 +100,6 @@ export class ServerCodeGenerator {
       this.generateResolverMap(),
       this.generateResolvers(),
       this.generateEnumResolvers(),
-      this.generateSubscriptionResolver(),
       this.generateTypes(),
       this.generateArgsForTypes(),
       this.generateInputTypes(),
@@ -160,6 +161,10 @@ export class ServerCodeGenerator {
 
   generateResolver(node: GraphQLNamedType) {
     if (isObjectType(node)) {
+      if (node === this.schema.getSubscriptionType()) {
+        return this.generateSubscriptionResolver(node);
+      }
+
       return this.generateObjectResolver(node);
     } else if (isInterfaceType(node)) {
       return this.generateInterfaceResolver(node);
@@ -235,24 +240,19 @@ export class ServerCodeGenerator {
 
   // subscription resolver interface
 
-  generateSubscriptionResolver() {
-    const node = this.schema.getSubscriptionType();
+  generateSubscriptionResolver(node: GraphQLObjectType) {
+    const fields = Object.values(node.getFields());
 
-    if (node) {
-      const fields = Object.values(node.getFields());
-
-      return `${this.commonCodeGenerator.generateDescription(node)}
-        export interface S${node.name}<TContext> {
-          __isGeneratedSubscriptionResolver?: TContext,
-
-          ${this.join(
-            fields.map((it) => this.generateSubscriptionField(it, node))
-          )}
-        }`;
-    }
+    return `${this.commonCodeGenerator.generateDescription(node)}
+      export interface R${node.name}<TContext> {
+        ${this.generateIsTypeOf(node)}
+        ${this.join(
+          fields.map((it) => this.generateSubscriptionFieldResolver(it, node))
+        )}
+      }`;
   }
 
-  generateSubscriptionField(
+  generateSubscriptionFieldResolver(
     field: GraphQLField<unknown, unknown>,
     parent: GraphQLObjectType
   ) {

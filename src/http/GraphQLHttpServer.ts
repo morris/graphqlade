@@ -6,18 +6,20 @@ import {
   GraphQLSchema,
   validate,
 } from "graphql";
-import {
-  GraphQLExecutionArgsParser,
-  ParsedExecutionArgs,
-} from "../execute/GraphQLExecutionArgsParser";
-import { assertRecord } from "../util/assert";
-import { toError } from "../util/toError";
+import { GraphQLExecutionArgsParser, ParsedExecutionArgs } from "../execute";
+import { CreateContextFn } from "../server";
+import { assertRecord, toError } from "../util";
 
-export interface GraphQLHttpServerOptions {
+export interface GraphQLHttpServerOptions<TContext> {
   /**
    * Executable GraphQLSchema instance.
    */
   schema: GraphQLSchema;
+
+  /**
+   * Function to create context from HTTP headers.
+   */
+  createContext: CreateContextFn<TContext>;
 
   /**
    * Overrides execution args parser.
@@ -44,10 +46,12 @@ export interface GraphQLHttpServerResponse {
 
 export class GraphQLHttpServer<TContext> {
   public readonly schema: GraphQLSchema;
+  public readonly createContext: CreateContextFn<TContext>;
   public readonly parser: GraphQLExecutionArgsParser;
 
-  constructor(options: GraphQLHttpServerOptions) {
+  constructor(options: GraphQLHttpServerOptions<TContext>) {
     this.schema = options.schema;
+    this.createContext = options.createContext;
     this.parser = options.parser ?? new GraphQLExecutionArgsParser();
   }
 
@@ -55,10 +59,14 @@ export class GraphQLHttpServer<TContext> {
 
   async execute(
     request: GraphQLHttpServerRequest,
-    contextValue: TContext
+    contextValue?: TContext
   ): Promise<GraphQLHttpServerResponse> {
     try {
-      return this.executeParsed(request, this.parse(request), contextValue);
+      return this.executeParsed(
+        request,
+        this.parse(request),
+        contextValue ?? this.createContext(request)
+      );
     } catch (err) {
       const errWithStatus = toError(err) as Error & { status?: number };
       const status =
@@ -77,7 +85,7 @@ export class GraphQLHttpServer<TContext> {
   async executeParsed(
     request: GraphQLHttpServerRequest,
     args: ParsedExecutionArgs,
-    contextValue: TContext
+    contextValue?: TContext
   ) {
     const errors = await this.validate(request, args);
 
@@ -91,17 +99,21 @@ export class GraphQLHttpServer<TContext> {
       };
     }
 
-    return this.executeValidated(request, args, contextValue);
+    return this.executeValidated(
+      request,
+      args,
+      contextValue ?? this.createContext(request)
+    );
   }
 
   async executeValidated(
-    _: GraphQLHttpServerRequest,
+    request: GraphQLHttpServerRequest,
     args: ParsedExecutionArgs,
-    contextValue: TContext
+    contextValue?: TContext
   ) {
     const body = await execute({
       schema: this.schema,
-      contextValue,
+      contextValue: contextValue ?? this.createContext(request),
       ...args,
     });
 
