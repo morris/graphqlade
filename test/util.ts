@@ -1,13 +1,13 @@
 import { Server } from "http";
 import WebSocket from "ws";
-import { bootstrap } from "../examples/server/src/server";
+import { main } from "../examples/server/src/main";
 import { LoggerLike } from "../src/util/LoggerLike";
 
 export function requireExampleServer(env?: NodeJS.ProcessEnv) {
   let server: Server;
 
   beforeAll(async () => {
-    server = await bootstrap({ PORT: "4999", ...env });
+    ({ server } = await main({ PORT: "4999", ...env }));
   });
 
   afterAll(async () => {
@@ -22,7 +22,6 @@ export function requireExampleServer(env?: NodeJS.ProcessEnv) {
 export function wsClosed(socket: WebSocket): Promise<[number, string]> {
   return new Promise((resolve) => {
     socket.on("close", (code, reason) => {
-      // reason may be a Buffer?!
       resolve([code, reason.toString()]);
     });
   });
@@ -34,20 +33,14 @@ export class TestLogger implements LoggerLike {
   public readonly errors: Array<string | Error> = [];
 
   log(message: string | Error) {
-    // eslint-disable-next-line no-console
-    console.log(message);
     this.logs.push(message);
   }
 
   warn(message: string | Error) {
-    // eslint-disable-next-line no-console
-    console.warn(message);
     this.warnings.push(message);
   }
 
   error(message: string | Error) {
-    // eslint-disable-next-line no-console
-    console.error(message);
     this.errors.push(message);
   }
 }

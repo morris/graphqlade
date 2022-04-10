@@ -1,7 +1,7 @@
 import { GraphQLScalarType } from "graphql";
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-scalars";
-import { MyContext } from "../context";
 import { ResolverMap } from "../generated/schema";
+import { MyContext } from "../MyContext";
 
 export const scalarResolvers: ResolverMap<MyContext> = {
   Date: GraphQLDate,

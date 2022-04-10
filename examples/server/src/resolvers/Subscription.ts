@@ -1,6 +1,6 @@
 import { AsyncPushIterator } from "../../../../src";
-import { MyContext } from "../context";
 import { ResolverMap } from "../generated/schema";
+import { MyContext } from "../MyContext";
 
 export const subscriptionResolvers: ResolverMap<MyContext> = {
   Subscription: {

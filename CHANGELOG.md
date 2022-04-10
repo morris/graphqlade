@@ -12,6 +12,7 @@
   - Remove specific subscription resolver options (add subscription resolvers to regular resolver map)
 - Add `GraphQLServer` class, combining HTTP and web socket server setup
 - Add `DirectivesMap` (maps directive names to their arguments) to code generation
+- Add simplified request handlers for Express and Koa
 
 ## v0.3.5
 

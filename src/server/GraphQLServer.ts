@@ -1,9 +1,10 @@
 import { GraphQLSchema } from "graphql";
+import { IncomingHttpHeaders } from "http";
 import { GraphQLHttpServer, GraphQLHttpServerOptions } from "../http";
 import { GraphQLWebSocketServer, GraphQLWebSocketServerOptions } from "../ws";
 
 export interface CreateContextFnOptions {
-  headers?: Record<string, string | string[] | undefined>;
+  headers?: IncomingHttpHeaders;
   connectionInitPayload?: Record<string, unknown> | null;
 }
 

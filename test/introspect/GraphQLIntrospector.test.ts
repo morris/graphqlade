@@ -19,7 +19,7 @@ describe("The GraphQLIntrospector", () => {
 
     const schema = await introspector.buildClientSchemaFromIntrospection(
       "http://localhost:4999/graphql",
-      { Authorization: "Bearer of a ring" }
+      { authorization: "Bearer of a ring" }
     );
 
     expect(schema.getType("Boss")).toBeDefined();

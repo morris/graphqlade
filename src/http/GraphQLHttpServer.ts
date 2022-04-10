@@ -6,9 +6,16 @@ import {
   GraphQLSchema,
   validate,
 } from "graphql";
+import { IncomingHttpHeaders } from "http";
 import { GraphQLExecutionArgsParser, ParsedExecutionArgs } from "../execute";
 import { CreateContextFn } from "../server";
 import { assertRecord, toError } from "../util";
+import {
+  ExpressNextFunctionLike,
+  ExpressRequestLike,
+  ExpressResponseLike,
+} from "./express";
+import { KoaContextLike } from "./koa";
 
 export interface GraphQLHttpServerOptions<TContext> {
   /**
@@ -29,7 +36,7 @@ export interface GraphQLHttpServerOptions<TContext> {
 
 export interface GraphQLHttpServerRequest {
   method: string;
-  headers: Record<string, string | string[] | undefined>;
+  headers: IncomingHttpHeaders;
   query?: ParsedQs;
   body?: unknown;
 }
@@ -55,6 +62,44 @@ export class GraphQLHttpServer<TContext> {
     this.parser = options.parser ?? new GraphQLExecutionArgsParser();
   }
 
+  // express helpers
+
+  expressHandler() {
+    return (
+      req: ExpressRequestLike,
+      res: ExpressResponseLike,
+      next: ExpressNextFunctionLike
+    ) => this.handleExpress(req, res, next);
+  }
+
+  async handleExpress(
+    req: ExpressRequestLike,
+    res: ExpressResponseLike,
+    next: ExpressNextFunctionLike
+  ) {
+    try {
+      const response = await this.execute(req);
+
+      res.status(response.status).set(response.headers).json(response.body);
+    } catch (err) {
+      next(toError(err));
+    }
+  }
+
+  // koa helpers
+
+  koaHandler() {
+    return (ctx: KoaContextLike) => this.handleKoa(ctx);
+  }
+
+  async handleKoa(ctx: KoaContextLike) {
+    const response = await this.execute(ctx.request);
+
+    ctx.status = response.status;
+    ctx.set(response.headers);
+    ctx.body = response.body;
+  }
+
   // execution
 
   async execute(
@@ -67,16 +112,15 @@ export class GraphQLHttpServer<TContext> {
         this.parse(request),
         contextValue ?? this.createContext(request)
       );
-    } catch (err) {
-      const errWithStatus = toError(err) as Error & { status?: number };
-      const status =
-        typeof errWithStatus.status === "number" ? errWithStatus.status : 500;
+    } catch (err_) {
+      const err = toError(err_);
+      const status = typeof err.status === "number" ? err.status : 500;
 
       return {
         status,
         headers: {},
         body: {
-          errors: [this.serializeError(err)],
+          errors: [this.serializeError(err_)],
         },
       };
     }
@@ -156,11 +200,11 @@ export class GraphQLHttpServer<TContext> {
           throw new Error(
             `Unsupported method: ${request.method.toUpperCase()}`
           );
-        } catch (err) {
-          const errWithStatus = toError(err) as Error & { status?: number };
-          errWithStatus.status = 405;
+        } catch (err_) {
+          const err = toError(err_);
+          err.status = 405;
 
-          throw errWithStatus;
+          throw err;
         }
     }
   }

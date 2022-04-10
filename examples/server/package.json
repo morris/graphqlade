@@ -5,7 +5,7 @@
   "private": true,
   "license": "ISC",
   "scripts": {
-    "start": "ts-node src/server.ts",
+    "start": "ts-node src/start.ts",
     "gql2ts": "node gql2ts.js"
   },
   "dependencies": {
