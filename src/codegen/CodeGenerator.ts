@@ -1,3 +1,4 @@
+import fs from "fs";
 import { validate } from "graphql";
 import * as path from "path";
 import { GraphQLIntrospector, IntrospectionRequestFn } from "../introspect";
@@ -133,6 +134,7 @@ export class CodeGenerator {
     const logger = options?.logger ?? console;
 
     try {
+      await this.writeTsDirectiveDefinition(options);
       await this.write(options);
 
       if (options.watch) {
@@ -204,6 +206,24 @@ export class CodeGenerator {
     if (options.client) await this.writeClient();
   }
 
+  async writeTsDirectiveDefinition(
+    options: Omit<CodeGeneratorCliOptions, "watch">
+  ) {
+    if (options.server) {
+      await fs.promises.writeFile(
+        path.join(this.root, this.schema, "_ts.gql"),
+        this.getTsDirectiveDefinition()
+      );
+    }
+
+    if (options.client) {
+      await fs.promises.writeFile(
+        path.join(this.root, this.operations, "_ts.gql"),
+        this.getTsDirectiveDefinition()
+      );
+    }
+  }
+
   //
 
   async writeServer() {
@@ -218,6 +238,15 @@ export class CodeGenerator {
       path.join(this.root, this.out, "operations.ts"),
       await this.generateClient()
     );
+  }
+
+  getTsDirectiveDefinition() {
+    return `directive @ts(
+  type: String!
+  inputType: String
+  from: String
+) on OBJECT | INTERFACE | ENUM | SCALAR
+`;
   }
 
   //

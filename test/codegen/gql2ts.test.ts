@@ -15,7 +15,7 @@ describe("The gql2ts function", () => {
       logger,
     });
 
-    expect(logger.errors.length).toEqual(0);
+    expect(logger.errors).toEqual([]);
   });
 
   it("should generate client-code for the example client", async () => {
@@ -32,6 +32,6 @@ describe("The gql2ts function", () => {
       logger,
     });
 
-    expect(logger.errors.length).toEqual(0);
+    expect(logger.errors).toEqual([]);
   });
 });

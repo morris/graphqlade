@@ -1,6 +1,7 @@
 import { mkdirSync, rmdirSync, writeFileSync } from "fs";
 import { join } from "path";
 import { GraphQLReader, watchRecursive } from "../../src";
+import { TestLogger } from "../util";
 
 describe("The watchRecursive function", () => {
   beforeAll(() => {
@@ -15,12 +16,14 @@ describe("The watchRecursive function", () => {
 
   it("should watch directories recursively", async () => {
     const callbacks: string[] = [];
+    const logger = new TestLogger();
 
     const stop = await watchRecursive({
       dirname: join(__dirname, "watchRecursive"),
       callback: (path) => callbacks.push(path),
       match: (path, stats) =>
         stats.isDirectory() || new GraphQLReader().isGraphQLFile(path),
+      logger,
     });
 
     mkdirSync(join(__dirname, "watchRecursive/foo"), { recursive: true });

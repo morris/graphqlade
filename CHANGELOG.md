@@ -10,6 +10,7 @@
   - `GraphQLHttpServer` now requires a context type and a `createContext` function
   - Rename `src/server` to `src/execute`
   - Remove specific subscription resolver options (add subscription resolvers to regular resolver map)
+  - Code generation now automatically creates `_ts.gql` with the `@ts` directive definition
 - Add `GraphQLServer` class, combining HTTP and web socket server setup
 - Add `DirectivesMap` (maps directive names to their arguments) to code generation
 - Add simplified request handlers for Express and Koa
