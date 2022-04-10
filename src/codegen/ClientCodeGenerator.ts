@@ -27,6 +27,7 @@ import {
   OperationDefinitionNode,
   print,
   SelectionSetNode,
+  stripIgnoredCharacters,
   TypeNode,
   VariableDefinitionNode,
   visit,
@@ -291,7 +292,10 @@ export class ClientCodeGenerator {
   generateOperationDocument(node: NamedOperationDefinitionNode) {
     return `export const ${node.name.value}Document =
       ${JSON.stringify(
-        this.join([print(node), this.generateOperationFragments(node)])
+        this.join([
+          stripIgnoredCharacters(print(node)),
+          this.generateOperationFragments(node),
+        ])
       )}`;
   }
 
@@ -313,7 +317,9 @@ export class ClientCodeGenerator {
     });
 
     return this.join(
-      Array.from(names).map((name) => print(this.requireFragment(name).node))
+      Array.from(names).map((name) =>
+        stripIgnoredCharacters(print(this.requireFragment(name).node))
+      )
     );
   }
 

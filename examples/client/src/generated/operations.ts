@@ -8,8 +8,7 @@ export function typeRef<T>(value?: T | null): T {
   return {} as T;
 }
 
-export const BossesDocument =
-  "query Bosses {\n  bosses {\n    id\n    name\n    location {\n      id\n      name\n    }\n  }\n}";
+export const BossesDocument = "query Bosses{bosses{id name location{id name}}}";
 
 export type XBosses<TExtensions> = ExecutionResult<DBosses, TExtensions>;
 
@@ -30,7 +29,7 @@ export type DBosses = {
 };
 
 export const CompareBossDifficultyDocument =
-  "query CompareBossDifficulty($left: ID!, $right: ID!) {\n  left: boss(id: $left) {\n    ...compareBossDifficultyData\n  }\n  right: boss(id: $right) {\n    ...compareBossDifficultyData\n  }\n}\n\nfragment compareBossDifficultyData on Boss {\n  id\n  name\n  reviews {\n    difficulty\n  }\n}";
+  "query CompareBossDifficulty($left:ID!$right:ID!){left:boss(id:$left){...compareBossDifficultyData}right:boss(id:$right){...compareBossDifficultyData}}\n\nfragment compareBossDifficultyData on Boss{id name reviews{difficulty}}";
 
 export interface VCompareBossDifficulty {
   left: string;
@@ -49,7 +48,7 @@ export type DCompareBossDifficulty = {
 };
 
 export const CreateBossReviewDocument =
-  "mutation CreateBossReview($input: CreateBossReviewInput!) {\n  createBossReview(input: $input) {\n    id\n  }\n}";
+  "mutation CreateBossReview($input:CreateBossReviewInput!){createBossReview(input:$input){id}}";
 
 export interface VCreateBossReview {
   input: TCreateBossReviewInput;
@@ -67,7 +66,7 @@ export type DCreateBossReview = {
 };
 
 export const CreateLocationReviewDocument =
-  "mutation CreateLocationReview($input: CreateLocationReviewInput!) {\n  createLocationReview(input: $input) {\n    id\n  }\n}";
+  "mutation CreateLocationReview($input:CreateLocationReviewInput!){createLocationReview(input:$input){id}}";
 
 export interface VCreateLocationReview {
   input: TCreateLocationReviewInput;
@@ -85,7 +84,7 @@ export type DCreateLocationReview = {
 };
 
 export const LocationsDocument =
-  "query Locations($skipBosses: Boolean = false, $includeReviews: Boolean = false) {\n  locations {\n    id\n    name\n    bosses @skip(if: $skipBosses) {\n      id\n      name\n      reviews @include(if: $includeReviews) {\n        difficulty\n      }\n    }\n  }\n}";
+  "query Locations($skipBosses:Boolean=false$includeReviews:Boolean=false){locations{id name bosses@skip(if:$skipBosses){id name reviews@include(if:$includeReviews){difficulty}}}}";
 
 export interface VLocations {
   skipBosses?: boolean;
@@ -119,7 +118,7 @@ export type DLocations = {
 };
 
 export const ReviewsDocument =
-  "query Reviews {\n  reviews {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}";
+  "query Reviews{reviews{...reviewData}}\n\nfragment reviewData on Review{__typename ...on BossReview{boss{id name}difficulty theme ...reviewMetadata}...on LocationReview{location{id name}difficulty design ...reviewMetadata}}\n\nfragment reviewMetadata on Review{id author createdAt}";
 
 export type XReviews<TExtensions> = ExecutionResult<DReviews, TExtensions>;
 
@@ -128,7 +127,7 @@ export type DReviews = {
 };
 
 export const NewReviewsDocument =
-  "subscription NewReviews($limit: Int) {\n  newReview(limit: $limit) {\n    ...reviewData\n  }\n}\n\nfragment reviewData on Review {\n  __typename\n  ... on BossReview {\n    boss {\n      id\n      name\n    }\n    difficulty\n    theme\n    ...reviewMetadata\n  }\n  ... on LocationReview {\n    location {\n      id\n      name\n    }\n    difficulty\n    design\n    ...reviewMetadata\n  }\n}\n\nfragment reviewMetadata on Review {\n  id\n  author\n  createdAt\n}";
+  "subscription NewReviews($limit:Int){newReview(limit:$limit){...reviewData}}\n\nfragment reviewData on Review{__typename ...on BossReview{boss{id name}difficulty theme ...reviewMetadata}...on LocationReview{location{id name}difficulty design ...reviewMetadata}}\n\nfragment reviewMetadata on Review{id author createdAt}";
 
 export interface VNewReviews {
   limit?: number;
@@ -144,7 +143,7 @@ export type DNewReviews = {
 };
 
 export const SearchDocument =
-  "query Search($q: String!, $types: [SearchType!]) {\n  search(q: $q, types: $types) {\n    __typename\n    ... on Boss {\n      id\n      name\n    }\n    ... on Location {\n      id\n      name\n    }\n  }\n}";
+  "query Search($q:String!$types:[SearchType!]){search(q:$q types:$types){__typename ...on Boss{id name}...on Location{id name}}}";
 
 export interface VSearch {
   q: string;
