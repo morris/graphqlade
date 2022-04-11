@@ -68,7 +68,7 @@ export type ResolverErrorHandler<TContext> = (
 ) => Error | undefined | void;
 
 export class GraphQLSchemaManager<TContext> {
-  protected schema: GraphQLSchema;
+  public readonly schema: GraphQLSchema;
 
   constructor(schema: GraphQLSchema) {
     this.schema = schema;
@@ -82,6 +82,8 @@ export class GraphQLSchemaManager<TContext> {
     for (const type of Object.values(this.schema.getTypeMap())) {
       this.addDefaultFieldResolverToType(type, defaultFieldResolver);
     }
+
+    return this;
   }
 
   addDefaultFieldResolverToType(
@@ -99,7 +101,7 @@ export class GraphQLSchemaManager<TContext> {
 
   // type resolvers
 
-  addResolversToSchema(resolvers: AnyResolverMap<TContext>): void {
+  addResolversToSchema(resolvers: AnyResolverMap<TContext>) {
     const r = resolvers as CustomResolverMap<TContext>;
 
     for (const typeName of Object.keys(r)) {
@@ -110,6 +112,8 @@ export class GraphQLSchemaManager<TContext> {
 
       this.addResolversToType(type, resolver);
     }
+
+    return this;
   }
 
   addResolversToType(
@@ -232,7 +236,7 @@ export class GraphQLSchemaManager<TContext> {
 
   // resolver inheritance
 
-  addInheritedResolversToSchema(resolvers: AnyResolverMap<TContext>): void {
+  addInheritedResolversToSchema(resolvers: AnyResolverMap<TContext>) {
     for (const typeName of Object.keys(resolvers)) {
       const type = this.schema.getType(typeName);
 
@@ -240,6 +244,8 @@ export class GraphQLSchemaManager<TContext> {
 
       this.addInheritedResolversToType(type, resolvers);
     }
+
+    return this;
   }
 
   addInheritedResolversToType(
@@ -262,6 +268,8 @@ export class GraphQLSchemaManager<TContext> {
     for (const type of Object.values(this.schema.getTypeMap())) {
       this.setResolverErrorHandlerOnType(type, handler);
     }
+
+    return this;
   }
 
   setResolverErrorHandlerOnType(

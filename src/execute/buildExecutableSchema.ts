@@ -6,6 +6,7 @@ import {
   GraphQLSchemaManager,
   ResolverErrorHandler,
 } from "./GraphQLSchemaManager";
+import { mergeResolvers } from "./mergeResolvers";
 
 export interface BuildExecutableSchemaOptions<TContext> {
   /**
@@ -25,7 +26,7 @@ export interface BuildExecutableSchemaOptions<TContext> {
   /**
    * Map of resolvers.
    */
-  resolvers: AnyResolverMap<TContext>;
+  resolvers: AnyResolverMap<TContext> | AnyResolverMap<TContext>[];
 
   /**
    * Default field resolver.
@@ -55,9 +56,13 @@ export async function buildExecutableSchema<TContext>(
     ? options.schema
     : await reader.buildSchemaFromDir(join(root, options.schema ?? "schema"));
   const schemaManager = new GraphQLSchemaManager<TContext>(schema);
+  const resolvers = Array.isArray(options.resolvers)
+    ? mergeResolvers(options.resolvers)
+    : options.resolvers;
 
-  schemaManager.addResolversToSchema(options.resolvers);
-  schemaManager.addInheritedResolversToSchema(options.resolvers);
+  schemaManager
+    .addResolversToSchema(resolvers)
+    .addInheritedResolversToSchema(resolvers);
 
   if (options.defaultFieldResolver) {
     schemaManager.addDefaultFieldResolverToSchema(options.defaultFieldResolver);

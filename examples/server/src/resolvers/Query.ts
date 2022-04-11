@@ -1,6 +1,6 @@
 import { ResolverMap } from "../generated/schema";
 import { MyContext } from "../MyContext";
-import { BossData, LocationData } from "../types";
+import { LocationData } from "../types";
 
 export const queryResolvers: ResolverMap<MyContext> = {
   Query: {
@@ -18,9 +18,6 @@ export const queryResolvers: ResolverMap<MyContext> = {
     },
     location(_, args, context) {
       return context.getLocationById(parseInt(args.id));
-    },
-    reviews(_, __, context) {
-      return context.getReviews();
     },
     search(_, args, context) {
       if (args.types) throw new Error("Not implemented");
@@ -49,50 +46,11 @@ export const queryResolvers: ResolverMap<MyContext> = {
       // hence the cast
       return context.getLocationById(data.locationId) as LocationData;
     },
-    reviews(data, _, context) {
-      return context.getReviewsBySubjectId(data.id);
-    },
   },
 
   Location: {
     bosses(data, _, context) {
       return context.getBossesByLocationId(data.id);
-    },
-    reviews(data, _, context) {
-      return context.getReviewsBySubjectId(data.id);
-    },
-  },
-
-  Review: {
-    createdAt(data) {
-      return data.time;
-    },
-  },
-
-  BossReview: {
-    __isTypeOf(data) {
-      return data.subjectType === 1;
-    },
-    boss(data, __, context) {
-      return context.getBossById(data.subjectId) as BossData;
-    },
-    difficulty(data) {
-      return data.difficulty.toUpperCase();
-    },
-    theme(data) {
-      return data.theme as number;
-    },
-  },
-
-  LocationReview: {
-    __isTypeOf(data) {
-      return data.subjectType === 2;
-    },
-    location(data, __, context) {
-      return context.getLocationById(data.subjectId) as BossData;
-    },
-    difficulty(data) {
-      return data.difficulty.toUpperCase();
     },
   },
 
