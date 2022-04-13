@@ -11,10 +11,12 @@
   - Rename `src/server` to `src/execute`
   - Remove specific subscription resolver options (add subscription resolvers to regular resolver map)
   - Code generation now automatically creates `_ts.gql` with the `@ts` directive definition
+  - Refactor `buildExecutableSchema` into static `GraphQLServer.bootstrap` method (bootstraps complete server)
+  - Refactor `GraphQLSchemaManager` methods
 - Add `GraphQLServer` class, combining HTTP and web socket server setup
 - Add `DirectivesMap` (maps directive names to their arguments) to code generation
 - Add simplified request handlers for Express and Koa
-- Allow lists of resolvers in `buildExecutableSchema`, merged via new utility `mergeResolvers` function
+- Allow lists of resolvers in `GraphQLServer.bootstrap`, merged via new utility `mergeResolvers` function
 
 ## v0.3.5
 

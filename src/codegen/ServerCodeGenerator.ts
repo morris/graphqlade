@@ -132,11 +132,14 @@ export class ServerCodeGenerator {
   generateResolverMap() {
     const types = Object.values(this.schema.getTypeMap());
 
-    return `export interface ResolverMap<TContext> {
-      __isGeneratedResolverMap?: TContext,
+    return `export interface Resolvers<TContext> {
+      __isGeneratedResolvers?: TContext,
 
       ${this.join(types.map((it) => this.generateResolverMapEntry(it)))}
-    }`;
+    }
+
+    /** @deprecated Use \`Resolvers<TContext>\` instead */
+    export type ResolverMap<TContext> = Resolvers<TContext>;`;
   }
 
   generateResolverMapEntry(node: GraphQLNamedType) {

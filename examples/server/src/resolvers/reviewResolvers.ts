@@ -1,9 +1,9 @@
 import { AsyncPushIterator } from "../../../../src";
-import { ResolverMap } from "../generated/schema";
+import { Resolvers } from "../generated/schema";
 import { MyContext } from "../MyContext";
 import { BossData, LocationData } from "../types";
 
-export const reviewResolvers: ResolverMap<MyContext> = {
+export const reviewResolvers: Resolvers<MyContext> = {
   Query: {
     reviews(_, __, context) {
       return context.getReviews();

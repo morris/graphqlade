@@ -1,8 +1,8 @@
-import { ResolverMap } from "../generated/schema";
+import { Resolvers } from "../generated/schema";
 import { MyContext } from "../MyContext";
 import { LocationData } from "../types";
 
-export const queryResolvers: ResolverMap<MyContext> = {
+export const queryResolvers: Resolvers<MyContext> = {
   Query: {
     praise() {
       return "the sun!";

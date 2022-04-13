@@ -1,27 +1,16 @@
-import { GraphQLSchema } from "graphql";
-import { resolvers } from "../../examples/server/src/resolvers";
-import { buildExecutableSchema, GraphQLHttpServer } from "../../src";
+import { MyContext } from "../../examples/server/src/MyContext";
+import { GraphQLServer } from "../../src";
+import { bootstrapExample } from "../util";
 
 describe("The example server", () => {
-  let schema: GraphQLSchema;
-  let gqlHttpServer: GraphQLHttpServer<undefined>;
+  let gqlServer: GraphQLServer<MyContext>;
 
   beforeAll(async () => {
-    schema = await buildExecutableSchema({
-      root: `${__dirname}/../../examples/server`,
-      resolvers,
-    });
-
-    gqlHttpServer = new GraphQLHttpServer({
-      schema,
-      createContext() {
-        return undefined;
-      },
-    });
+    gqlServer = await bootstrapExample();
   });
 
   it("should support custom scalar parsing and serialization", async () => {
-    const response = await gqlHttpServer.execute(
+    const response = await gqlServer.http.execute(
       {
         method: "POST",
         headers: {},
@@ -56,7 +45,7 @@ describe("The example server", () => {
   });
 
   it("should support custom scalar parsing and serialization (2)", async () => {
-    const response = await gqlHttpServer.execute(
+    const response = await gqlServer.http.execute(
       {
         method: "POST",
         headers: {},

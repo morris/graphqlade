@@ -1,7 +1,7 @@
 import type { ExecutionResult, GraphQLError } from "graphql";
 import type { IncomingMessage } from "http";
 import type WebSocket from "ws";
-import type { RawExecutionArgs } from "../execute";
+import type { RawExecutionArgs } from "../server";
 import {
   assert,
   assertDefined,

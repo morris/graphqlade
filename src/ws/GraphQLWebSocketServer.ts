@@ -2,11 +2,11 @@ import { GraphQLError, GraphQLSchema, subscribe, validate } from "graphql";
 import type { IncomingMessage } from "http";
 import type WebSocket from "ws";
 import {
+  CreateContextFn,
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
   RawExecutionArgs,
-} from "../execute";
-import { CreateContextFn } from "../server";
+} from "../server";
 import {
   AcknowledgeFn,
   GraphQLServerWebSocket,

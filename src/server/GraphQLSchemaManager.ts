@@ -18,17 +18,21 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
-import { assertDefined, toError } from "../util";
+import { assertDefined, assertRecord, mergeResolvers, toError } from "../util";
 
-export type AnyResolverMap<TContext> =
-  | CustomResolverMap<TContext>
-  | GeneratedResolverMap<TContext>;
+export type ResolversInput<TContext> =
+  | AnyResolvers<TContext>
+  | AnyResolvers<TContext>[];
 
-export interface GeneratedResolverMap<TContext> {
-  __isGeneratedResolverMap?: TContext;
+export type AnyResolvers<TContext> =
+  | CustomResolvers<TContext>
+  | GeneratedResolvers<TContext>;
+
+export interface GeneratedResolvers<TContext> {
+  __isGeneratedResolvers?: TContext;
 }
 
-export interface CustomResolverMap<TContext> {
+export interface CustomResolvers<TContext> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [typeName: string]: TypeResolver<any, TContext>;
 }
@@ -46,13 +50,17 @@ export type TypeResolver<TSource = unknown, TContext = unknown> =
 export interface ObjectResolver<TSource = unknown, TContext = unknown> {
   [fieldName: string]:
     | GraphQLIsTypeOfFn<TSource, TContext>
-    | GraphQLFieldResolver<TSource, TContext>;
+    | GraphQLFieldResolver<TSource, TContext>
+    | undefined;
+  __isTypeOf?: GraphQLIsTypeOfFn<TSource, TContext>;
 }
 
 export interface InterfaceResolver<TSource = unknown, TContext = unknown> {
   [fieldName: string]:
     | GraphQLTypeResolver<TSource, TContext>
-    | GraphQLFieldResolver<TSource, TContext>;
+    | GraphQLFieldResolver<TSource, TContext>
+    | undefined;
+  __resolveType?: GraphQLTypeResolver<TSource, TContext>;
 }
 
 export interface UnionResolver<TSource = unknown, TContext = unknown> {
@@ -76,17 +84,17 @@ export class GraphQLSchemaManager<TContext> {
 
   // default resolvers
 
-  addDefaultFieldResolverToSchema(
+  setDefaultFieldResolver(
     defaultFieldResolver: GraphQLFieldResolver<unknown, TContext>
   ) {
     for (const type of Object.values(this.schema.getTypeMap())) {
-      this.addDefaultFieldResolverToType(type, defaultFieldResolver);
+      this.setDefaultFieldResolverToType(type, defaultFieldResolver);
     }
 
     return this;
   }
 
-  addDefaultFieldResolverToType(
+  protected setDefaultFieldResolverToType(
     type: GraphQLNamedType,
     defaultFieldResolver: GraphQLFieldResolver<unknown, TContext>
   ) {
@@ -101,75 +109,84 @@ export class GraphQLSchemaManager<TContext> {
 
   // type resolvers
 
-  addResolversToSchema(resolvers: AnyResolverMap<TContext>) {
-    const r = resolvers as CustomResolverMap<TContext>;
+  setResolvers(resolvers: ResolversInput<TContext>) {
+    const mergedResolvers = mergeResolvers(resolvers);
+    this.setInheritedResolvers(mergedResolvers);
+    this.setResolversWithoutInheritance(mergedResolvers);
 
-    for (const typeName of Object.keys(r)) {
-      const resolver = r[typeName];
+    return this;
+  }
+
+  setResolversWithoutInheritance(resolvers: ResolversInput<TContext>) {
+    const mergedResolvers = mergeResolvers(
+      resolvers
+    ) as CustomResolvers<TContext>;
+
+    for (const typeName of Object.keys(mergedResolvers)) {
+      const resolver = mergedResolvers[typeName];
       const type = this.schema.getType(typeName);
 
       assertDefined(type, `Cannot set resolver for undefined type ${typeName}`);
 
-      this.addResolversToType(type, resolver);
+      this.setResolversToType(type, resolver);
     }
 
     return this;
   }
 
-  addResolversToType(
+  protected setResolversToType(
     type: GraphQLNamedType,
     resolver: TypeResolver<unknown, TContext>
   ) {
     if (isObjectType(type)) {
-      this.addResolversToObjectType(
+      this.setResolversToObjectType(
         type,
         resolver as ObjectResolver<unknown, TContext>
       );
     } else if (isInterfaceType(type)) {
-      this.addResolversToInterfaceType(
+      this.setResolversToInterfaceType(
         type,
         resolver as InterfaceResolver<unknown, TContext>
       );
     } else if (isUnionType(type)) {
-      this.addResolversToUnionType(
+      this.setResolversToUnionType(
         type,
         resolver as UnionResolver<unknown, TContext>
       );
     } else if (isEnumType(type)) {
-      this.addResolversToEnumType(
-        type,
-        isEnumType(resolver) ? resolver : (resolver as Record<string, unknown>)
-      );
+      if (!isEnumType(resolver)) assertRecord(resolver);
+
+      this.setResolversToEnumType(type, resolver);
     } else if (isScalarType(type)) {
-      this.addResolversToScalarType(type, assertScalarType(resolver));
+      this.setResolversToScalarType(type, assertScalarType(resolver));
     } else {
       throw new Error(`Cannot set resolver for ${type.name}`);
     }
   }
 
-  addResolversToObjectType(
+  protected setResolversToObjectType(
     type: GraphQLObjectType<unknown, TContext>,
     resolver: ObjectResolver<unknown, TContext>
   ) {
-    type.isTypeOf =
-      (resolver.__isTypeOf as GraphQLIsTypeOfFn<unknown, TContext>) ??
-      type.isTypeOf;
+    if (resolver.__isTypeOf) {
+      type.isTypeOf = resolver.__isTypeOf;
+    }
 
-    this.addFieldResolvers(type, resolver);
+    this.setFieldResolvers(type, resolver);
   }
 
-  addResolversToInterfaceType(
+  protected setResolversToInterfaceType(
     type: GraphQLInterfaceType,
     resolver: InterfaceResolver<unknown, TContext>
   ) {
-    type.resolveType =
-      (resolver.__resolveType as GraphQLTypeResolver<unknown, TContext>) ??
-      type.resolveType;
+    if (resolver.__resolveType) {
+      type.resolveType = resolver.__resolveType;
+    }
 
-    this.addFieldResolvers(type, resolver);
+    this.setFieldResolvers(type, resolver);
   }
 
-  protected addFieldResolvers(
+  protected setFieldResolvers(
     type: GraphQLObjectType<unknown, TContext> | GraphQLInterfaceType,
     resolver:
       | ObjectResolver<unknown, TContext>
@@ -189,20 +206,21 @@ export class GraphQLSchemaManager<TContext> {
       const resolveOrSubscribe =
         type === this.schema.getSubscriptionType() ? "subscribe" : "resolve";
 
-      field[resolveOrSubscribe] =
-        field[resolveOrSubscribe] ??
-        (resolver[fieldName] as GraphQLFieldResolver<unknown, TContext>);
+      field[resolveOrSubscribe] = resolver[fieldName] as GraphQLFieldResolver<
+        unknown,
+        TContext
+      >;
     }
   }
 
-  addResolversToUnionType(
+  protected setResolversToUnionType(
     type: GraphQLUnionType,
     resolver: UnionResolver<unknown, TContext>
   ) {
     type.resolveType = resolver.__resolveType ?? type.resolveType;
   }
 
-  addResolversToEnumType(
+  protected setResolversToEnumType(
     type: GraphQLEnumType,
     resolver: GraphQLEnumType | Record<string, unknown>
   ) {
@@ -225,7 +243,7 @@ export class GraphQLSchemaManager<TContext> {
     type.serialize = (...args) => newEnumType.serialize(...args);
   }
 
-  addResolversToScalarType(
+  protected setResolversToScalarType(
     type: GraphQLScalarType,
     resolver: GraphQLScalarType
   ) {
@@ -236,29 +254,33 @@ export class GraphQLSchemaManager<TContext> {
 
   // resolver inheritance
 
-  addInheritedResolversToSchema(resolvers: AnyResolverMap<TContext>) {
-    for (const typeName of Object.keys(resolvers)) {
+  setInheritedResolvers(resolvers: ResolversInput<TContext>) {
+    const mergedResolvers = mergeResolvers(
+      resolvers
+    ) as CustomResolvers<TContext>;
+
+    for (const typeName of Object.keys(mergedResolvers)) {
       const type = this.schema.getType(typeName);
 
       assertDefined(type, `Cannot set resolver for undefined type ${typeName}`);
 
-      this.addInheritedResolversToType(type, resolvers);
+      this.setInheritedResolversToType(type, mergedResolvers);
     }
 
     return this;
   }
 
-  addInheritedResolversToType(
+  protected setInheritedResolversToType(
     type: GraphQLNamedType,
-    resolvers: AnyResolverMap<TContext>
+    resolvers: AnyResolvers<TContext>
   ) {
     if (!isObjectType(type) && !isInterfaceType(type)) return;
 
-    const r = resolvers as CustomResolverMap<TContext>;
+    const r = resolvers as CustomResolvers<TContext>;
 
     for (const implementedInterface of type.getInterfaces()) {
       const resolver = r[implementedInterface.name];
-      this.addResolversToType(type, resolver);
+      this.setResolversToType(type, resolver);
     }
   }
 
@@ -272,7 +294,7 @@ export class GraphQLSchemaManager<TContext> {
     return this;
   }
 
-  setResolverErrorHandlerOnType(
+  protected setResolverErrorHandlerOnType(
     type: GraphQLNamedType,
     handler: ResolverErrorHandler<TContext>
   ) {

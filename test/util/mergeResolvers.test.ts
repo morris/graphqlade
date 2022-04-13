@@ -1,10 +1,10 @@
 import { GraphQLDateTime } from "graphql-scalars";
-import { ResolverMap } from "../../examples/server/src/generated/schema";
-import { mergeResolvers } from "../../src/execute/mergeResolvers";
+import { Resolvers } from "../../examples/server/src/generated/schema";
+import { mergeResolvers } from "../../src";
 
 describe("The mergeResolvers function", () => {
   it("should merge resolvers", () => {
-    const a: ResolverMap<undefined> = {
+    const a: Resolvers<undefined> = {
       Query: {
         boss() {
           return { id: 11, name: "a", locationId: 21, required: true };
@@ -23,7 +23,7 @@ describe("The mergeResolvers function", () => {
       DateTime: GraphQLDateTime,
     };
 
-    const b: ResolverMap<undefined> = {
+    const b: Resolvers<undefined> = {
       Query: {
         location() {
           return { id: 21, name: "x" };

@@ -10,8 +10,8 @@ import { BossData, LocationData, ReviewData } from "../types";
 export type AsyncResult<T> = T | Promise<T>;
 export type Maybe<T> = T | null | undefined;
 
-export interface ResolverMap<TContext> {
-  __isGeneratedResolverMap?: TContext;
+export interface Resolvers<TContext> {
+  __isGeneratedResolvers?: TContext;
 
   Mutation?: RMutation<TContext>;
 
@@ -79,6 +79,9 @@ export interface ResolverMap<TContext> {
 
   __DirectiveLocation?: E__DirectiveLocation | GraphQLEnumType;
 }
+
+/** @deprecated Use `Resolvers<TContext>` instead */
+export type ResolverMap<TContext> = Resolvers<TContext>;
 
 export interface RMutation<TContext> {
   __isTypeOf?: (

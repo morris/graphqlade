@@ -1,38 +1,26 @@
 import KoaRouter from "@koa/router";
 import got from "got";
-import { GraphQLSchema } from "graphql";
-import { IncomingHttpHeaders, Server } from "http";
+import { Server } from "http";
 import Koa from "koa";
 import KoaBodyParser from "koa-bodyparser";
-import { resolvers } from "../../examples/server/src/resolvers";
-import { buildExecutableSchema, GraphQLHttpServer } from "../../src";
+import { MyContext } from "../../examples/server/src/MyContext";
+import { GraphQLServer } from "../../src";
+import { bootstrapExample } from "../util";
 
 describe("The GraphQLHttpServer exposed via Koa", () => {
-  let schema: GraphQLSchema;
-  let gqlHttpServer: GraphQLHttpServer<IncomingHttpHeaders>;
+  let gqlServer: GraphQLServer<MyContext>;
   let app: Koa;
   let server: Server;
 
   beforeAll(async () => {
-    schema = await buildExecutableSchema({
-      root: `${__dirname}/../../examples/server`,
-      resolvers,
-    });
-
-    gqlHttpServer = new GraphQLHttpServer({
-      schema,
-      createContext({ headers }) {
-        expect(headers?.["user-agent"]).toMatch(/got/);
-        return headers ?? {};
-      },
-    });
+    gqlServer = await bootstrapExample();
 
     app = new Koa();
 
     const router = new KoaRouter();
 
-    router.get("/graphql", gqlHttpServer.koaHandler());
-    router.post("/graphql", KoaBodyParser(), gqlHttpServer.koaHandler());
+    router.get("/graphql", gqlServer.http.koaHandler());
+    router.post("/graphql", KoaBodyParser(), gqlServer.http.koaHandler());
 
     app.use(router.allowedMethods()).use(router.routes());
 

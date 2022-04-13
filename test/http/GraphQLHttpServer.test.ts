@@ -1,27 +1,17 @@
-import { GraphQLError, GraphQLSchema } from "graphql";
-import { resolvers } from "../../examples/server/src/resolvers";
-import { buildExecutableSchema, GraphQLHttpServer } from "../../src";
+import { GraphQLError } from "graphql";
+import { MyContext } from "../../examples/server/src/MyContext";
+import { GraphQLServer } from "../../src";
+import { bootstrapExample } from "../util";
 
 describe("The GraphQLHttpServer", () => {
-  let schema: GraphQLSchema;
-  let gqlHttpServer: GraphQLHttpServer<undefined>;
+  let gqlServer: GraphQLServer<MyContext>;
 
   beforeAll(async () => {
-    schema = await buildExecutableSchema({
-      root: `${__dirname}/../../examples/server`,
-      resolvers,
-    });
-
-    gqlHttpServer = new GraphQLHttpServer<undefined>({
-      schema,
-      createContext() {
-        return undefined;
-      },
-    });
+    gqlServer = await bootstrapExample();
   });
 
   it("should be able to handle POST GraphQL requests", async () => {
-    const response = await gqlHttpServer.execute(
+    const response = await gqlServer.http.execute(
       {
         method: "POST",
         headers: {},
@@ -44,7 +34,7 @@ describe("The GraphQLHttpServer", () => {
   });
 
   it("should be able to handle GET GraphQL requests", async () => {
-    const response = await gqlHttpServer.execute(
+    const response = await gqlServer.http.execute(
       {
         method: "GET",
         headers: {},
@@ -56,7 +46,7 @@ describe("The GraphQLHttpServer", () => {
     );
 
     // test query caching
-    await gqlHttpServer.execute(
+    await gqlServer.http.execute(
       {
         method: "GET",
         headers: {},
@@ -79,7 +69,7 @@ describe("The GraphQLHttpServer", () => {
   });
 
   it("should reject unsupported methods", async () => {
-    const response = await gqlHttpServer.execute(
+    const response = await gqlServer.http.execute(
       {
         method: "PUT",
         headers: {},
@@ -105,7 +95,7 @@ describe("The GraphQLHttpServer", () => {
   });
 
   it("should reject mutations via GET", async () => {
-    const response = await gqlHttpServer.execute(
+    const response = await gqlServer.http.execute(
       {
         method: "GET",
         headers: {},
@@ -131,7 +121,7 @@ describe("The GraphQLHttpServer", () => {
   });
 
   it("should reject invalid queries", async () => {
-    const response = await gqlHttpServer.execute(
+    const response = await gqlServer.http.execute(
       {
         method: "POST",
         headers: {},

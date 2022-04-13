@@ -1,10 +1,17 @@
 import { GraphQLScalarType } from "graphql";
-import { AnyResolverMap } from "./GraphQLSchemaManager";
+import {
+  AnyResolvers,
+  CustomResolvers,
+  ResolversInput,
+  TypeResolver,
+} from "../server";
 
 export function mergeResolvers<TContext>(
-  resolversList: AnyResolverMap<TContext>[]
-): AnyResolverMap<TContext> {
-  return (resolversList as Record<string, Record<string, unknown>>[]).reduce(
+  resolversInput: ResolversInput<TContext>
+): AnyResolvers<TContext> {
+  if (!Array.isArray(resolversInput)) return resolversInput;
+
+  return (resolversInput as CustomResolvers<TContext>[]).reduce(
     (mergedResolvers, resolvers) => {
       for (const [typeName, resolver] of Object.entries(resolvers)) {
         if (resolver instanceof GraphQLScalarType) {
@@ -13,7 +20,7 @@ export function mergeResolvers<TContext>(
           mergedResolvers[typeName] = {
             ...mergedResolvers[typeName],
             ...resolver,
-          };
+          } as TypeResolver;
         }
       }
 

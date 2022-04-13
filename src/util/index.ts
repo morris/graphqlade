@@ -6,6 +6,7 @@ export * from "./getDirective";
 export * from "./isAsyncIterator";
 export * from "./listen";
 export * from "./LoggerLike";
+export * from "./mergeResolvers";
 export * from "./parseDirective";
 export * from "./toError";
 export * from "./watchRecursive";

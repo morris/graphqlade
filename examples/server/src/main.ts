@@ -3,7 +3,7 @@ import { EventEmitter } from "events";
 import express from "express";
 import { createServer } from "http";
 import * as ws from "ws";
-import { buildExecutableSchema, GraphQLServer, listen } from "../../../src"; // graphqlade in your app
+import { GraphQLServer, listen } from "../../../src"; // graphqlade in your app
 import { MyContext } from "./MyContext";
 import { resolvers } from "./resolvers";
 
@@ -11,19 +11,14 @@ export async function main(env: NodeJS.ProcessEnv) {
   // basic pubsub
   const pubsub = new EventEmitter();
 
-  // build executable schema
-  const schema = await buildExecutableSchema<MyContext>({
-    root: __dirname + "/..",
+  // bootstrap graphql server
+  const gqlServer = await GraphQLServer.bootstrap<MyContext>({
+    root: `${__dirname}/..`,
     resolvers,
-    resolverErrorHandler: (err) => {
+    resolverErrorHandler(err) {
       // eslint-disable-next-line no-console
       console.error(err.stack);
     },
-  });
-
-  // build graphql server
-  const gqlServer = new GraphQLServer<MyContext>({
-    schema,
     createContext() {
       return new MyContext({ pubsub });
     },

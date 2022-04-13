@@ -1,7 +1,21 @@
+import EventEmitter from "events";
 import { Server } from "http";
 import WebSocket from "ws";
 import { main } from "../examples/server/src/main";
+import { MyContext } from "../examples/server/src/MyContext";
+import { resolvers } from "../examples/server/src/resolvers";
+import { GraphQLServer } from "../src";
 import { LoggerLike } from "../src/util/LoggerLike";
+
+export function bootstrapExample() {
+  return GraphQLServer.bootstrap<MyContext>({
+    root: `${__dirname}/../examples/server`,
+    resolvers,
+    createContext() {
+      return new MyContext({ pubsub: new EventEmitter() });
+    },
+  });
+}
 
 export function requireExampleServer(env?: NodeJS.ProcessEnv) {
   let server: Server;
