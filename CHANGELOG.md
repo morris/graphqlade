@@ -8,7 +8,7 @@
   - Remove `AbstractClient` code generation in favor of operation tables
   - Rename `GraphQLServer` to `GraphQLHttpServer`
   - `GraphQLHttpServer` now requires a context type and a `createContext` function
-  - Rename `src/server` to `src/execute`
+  - Move `src/execute` modules to `src/server`
   - Remove specific subscription resolver options (add subscription resolvers to regular resolver map)
   - Code generation now automatically creates `_ts.gql` with the `@ts` directive definition
   - Refactor `buildExecutableSchema` into static `GraphQLServer.bootstrap` method (bootstraps complete server)
