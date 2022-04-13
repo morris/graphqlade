@@ -114,9 +114,6 @@ additional concepts and staying close to the "language" used by GraphQL.js.
 
 ## Missing features
 
-- Federation compatible with the
-  [Apollo Federation specification](https://www.apollographql.com/docs/federation/federation-spec/)
-  is planned, including a gateway implementation.
 - Automatic persisted queries are planned. There's no clear/emerging standard
   but it seems viable to add APQs in an opt-in fashion and make the protocol
   compatible with the Apollo stack.
