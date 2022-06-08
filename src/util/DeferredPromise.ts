@@ -2,7 +2,7 @@ export class DeferredPromise<T> implements Promise<T> {
   readonly then: Promise<T>["then"];
   readonly catch: Promise<T>["catch"];
   readonly finally: Promise<T>["finally"];
-  readonly [Symbol.toStringTag]: string;
+  readonly [Symbol.toStringTag] = "DeferredPromise";
 
   protected promise: Promise<T>;
   protected resolvePromise!: (value: T | PromiseLike<T>) => void;

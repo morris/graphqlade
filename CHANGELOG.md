@@ -2,6 +2,10 @@
 
 ## NEXT
 
+- Update deps
+
+## v1.0.0
+
 - BREAKING CHANGES
   - Upgrade to `graphql@16`
   - Upgrade to `ws@8`
