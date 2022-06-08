@@ -3,6 +3,7 @@
 ## NEXT
 
 - Update deps
+- Fall back to `unknown` for unmapped scalars
 
 ## v1.0.0
 

@@ -1,0 +1,3 @@
+query Divide($dividend: ESNumber!, $divisor: ESNumber!) {
+  divide(dividend: $dividend, divisor: $divisor)
+}

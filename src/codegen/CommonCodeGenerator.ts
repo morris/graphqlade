@@ -13,6 +13,7 @@ import {
   GraphQLType,
   isListType,
   isNonNullType,
+  isScalarType,
 } from "graphql";
 import { ImportCodeGenerator } from "./ImportCodeGenerator";
 
@@ -40,14 +41,32 @@ export class CommonCodeGenerator {
   constructor(options: CommonCodeGeneratorOptions) {
     this.schema = options.schema;
 
+    this.mapUnknownScalars();
+    this.mapStandardScalars();
+  }
+
+  // type maps
+
+  mapUnknownScalars() {
+    const types = Object.values(this.schema.getTypeMap());
+
+    for (const type of types) {
+      if (isScalarType(type)) {
+        this.addTypeMapping({
+          gqlType: type.name,
+          tsType: "unknown",
+        });
+      }
+    }
+  }
+
+  mapStandardScalars() {
     this.addTypeMapping({ gqlType: "Int", tsType: "number" });
     this.addTypeMapping({ gqlType: "Float", tsType: "number" });
     this.addTypeMapping({ gqlType: "String", tsType: "string" });
     this.addTypeMapping({ gqlType: "Boolean", tsType: "boolean" });
     this.addTypeMapping({ gqlType: "ID", tsType: "string" });
   }
-
-  // type maps
 
   addTypeMapping(typeMapping: TypeMapping) {
     this.typeMap.set(typeMapping.gqlType, typeMapping);

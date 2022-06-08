@@ -83,6 +83,20 @@ export type DCreateLocationReview = {
   }>;
 };
 
+export const DivideDocument =
+  "query Divide($dividend:ESNumber!$divisor:ESNumber!){divide(dividend:$dividend divisor:$divisor)}";
+
+export interface VDivide {
+  dividend: unknown;
+  divisor: unknown;
+}
+
+export type XDivide<TExtensions> = ExecutionResult<DDivide, TExtensions>;
+
+export type DDivide = {
+  divide: Maybe<unknown>;
+};
+
 export const LocationsDocument =
   "query Locations($skipBosses:Boolean=false$includeReviews:Boolean=false){locations{id name bosses@skip(if:$skipBosses){id name reviews@include(if:$includeReviews){difficulty}}}}";
 
@@ -412,6 +426,7 @@ export const OperationNameToDocument = {
   CompareBossDifficulty: CompareBossDifficultyDocument,
   CreateBossReview: CreateBossReviewDocument,
   CreateLocationReview: CreateLocationReviewDocument,
+  Divide: DivideDocument,
   Locations: LocationsDocument,
   Reviews: ReviewsDocument,
   NewReviews: NewReviewsDocument,
@@ -423,6 +438,7 @@ export interface OperationNameToVariables {
   CompareBossDifficulty: VCompareBossDifficulty;
   CreateBossReview: VCreateBossReview;
   CreateLocationReview: VCreateLocationReview;
+  Divide: VDivide;
   Locations: VLocations;
   Reviews: undefined;
   NewReviews: VNewReviews;
@@ -434,6 +450,7 @@ export interface OperationNameToData {
   CompareBossDifficulty: DCompareBossDifficulty;
   CreateBossReview: DCreateBossReview;
   CreateLocationReview: DCreateLocationReview;
+  Divide: DDivide;
   Locations: DLocations;
   Reviews: DReviews;
   NewReviews: DNewReviews;
@@ -445,6 +462,7 @@ export type OperationName = QueryName | MutationName | SubscriptionName;
 export type QueryName =
   | "Bosses"
   | "CompareBossDifficulty"
+  | "Divide"
   | "Locations"
   | "Reviews"
   | "Search";

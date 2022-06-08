@@ -34,12 +34,12 @@ export class ServerCodeGenerator {
     this.commonCodeGenerator =
       options.commonCodeGenerator ?? new CommonCodeGenerator(options);
 
-    this.initTypeMappings();
+    this.mapTypes();
   }
 
   //
 
-  initTypeMappings() {
+  mapTypes() {
     const types = Object.values(this.schema.getTypeMap());
 
     for (const node of types) {

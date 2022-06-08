@@ -63,13 +63,13 @@ export class ClientCodeGenerator {
     this.commonCodeGenerator =
       options.commonCodeGenerator ?? new CommonCodeGenerator(options);
 
-    this.initScalarMappings();
+    this.mapScalars();
     this.initFragmentMap();
   }
 
   //
 
-  initScalarMappings() {
+  mapScalars() {
     visit(this.operations, {
       ScalarTypeDefinition: (node) => {
         const tsDirective = getDirective<TsDirective>(node, "ts");
