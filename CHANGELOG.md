@@ -4,6 +4,8 @@
 
 - Update deps
 - Fall back to `unknown` for unmapped scalars
+- Add `OperationTypings` in client-side code generation for simplified client typing
+- Add `fetch`-based, type-safe `GraphQLClient` for queries and mutations
 
 ## v1.0.0
 

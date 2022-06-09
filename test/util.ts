@@ -62,3 +62,25 @@ export class TestLogger implements LoggerLike {
 export async function sleep(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export function mockFetchJson(json: unknown, rest?: Partial<Response>) {
+  return mockFetch(mockJsonResponse(json, rest));
+}
+
+export function mockFetch(response: Partial<Response>) {
+  return async () => {
+    return { ok: true, status: 200, statusText: "OK", ...response } as Response;
+  };
+}
+
+export function mockJsonResponse(json: unknown, rest?: Partial<Response>) {
+  return {
+    ok: true,
+    status: 200,
+    statusText: "OK",
+    ...rest,
+    async json() {
+      return json;
+    },
+  } as Response;
+}

@@ -124,6 +124,7 @@ export class ClientCodeGenerator {
       this.generateQueryNames(),
       this.generateMutationNames(),
       this.generateSubscriptionNames(),
+      this.generateOperationTypings(),
     ]);
   }
 
@@ -154,6 +155,18 @@ export class ClientCodeGenerator {
   }
 
   // operation tables
+
+  generateOperationTypings() {
+    return `export interface OperationTypings {
+      OperationName: OperationName;
+      QueryName: QueryName;
+      MutationName: MutationName;
+      SubscriptionName: SubscriptionName;
+      OperationNameToVariables: OperationNameToVariables;
+      OperationNameToData: OperationNameToData;
+      OperationNameToDocument: Record<OperationName, string>;
+    }`;
+  }
 
   generateOperationNames() {
     return `export type OperationName =

@@ -470,3 +470,13 @@ export type QueryName =
 export type MutationName = "CreateBossReview" | "CreateLocationReview";
 
 export type SubscriptionName = "NewReviews";
+
+export interface OperationTypings {
+  OperationName: OperationName;
+  QueryName: QueryName;
+  MutationName: MutationName;
+  SubscriptionName: SubscriptionName;
+  OperationNameToVariables: OperationNameToVariables;
+  OperationNameToData: OperationNameToData;
+  OperationNameToDocument: Record<OperationName, string>;
+}
