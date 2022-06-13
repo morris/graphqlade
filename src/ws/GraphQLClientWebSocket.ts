@@ -66,10 +66,7 @@ export class GraphQLClientWebSocket {
   }
 
   subscribe<TData>(payload: SubscribePayload) {
-    return new AsyncPushIterator<
-      // TODO remove support for passing execution result type in 2.0?
-      TData extends ExecutionResult ? TData : ExecutionResult<TData>
-    >(async (it) => {
+    return new AsyncPushIterator<ExecutionResult<TData>>(async (it) => {
       await this.requireAck();
 
       const id = (this.nextSubscriptionId++).toString();
