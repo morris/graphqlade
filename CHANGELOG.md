@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.1
+
+- Fix `GraphQLCLient.setHeaders` to safely reset headers
+- Export `GraphQLResultError` in browser build
+- Fix `GraphQLWebSocketClient.subscribe` typings
+
 ## v1.1.0
 
 - Update deps
