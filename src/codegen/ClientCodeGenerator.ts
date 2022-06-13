@@ -165,7 +165,9 @@ export class ClientCodeGenerator {
       OperationNameToVariables: OperationNameToVariables;
       OperationNameToData: OperationNameToData;
       OperationNameToDocument: Record<OperationName, string>;
-    }`;
+    }
+
+    export const typings = { OperationNameToDocument } as unknown as OperationTypings`;
   }
 
   generateOperationNames() {

@@ -1,4 +1,4 @@
-import { MyClient } from "./client";
+import { GraphQLClient, GraphQLWebSocketClient } from "graphqlade/dist/browser";
 import {
   DBosses,
   DLocations,
@@ -7,6 +7,7 @@ import {
   TDifficulty,
   TRating,
   typeRef,
+  typings,
 } from "./generated/operations";
 
 export interface AppState {
@@ -62,17 +63,35 @@ export function App(el: Element) {
     <div class="reviews"></div>
   `;
 
-  const client = new MyClient();
+  const client = new GraphQLClient({
+    url: "http://localhost:4000/graphql",
+    typings,
+  });
 
-  client.query("Bosses", undefined).then((x) => update({ bossData: x.data }));
-  client.query("Locations", {}).then((x) => update({ locationData: x.data }));
+  const socketClient = new GraphQLWebSocketClient({
+    url: "ws://localhost:4000/graphql",
+    typings,
+    connectionInitPayload: {
+      keys: ["MASTER_KEY"],
+    },
+  });
+
   client
-    .query("Reviews", undefined)
+    .postNamed("Bosses", undefined)
+    .then((x) => update({ bossData: x.data }));
+  client
+    .postNamed("Locations", {})
+    .then((x) => update({ locationData: x.data }));
+  client
+    .postNamed("Reviews", undefined)
     .then((x) => update({ reviewData: x.data }));
 
   setTimeout(async () => {
     try {
-      for await (const review of client.subscribe("NewReviews", {})) {
+      for await (const review of socketClient.subscribeNamed(
+        "NewReviews",
+        {}
+      )) {
         if (review.data?.newReview) {
           state.reviewData?.reviews?.push(review.data?.newReview);
           update({});
@@ -89,7 +108,7 @@ export function App(el: Element) {
     (e) => {
       e.preventDefault();
 
-      client.mutate("CreateBossReview", {
+      client.postNamed("CreateBossReview", {
         input: {
           bossId: el.querySelector<HTMLSelectElement>("[name=bossId]")
             ?.value as string,
@@ -129,7 +148,7 @@ export function App(el: Element) {
 
   // we'd like to have the types of nested data objects of operations
   // typescript does not allow "typeof" with optional chaining
-  // therefore we create some variables with the "certain" helper
+  // therefore we create some variables with the "typeRef" helper
   const Boss = typeRef(state.bossData?.bosses?.[0]);
   const Location = typeRef(state.locationData?.locations?.[0]);
   const Review = typeRef(state.reviewData?.reviews?.[0]);

@@ -1,4 +1,9 @@
+import { ExecutionResult } from "graphql";
 import WebSocket from "ws";
+import {
+  DNewReviews,
+  typings,
+} from "../../examples/client/src/generated/operations";
 import { GraphQLWebSocketClient, WebSocketLike } from "../../src";
 import { requireExampleServer, sleep } from "../util";
 
@@ -54,6 +59,42 @@ describe("The GraphQLWebSocketClient", () => {
     await complete;
 
     expect(messages).toEqual([{ type: "complete", id: "1" }]);
+    expect(results).toEqual([]);
+
+    client.close();
+  });
+
+  it("should be able to use typings", async () => {
+    const client = new GraphQLWebSocketClient({
+      url,
+      typings,
+      createWebSocket,
+      connectionInitPayload: {
+        keys: ["MASTER_KEY"],
+      },
+    });
+
+    const iterator = client.subscribeNamed("NewReviews", { limit: 10 });
+
+    const results: ExecutionResult<DNewReviews>[] = [];
+
+    const complete = (async () => {
+      for await (const result of iterator) {
+        results.push(result);
+        expect(result.data?.newReview?.author).toBeDefined();
+      }
+    })();
+
+    await sleep(300);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const socket = client.graphqlSocket?.socket as any;
+    expect(socket).toBeDefined();
+
+    iterator.return();
+
+    await complete;
+
     expect(results).toEqual([]);
 
     client.close();

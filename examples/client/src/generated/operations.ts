@@ -480,3 +480,7 @@ export interface OperationTypings {
   OperationNameToData: OperationNameToData;
   OperationNameToDocument: Record<OperationName, string>;
 }
+
+export const typings = {
+  OperationNameToDocument,
+} as unknown as OperationTypings;

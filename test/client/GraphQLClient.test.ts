@@ -1,5 +1,12 @@
+import nodeFetch from "node-fetch";
+import { typings as exampleTypings } from "../../examples/client/src/generated/operations";
 import { GraphQLClient, GraphQLRequestError } from "../../src";
-import { mockFetch, mockFetchJson, mockJsonResponse } from "../util";
+import {
+  mockFetch,
+  mockFetchJson,
+  mockJsonResponse,
+  requireExampleServer,
+} from "../util";
 
 const OperationNameToDocument = {
   Query1: "dont care",
@@ -38,16 +45,21 @@ interface OperationTypings {
   OperationNameToDocument: Record<OperationName, string>;
 }
 
-describe("The GraphQLClient", () => {
-  const url = "https://localhost:4000/graphql";
-  const operations = OperationNameToDocument;
+const typings = {
+  OperationNameToDocument,
+} as unknown as OperationTypings;
 
-  it("should be able to send GraphQL requests via POST (typed with operation typings)", async () => {
+describe("The GraphQLClient", () => {
+  requireExampleServer();
+
+  const url = "http://localhost:4999/graphql";
+
+  it("should be able to send GraphQL requests via POST (with typings)", async () => {
     const expectedResult = { data: { query2: 1 } };
 
-    const client = new GraphQLClient<OperationTypings>({
+    const client = new GraphQLClient({
       url,
-      operations,
+      typings,
       init: {
         headers: {
           authorization: "Bearer of a ring",
@@ -63,6 +75,7 @@ describe("The GraphQLClient", () => {
             "content-type": "application/json",
             authorization: "Bearer of a ring",
             "x-test": "lol",
+            "x-x": "wut",
           },
           body: '{"query":"dont care","variables":{"count":1},"operationName":"Query2"}',
           credentials: "include",
@@ -73,7 +86,9 @@ describe("The GraphQLClient", () => {
       },
     });
 
-    const result = await client.post(
+    client.setHeaders({ "x-x": "wut" });
+
+    const result = await client.postNamed(
       "Query2",
       { count: 1 },
       { credentials: "include", headers: { "x-test": "lol" } }
@@ -87,11 +102,11 @@ describe("The GraphQLClient", () => {
 
     const client = new GraphQLClient({
       url,
-      operations,
+      typings,
       fetch: mockFetchJson(expectedResult),
     });
 
-    const result = await client.post("Query2", { count: 1 });
+    const result = await client.postNamed("Query2", { count: 1 });
 
     expect(result).toEqual(expectedResult);
   });
@@ -104,12 +119,12 @@ describe("The GraphQLClient", () => {
 
     const client = new GraphQLClient({
       url,
-      operations,
+      typings,
       fetch: mockFetchJson(expectedResult),
     });
 
     try {
-      await client.post("Query2", { count: 1 });
+      await client.postNamed("Query2", { count: 1 });
       throw new Error("should not succeed");
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
@@ -130,7 +145,7 @@ describe("The GraphQLClient", () => {
 
     const client = new GraphQLClient({
       url,
-      operations,
+      typings,
       fetch: mockFetchJson(expectedResult, {
         ok: false,
         status: 400,
@@ -139,7 +154,7 @@ describe("The GraphQLClient", () => {
     });
 
     try {
-      await client.post("Query2", { count: 1 });
+      await client.postNamed("Query2", { count: 1 });
       throw new Error("should not succeed");
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
@@ -155,12 +170,12 @@ describe("The GraphQLClient", () => {
   it("should handle non-GraphQL JSON responses correctly", async () => {
     const client = new GraphQLClient({
       url,
-      operations,
+      typings,
       fetch: mockFetchJson({ not: "graphql" }),
     });
 
     try {
-      await client.post("Query2", { count: 1 });
+      await client.postNamed("Query2", { count: 1 });
       throw new Error("should not succeed");
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
@@ -176,7 +191,7 @@ describe("The GraphQLClient", () => {
   it("should handle non-JSON responses correctly", async () => {
     const client = new GraphQLClient({
       url,
-      operations,
+      typings,
       fetch: mockFetch({
         async json() {
           throw new Error("Unexpected input <");
@@ -185,7 +200,7 @@ describe("The GraphQLClient", () => {
     });
 
     try {
-      await client.post("Query2", { count: 1 });
+      await client.postNamed("Query2", { count: 1 });
       throw new Error("should not succeed");
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
@@ -203,7 +218,7 @@ describe("The GraphQLClient", () => {
   it("should handle non-GraphQL, non-2xx responses correctly", async () => {
     const client = new GraphQLClient({
       url,
-      operations,
+      typings,
       fetch: mockFetchJson(
         { error: "Server down" },
         { ok: false, status: 503, statusText: "Unavailable" }
@@ -211,13 +226,66 @@ describe("The GraphQLClient", () => {
     });
 
     try {
-      await client.post("Query2", { count: 1 });
+      await client.postNamed("Query2", { count: 1 });
+
       throw new Error("should not succeed");
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
         expect(err.message).toEqual("Not a GraphQL response; 503 Unavailable");
         expect(err.response.ok).toEqual(false);
         expect(err.result).toBeUndefined();
+      } else {
+        throw err;
+      }
+    }
+  });
+
+  it("should be able to query the example server with node-fetch", async () => {
+    const client = new GraphQLClient({
+      url,
+      typings: exampleTypings,
+      fetch: nodeFetch as unknown as typeof fetch,
+    });
+
+    const result = await client.postNamed("Divide", {
+      dividend: 1,
+      divisor: "2",
+    });
+
+    expect(result).toEqual({
+      data: {
+        divide: 0.5,
+      },
+    });
+  });
+
+  it("should handle validation errors from the example server", async () => {
+    const client = new GraphQLClient({
+      url,
+      typings: exampleTypings,
+      fetch: nodeFetch as unknown as typeof fetch,
+    });
+
+    try {
+      await client.postNamed("Divide", { dividend: {}, divisor: "2" });
+
+      throw new Error("should not succeed");
+    } catch (err) {
+      if (err instanceof GraphQLRequestError) {
+        expect(err.result).toEqual({
+          errors: [
+            {
+              locations: [
+                {
+                  column: 14,
+                  line: 1,
+                },
+              ],
+              message:
+                'Variable "$dividend" got invalid value {}; Expected type "ESNumber". Could not parse [object Object] to ESNumber',
+            },
+          ],
+        });
       } else {
         throw err;
       }

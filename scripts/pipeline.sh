@@ -1,3 +1,5 @@
+set -e
+
 npm install
 npm run clean
 npm run lint

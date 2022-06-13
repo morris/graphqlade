@@ -1,4 +1,5 @@
-// keep specifically targeted imports here fore browser build
+// keep granular imports here for browser build
+import type { ExecutionResult } from "graphql";
 import { AsyncPushIterator } from "../util/AsyncPushIterator";
 import { toError } from "../util/toError";
 import {
@@ -7,7 +8,9 @@ import {
   WebSocketLike,
 } from "./GraphQLClientWebSocket";
 
-export interface GraphQLWebSocketClientOptions {
+export interface GraphQLWebSocketClientOptions<
+  TTypings extends GraphQLWebSocketClientTypings = GraphQLWebSocketClientTypings
+> {
   /**
    * URL to GraphQL API.
    */
@@ -65,6 +68,17 @@ export interface GraphQLWebSocketClientOptions {
    * Defaults to 2 (for exponential back-off).
    */
   reconnectDelayMultiplier?: number;
+
+  typings?: TTypings;
+}
+
+export interface GraphQLWebSocketClientTypings {
+  SubscriptionName: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  OperationNameToVariables: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  OperationNameToData: any;
+  OperationNameToDocument: Record<string, string>;
 }
 
 export type CreateWebSocketFn = (
@@ -72,7 +86,9 @@ export type CreateWebSocketFn = (
   protocol: string
 ) => WebSocketLike;
 
-export class GraphQLWebSocketClient {
+export class GraphQLWebSocketClient<
+  TTypings extends GraphQLWebSocketClientTypings = GraphQLWebSocketClientTypings
+> {
   public readonly url: string;
   public readonly protocol: string;
   public graphqlSocket?: GraphQLClientWebSocket;
@@ -86,12 +102,15 @@ export class GraphQLWebSocketClient {
   protected reconnectDelayMultiplier: number;
   protected reconnectDelay: number;
   protected reconnectDelayPromise?: Promise<void>;
+  protected operations: TTypings["OperationNameToDocument"];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected subscriptions = new Set<AsyncPushIterator<any>>();
 
-  constructor(options: GraphQLWebSocketClientOptions) {
-    this.url = options.url;
+  constructor(options: GraphQLWebSocketClientOptions<TTypings>) {
+    this.url = options.url
+      .replace("https://", "wss://")
+      .replace("http://", "ws://");
     this.protocol = options.protocol ?? "graphql-transport-ws";
     this.connectionInitPayload = options.connectionInitPayload;
     this.connectionAckTimeout = options.connectionAckTimeout ?? 3000;
@@ -105,13 +124,31 @@ export class GraphQLWebSocketClient {
     this.maxReconnectDelay = options.maxReconnectDelay ?? 30000;
     this.reconnectDelayMultiplier = options.reconnectDelayMultiplier ?? 2;
     this.reconnectDelay = 0;
+
+    this.operations = options.typings?.OperationNameToDocument ?? {};
   }
 
   setConnectionInitPayload(connectionInitPayload: Record<string, unknown>) {
     this.connectionInitPayload = connectionInitPayload;
   }
 
-  subscribe<TExecutionResult>(payload: SubscribePayload) {
+  subscribeNamed<TSubscriptionName extends TTypings["SubscriptionName"]>(
+    operationName: TSubscriptionName,
+    variables: TTypings["OperationNameToVariables"][TSubscriptionName]
+  ) {
+    return this.subscribe<TTypings["OperationNameToData"][TSubscriptionName]>({
+      operationName,
+      query: this.operations[operationName],
+      variables,
+    });
+  }
+
+  subscribe<TData>(payload: SubscribePayload) {
+    // TODO remove support for passing execution result type in 2.0?
+    type TExecutionResult = TData extends ExecutionResult
+      ? TData
+      : ExecutionResult<TData>;
+
     return new AsyncPushIterator<TExecutionResult>(async (it) => {
       this.subscriptions.add(it);
       let innerIt: AsyncPushIterator<TExecutionResult> | undefined;
@@ -119,7 +156,7 @@ export class GraphQLWebSocketClient {
       const run = async () => {
         try {
           const socket = await this.requireConnection();
-          innerIt = socket.subscribe<TExecutionResult>(payload);
+          innerIt = socket.subscribe<TData>(payload);
 
           for await (const result of innerIt) {
             it.push(result);

@@ -1,4 +1,5 @@
-// keep specifically targeted imports here fore browser build
+// keep granular imports here for browser build
+import type { ExecutionResult } from "graphql";
 import { assert, assertRecord } from "../util/assert";
 import { AsyncPushIterator } from "../util/AsyncPushIterator";
 import { DeferredPromise } from "../util/DeferredPromise";
@@ -64,8 +65,11 @@ export class GraphQLClientWebSocket {
     return this;
   }
 
-  subscribe<TExecutionResult>(payload: SubscribePayload) {
-    return new AsyncPushIterator<TExecutionResult>(async (it) => {
+  subscribe<TData>(payload: SubscribePayload) {
+    return new AsyncPushIterator<
+      // TODO remove support for passing execution result type in 2.0?
+      TData extends ExecutionResult ? TData : ExecutionResult<TData>
+    >(async (it) => {
       await this.requireAck();
 
       const id = (this.nextSubscriptionId++).toString();
