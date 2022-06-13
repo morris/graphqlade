@@ -55,11 +55,17 @@ export interface IntrospectionOptions {
    */
   url: string;
 
+  fetch?: typeof fetch;
+
+  getHeaders?: () => Record<string, string> | Promise<Record<string, string>>;
+
   /**
    * Request function to use for introspection.
    * Can also be used to run e.g. authentication beforehand.
+   *
+   * @deprecated
    */
-  request: IntrospectionRequestFn;
+  request?: IntrospectionRequestFn;
 }
 
 export interface CodeGeneratorCliOptions {
@@ -298,7 +304,10 @@ export class CodeGenerator {
     }
 
     return this.introspector.buildClientSchemaFromIntrospection(
-      this.introspection.url
+      this.introspection.url,
+      this.introspection.getHeaders
+        ? await this.introspection.getHeaders()
+        : undefined
     );
   }
 }

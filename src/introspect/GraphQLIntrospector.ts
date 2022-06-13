@@ -5,10 +5,14 @@ import {
   IntrospectionOptions,
   IntrospectionQuery,
 } from "graphql";
+import { GraphQLClient } from "../client";
 import { assert, assertRecord } from "../util";
 
 export interface GraphQLIntrospectorOptions {
-  request: IntrospectionRequestFn;
+  fetch?: typeof fetch;
+
+  /** @deprecated */
+  request?: IntrospectionRequestFn;
 }
 
 export type IntrospectionRequestFn = (
@@ -24,16 +28,13 @@ export interface IntrospectionRequestFnOptions {
   responseType: "json";
 }
 
-export interface IntrospectionQueryResult {
-  data: IntrospectionQuery;
-  errors?: GraphQLError[];
-}
-
 export class GraphQLIntrospector {
-  protected request: IntrospectionRequestFn;
+  protected customFetch?: typeof fetch;
+  protected request?: IntrospectionRequestFn;
 
-  constructor(options: GraphQLIntrospectorOptions) {
-    this.request = options.request;
+  constructor(options?: GraphQLIntrospectorOptions) {
+    this.customFetch = options?.fetch;
+    this.request = options?.request;
   }
 
   async buildClientSchemaFromIntrospection(
@@ -51,24 +52,43 @@ export class GraphQLIntrospector {
     headers?: Record<string, string>,
     introspectionOptions?: IntrospectionOptions
   ) {
-    const r = await this.request({
-      url,
-      method: "POST",
-      headers: this.getHeaders(headers),
-      json: this.getIntrospectionQueryBody(introspectionOptions),
-      responseType: "json",
-    });
+    // TODO legacy got-based request, remove in 2.0
+    if (this.request) {
+      const response = await this.request({
+        url,
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json",
+          ...headers,
+        },
+        json: this.getIntrospectionQueryBody(introspectionOptions),
+        responseType: "json",
+      });
 
-    return this.validateIntrospectionQueryResult(r.body);
+      return this.validateIntrospectionQueryResult(response.body);
+    }
+    //
+
+    const client = new GraphQLClient({
+      url,
+      fetch: this.customFetch,
+      init: { headers },
+    });
+    const result = await client.post(
+      this.getIntrospectionQueryBody(introspectionOptions)
+    );
+
+    return this.validateIntrospectionQueryResult(result);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  validateIntrospectionQueryResult(body: any): IntrospectionQuery {
-    assert(!!body, "Introspection failed: Empty response body");
-    assertRecord(body, "Introspection failed: Invalid response body");
+  validateIntrospectionQueryResult(result: unknown): IntrospectionQuery {
+    // TODO a lot of this is covered by the GraphQLClient; simplify in 2.0
+    assert(!!result, "Introspection failed: Empty response body");
+    assertRecord(result, "Introspection failed: Invalid response body");
 
-    if (Array.isArray(body.errors) && body.errors.length > 0) {
-      const errors = body.errors as GraphQLError[];
+    if (Array.isArray(result.errors) && result.errors.length > 0) {
+      const errors = result.errors as GraphQLError[];
       throw new Error(
         `Introspection failed: ${errors.map((it) =>
           typeof it.message === "string" ? it.message : "Unknown error"
@@ -76,18 +96,10 @@ export class GraphQLIntrospector {
       );
     }
 
-    assert(!!body.data, "Introspection failed: No data");
-    assertRecord(body.data, "Introspection failed: Invalid data");
+    assert(!!result.data, "Introspection failed: No data");
+    assertRecord(result.data, "Introspection failed: Invalid data");
 
-    return body.data as unknown as IntrospectionQuery;
-  }
-
-  getHeaders(headers?: Record<string, string>): Record<string, string> {
-    return {
-      "content-type": "application/json",
-      accept: "application/json",
-      ...headers,
-    };
+    return result.data as unknown as IntrospectionQuery;
   }
 
   getIntrospectionQueryBody(introspectionOptions?: IntrospectionOptions) {

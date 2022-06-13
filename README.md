@@ -12,7 +12,7 @@ interface/type generation from GraphQL schemata and GraphQL client operations.
 With a rich feature set and zero dependencies besides
 [GraphQL.js](https://github.com/graphql/graphql-js), it provides a highly
 integrated foundation for GraphQL servers and clients at around
-4000 lines of readable, tested code&mdash;all in **one place**.
+4500 lines of readable, tested code&mdash;all in **one place**.
 
 ## Why?
 

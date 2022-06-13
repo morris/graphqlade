@@ -8,6 +8,8 @@
 - Add `fetch`-based, type-safe `GraphQLClient` for queries and mutations
 - Add type-safe `subscribeNamed` method to `GraphQLWebSocketClient`
 - Add API documentation
+- Support `fetch` in introspection and code generation
+- Add `getHeaders` option to introspection in code generation (e.g. to support auth)
 
 ## v1.0.0
 
