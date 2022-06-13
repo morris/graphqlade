@@ -75,7 +75,6 @@ describe("The GraphQLClient", () => {
             "content-type": "application/json",
             authorization: "Bearer of a ring",
             "x-test": "lol",
-            "x-x": "wut",
           },
           body: '{"query":"dont care","variables":{"count":1},"operationName":"Query2"}',
           credentials: "include",
@@ -86,12 +85,49 @@ describe("The GraphQLClient", () => {
       },
     });
 
-    client.setHeaders({ "x-x": "wut" });
-
     const result = await client.postNamed(
       "Query2",
       { count: 1 },
       { credentials: "include", headers: { "x-test": "lol" } }
+    );
+
+    expect(result).toEqual(expectedResult);
+  });
+
+  it("should be reset initial headers", async () => {
+    const expectedResult = { data: { query2: 1 } };
+
+    const client = new GraphQLClient({
+      url,
+      typings,
+      init: {
+        headers: {
+          authorization: "Bearer of a ring",
+        },
+      },
+      async fetch(info, init) {
+        expect(info).toEqual(url);
+        expect(init).toEqual({
+          method: "POST",
+          headers: {
+            accept: "application/json",
+            "content-type": "application/json",
+            "x-api-key": "wut",
+            "x-test": "lol",
+          },
+          body: '{"query":"dont care","variables":{"count":1},"operationName":"Query2"}',
+        });
+
+        return mockJsonResponse(expectedResult);
+      },
+    });
+
+    client.setHeaders({ "x-api-key": "wut" });
+
+    const result = await client.postNamed(
+      "Query2",
+      { count: 1 },
+      { headers: { "x-test": "lol" } }
     );
 
     expect(result).toEqual(expectedResult);
