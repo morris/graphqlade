@@ -49,7 +49,7 @@ export class GraphQLClient<
   }
 
   setHeaders(headers: Record<string, string>) {
-    this.init.headers = { ...this.init.headers, ...headers };
+    this.init = { ...this.init, headers };
   }
 
   async postNamed<
