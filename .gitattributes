@@ -1,3 +1,4 @@
 * text=auto eol=lf
+docs/* linguist-vendored
 examples/** linguist-vendored
 scripts/** linguist-vendored

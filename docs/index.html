@@ -1,0 +1,163 @@
+<!DOCTYPE html><html class="default"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>graphqlade</title><meta name="description" content="Documentation for graphqlade"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><script>document.body.classList.add(localStorage.getItem("tsd-theme") || "os")</script><header><div class="tsd-page-toolbar"><div class="container"><div class="table-wrap"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption">Search</label><input type="text" id="tsd-search-field"/></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">graphqlade</a></div><div class="table-cell" id="tsd-widgets"><div id="tsd-filter"><a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a><div class="tsd-filter-group"><div class="tsd-select" id="tsd-filter-visibility"><span class="tsd-select-label">All</span><ul class="tsd-select-list"><li data-value="public">Public</li><li data-value="protected">Public/Protected</li><li data-value="private" class="selected">All</li></ul></div> <input type="checkbox" id="tsd-filter-inherited" checked/><label class="tsd-widget" for="tsd-filter-inherited">Inherited</label><input type="checkbox" id="tsd-filter-externals" checked/><label class="tsd-widget" for="tsd-filter-externals">Externals</label></div></div><a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a></div></div></div></div><div class="tsd-page-title"><div class="container"><h1>graphqlade </h1></div></div></header><div class="container container-main"><div class="row"><div class="col-8 col-content"><div class="tsd-panel tsd-typography"><img src="https://raw.githubusercontent.com/morris/graphqlade/main/img/logo.png" alt="GraphQLade" width="336">
+
+<p><a href="https://www.npmjs.com/package/graphqlade"><img src="https://img.shields.io/npm/v/graphqlade?style=flat-square" alt="NPM version"></a>
+<a href="https://github.com/morris/graphqlade/actions"><img src="https://img.shields.io/github/workflow/status/morris/graphqlade/Pipeline?style=flat-square" alt="Build status"></a>
+<a href="https://app.codecov.io/gh/morris/graphqlade"><img src="https://img.shields.io/codecov/c/github/morris/graphqlade?style=flat-square&token=5GBOZPEJW0" alt="Coverage"></a></p>
+<p>GraphQLade is a lightweight but <strong>complete</strong> library for
+<strong>GraphQL + TypeScript</strong> development on both server- and client-side.
+It emphasizes a <strong>GraphQL first</strong> approach with <strong>maximum type-safety</strong> through
+interface/type generation from GraphQL schemata and GraphQL client operations.</p>
+<p>With a rich feature set and zero dependencies besides
+<a href="https://github.com/graphql/graphql-js">GraphQL.js</a>, it provides a highly
+integrated foundation for GraphQL servers and clients at around
+4000 lines of readable, tested code&mdash;all in <strong>one place</strong>.</p>
+
+<a href="#why" id="why" style="color: inherit; text-decoration: none;">
+  <h2>Why?</h2>
+</a>
+<p>Existing stacks (e.g. Apollo, GraphQL Tools, TypeGraphQL) are obtrusive in
+some ways (high lock-in, missing features) and over-engineered in others,
+while <strong>type-safety</strong> is often a secondary concern rather than a design principle.</p>
+<p>Additionally, most stacks suffer from
+<a href="https://httptoolkit.tech/blog/simple-graphql-server-without-apollo/">significant fragmentation</a>.
+Issues are spread across many packages and maintainers, making it hard to reason
+about fitness of a particular combination of dependencies and stalling
+improvements to the ecosystem.</p>
+
+<a href="#design-principles" id="design-principles" style="color: inherit; text-decoration: none;">
+  <h2>Design principles</h2>
+</a>
+
+<a href="#graphql-first" id="graphql-first" style="color: inherit; text-decoration: none;">
+  <h3>GraphQL first</h3>
+</a>
+<p>GraphQL schemata and operations are defined through spec-compliant,
+<strong>plain GraphQL files</strong>.</p>
+
+<a href="#type-safety-through-code-generation" id="type-safety-through-code-generation" style="color: inherit; text-decoration: none;">
+  <h3>Type-safety through code generation</h3>
+</a>
+<p>GraphQLade generates a complete set of <strong>TypeScript types and interfaces</strong> from
+GraphQL sources, both for schemata and operations, including type tables mapping
+operation names to their variable and result interfaces.</p>
+
+<a href="#enhance-and-integrate-with-graphqljs" id="enhance-and-integrate-with-graphqljs" style="color: inherit; text-decoration: none;">
+  <h3>Enhance and integrate with GraphQL.js</h3>
+</a>
+<p>GraphQLade provides a library of <strong>type-safe runtime helpers</strong> for building HTTP
+and WebSocket servers, resolvers and clients. They transparently integrate with
+<a href="https://github.com/graphql/graphql-js">GraphQL.js</a>, introducing very few
+additional concepts and staying close to the &quot;language&quot; used by GraphQL.js.</p>
+
+<a href="#features" id="features" style="color: inherit; text-decoration: none;">
+  <h2>Features</h2>
+</a>
+
+<a href="#server-side" id="server-side" style="color: inherit; text-decoration: none;">
+  <h3>Server-side</h3>
+</a>
+<ul>
+<li>Server-side code generation from GraphQL schemata<ul>
+<li>Generates types for<ul>
+<li>objects,</li>
+<li>interfaces,</li>
+<li>unions,</li>
+<li>enums,</li>
+<li>resolvers,</li>
+<li>arguments,</li>
+<li>directives,</li>
+<li>...</li>
+</ul>
+</li>
+<li>Source type substitution</li>
+<li>Type mapping for scalars</li>
+<li>Generated types are compatible with<ul>
+<li><a href="https://www.graphql-tools.com/">GraphQL Tools</a></li>
+<li><a href="https://www.apollographql.com/docs/apollo-server/">Apollo Server</a></li>
+</ul>
+</li>
+<li>Watch mode</li>
+</ul>
+</li>
+<li>Runtime helpers for building executable
+<a href="https://github.com/graphql/graphql-js">GraphQL.js</a> schemata</li>
+<li>Runtime helpers for serving GraphQL over HTTP</li>
+<li>Operation parser with LRU-cache</li>
+<li>Server-side GraphQL web sockets, including convenient server helpers<ul>
+<li>Supports <a href="https://github.com/enisdenjo/graphql-ws">graphql-ws</a>
+(possibly the future standard)</li>
+<li>Supports <a href="https://github.com/apollographql/subscriptions-transport-ws">subscription-transport-ws</a>
+(e.g. <a href="https://www.apollographql.com/docs/react/">Apollo Client</a>)</li>
+</ul>
+</li>
+</ul>
+<p><strong><a href="https://github.com/morris/graphqlade/wiki/Server-Side-Usage">Learn more about GraphQLade&#39;s server-side workflow →</a></strong></p>
+
+<a href="#client-side" id="client-side" style="color: inherit; text-decoration: none;">
+  <h3>Client-side</h3>
+</a>
+<ul>
+<li>Client-side code generation from GraphQL operations and remote schemata.<ul>
+<li>Generates interfaces for variables and results of named operations.</li>
+<li>Generates tables mapping operation names to their respective variable and
+result interfaces.</li>
+<li>Validates operations against a GraphQL API at build time.</li>
+<li>Type mapping for scalars</li>
+<li>Watch mode</li>
+</ul>
+</li>
+<li>Client-side GraphQL web sockets<ul>
+<li>Supports <a href="https://github.com/enisdenjo/graphql-ws">graphql-ws</a>
+(possibly the future standard).</li>
+<li>Supports <a href="https://github.com/apollographql/subscriptions-transport-ws">subscription-transport-ws</a>
+(e.g. <a href="https://www.apollographql.com/docs/apollo-server/">Apollo Server</a>).</li>
+<li>Contains a reconnecting GraphQL web socket client.</li>
+<li>Subscriptions implement <code>AsyncIterableIterator</code> correctly.</li>
+</ul>
+</li>
+</ul>
+<p><strong><a href="https://github.com/morris/graphqlade/wiki/Client-Side-Usage">Learn more about GraphQLade&#39;s client-side workflow →</a></strong></p>
+
+<a href="#general" id="general" style="color: inherit; text-decoration: none;">
+  <h3>General</h3>
+</a>
+<ul>
+<li>Reads combined GraphQL documents recursively from directories.<ul>
+<li>Raises syntax errors with useful locations in source files.</li>
+</ul>
+</li>
+<li>Almost dependency-free:<ul>
+<li><code>graphql</code> (peer dependency)</li>
+<li><code>typescript</code> (optional, required for watch mode, but you&#39;ll have
+<code>typescript</code> anyway)</li>
+<li><code>prettier</code> (optional, but you&#39;ll get ugly code)</li>
+<li><code>ws</code> (optional, required for server-side web socket support)</li>
+<li><code>got</code> or some other HTTP request library (optional, required only for remote
+introspection during client-side code generation)</li>
+</ul>
+</li>
+<li>Class-based implementation with granular methods<ul>
+<li>Customization is easily possible through inheritance and method overrides.</li>
+</ul>
+</li>
+</ul>
+
+<a href="#missing-features" id="missing-features" style="color: inherit; text-decoration: none;">
+  <h2>Missing features</h2>
+</a>
+<ul>
+<li>Automatic persisted queries are planned. There&#39;s no clear/emerging standard
+but it seems viable to add APQs in an opt-in fashion and make the protocol
+compatible with the Apollo stack.</li>
+<li>Caching was ignored so far. Apollo&#39;s <code>@cacheControl</code> style is viable but the
+benefit seems questionable.</li>
+<li>Writing operations inline (with e.g. template strings tagged <code>gql</code>) are not
+planned. The current approach of separate and named operations in pure
+GraphQL, combined with interface/client generation, requires the least tooling
+and has great developer ergonomics (type safety, auto-completion, no
+duplication).</li>
+<li>File uploads are out of scope. It&#39;s recommended to use regular HTTP endpoints.</li>
+<li>IDE plug-ins are out of scope or not even required since GraphQLade doesn&#39;t
+introduce non-standard concepts. Existing plug-ins work well so far.</li>
+</ul>
+</div></div><div class="col-4 col-menu menu-sticky-wrap menu-highlight"><nav class="tsd-navigation primary"><ul><li class="current"><a href="modules.html">Exports</a></li></ul></nav><nav class="tsd-navigation secondary menu-sticky"><ul><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/AsyncPushIterator.html" class="tsd-kind-icon">Async<wbr/>Push<wbr/>Iterator</a></li><li class="tsd-kind-class"><a href="classes/ClientCodeGenerator.html" class="tsd-kind-icon">Client<wbr/>Code<wbr/>Generator</a></li><li class="tsd-kind-class"><a href="classes/CodeGenerator.html" class="tsd-kind-icon">Code<wbr/>Generator</a></li><li class="tsd-kind-class"><a href="classes/CommonCodeGenerator.html" class="tsd-kind-icon">Common<wbr/>Code<wbr/>Generator</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/DeferredPromise.html" class="tsd-kind-icon">Deferred<wbr/>Promise</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/GraphQLClient.html" class="tsd-kind-icon">GraphQLClient</a></li><li class="tsd-kind-class"><a href="classes/GraphQLClientWebSocket.html" class="tsd-kind-icon">GraphQLClient<wbr/>Web<wbr/>Socket</a></li><li class="tsd-kind-class"><a href="classes/GraphQLExecutionArgsParser.html" class="tsd-kind-icon">GraphQLExecution<wbr/>Args<wbr/>Parser</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/GraphQLHttpServer.html" class="tsd-kind-icon">GraphQLHttp<wbr/>Server</a></li><li class="tsd-kind-class"><a href="classes/GraphQLIntrospector.html" class="tsd-kind-icon">GraphQLIntrospector</a></li><li class="tsd-kind-class"><a href="classes/GraphQLReader.html" class="tsd-kind-icon">GraphQLReader</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/GraphQLRequestError.html" class="tsd-kind-icon">GraphQLRequest<wbr/>Error</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/GraphQLSchemaManager.html" class="tsd-kind-icon">GraphQLSchema<wbr/>Manager</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/GraphQLServer.html" class="tsd-kind-icon">GraphQLServer</a></li><li class="tsd-kind-class"><a href="classes/GraphQLServerWebSocket.html" class="tsd-kind-icon">GraphQLServer<wbr/>Web<wbr/>Socket</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/GraphQLWebSocketClient.html" class="tsd-kind-icon">GraphQLWeb<wbr/>Socket<wbr/>Client</a></li><li class="tsd-kind-class tsd-has-type-parameter"><a href="classes/GraphQLWebSocketServer.html" class="tsd-kind-icon">GraphQLWeb<wbr/>Socket<wbr/>Server</a></li><li class="tsd-kind-class"><a href="classes/ImportCodeGenerator.html" class="tsd-kind-icon">Import<wbr/>Code<wbr/>Generator</a></li><li class="tsd-kind-class"><a href="classes/ServerCodeGenerator.html" class="tsd-kind-icon">Server<wbr/>Code<wbr/>Generator</a></li><li class="tsd-kind-interface"><a href="interfaces/ClientCodeGeneratorOptions.html" class="tsd-kind-icon">Client<wbr/>Code<wbr/>Generator<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/CodeGeneratorCliOptions.html" class="tsd-kind-icon">Code<wbr/>Generator<wbr/>Cli<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/CodeGeneratorOptions.html" class="tsd-kind-icon">Code<wbr/>Generator<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/CommonCodeGeneratorOptions.html" class="tsd-kind-icon">Common<wbr/>Code<wbr/>Generator<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/CompleteMessage.html" class="tsd-kind-icon">Complete<wbr/>Message</a></li><li class="tsd-kind-interface"><a href="interfaces/ConnectionAckMessage.html" class="tsd-kind-icon">Connection<wbr/>Ack<wbr/>Message</a></li><li class="tsd-kind-interface"><a href="interfaces/ConnectionInitMessage.html" class="tsd-kind-icon">Connection<wbr/>Init<wbr/>Message</a></li><li class="tsd-kind-interface"><a href="interfaces/CreateContextFnOptions.html" class="tsd-kind-icon">Create<wbr/>Context<wbr/>Fn<wbr/>Options</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/CustomResolvers.html" class="tsd-kind-icon">Custom<wbr/>Resolvers</a></li><li class="tsd-kind-interface"><a href="interfaces/ErrorMessage.html" class="tsd-kind-icon">Error<wbr/>Message</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/GeneratedResolvers.html" class="tsd-kind-icon">Generated<wbr/>Resolvers</a></li><li class="tsd-kind-interface"><a href="interfaces/Gql2TsOptions.html" class="tsd-kind-icon">Gql2<wbr/>Ts<wbr/>Options</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/GraphQLClientOptions.html" class="tsd-kind-icon">GraphQLClient<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLClientTypings.html" class="tsd-kind-icon">GraphQLClient<wbr/>Typings</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLClientWebSocketOptions.html" class="tsd-kind-icon">GraphQLClient<wbr/>Web<wbr/>Socket<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLExecutionArgsParserCacheEntry.html" class="tsd-kind-icon">GraphQLExecution<wbr/>Args<wbr/>Parser<wbr/>Cache<wbr/>Entry</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLExecutionArgsParserOptions.html" class="tsd-kind-icon">GraphQLExecution<wbr/>Args<wbr/>Parser<wbr/>Options</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/GraphQLHttpServerOptions.html" class="tsd-kind-icon">GraphQLHttp<wbr/>Server<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLHttpServerRequest.html" class="tsd-kind-icon">GraphQLHttp<wbr/>Server<wbr/>Request</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLHttpServerResponse.html" class="tsd-kind-icon">GraphQLHttp<wbr/>Server<wbr/>Response</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLIntrospectorOptions.html" class="tsd-kind-icon">GraphQLIntrospector<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLReaderCacheEntry.html" class="tsd-kind-icon">GraphQLReader<wbr/>Cache<wbr/>Entry</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLReaderOptions.html" class="tsd-kind-icon">GraphQLReader<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLRequestOptions.html" class="tsd-kind-icon">GraphQLRequest<wbr/>Options</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/GraphQLServerBootstrapOptions.html" class="tsd-kind-icon">GraphQLServer<wbr/>Bootstrap<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLServerWebSocketOptions.html" class="tsd-kind-icon">GraphQLServer<wbr/>Web<wbr/>Socket<wbr/>Options</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/GraphQLWebSocketClientOptions.html" class="tsd-kind-icon">GraphQLWeb<wbr/>Socket<wbr/>Client<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/GraphQLWebSocketClientTypings.html" class="tsd-kind-icon">GraphQLWeb<wbr/>Socket<wbr/>Client<wbr/>Typings</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/GraphQLWebSocketServerOptions.html" class="tsd-kind-icon">GraphQLWeb<wbr/>Socket<wbr/>Server<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/ImportDef.html" class="tsd-kind-icon">Import<wbr/>Def</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/InterfaceResolver.html" class="tsd-kind-icon">Interface<wbr/>Resolver</a></li><li class="tsd-kind-interface"><a href="interfaces/IntrospectionOptions.html" class="tsd-kind-icon">Introspection<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/IntrospectionQueryResult.html" class="tsd-kind-icon">Introspection<wbr/>Query<wbr/>Result</a></li><li class="tsd-kind-interface"><a href="interfaces/IntrospectionRequestFnOptions.html" class="tsd-kind-icon">Introspection<wbr/>Request<wbr/>Fn<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/LoggerLike.html" class="tsd-kind-icon">Logger<wbr/>Like</a></li><li class="tsd-kind-interface"><a href="interfaces/NextMessage.html" class="tsd-kind-icon">Next<wbr/>Message</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/ObjectResolver.html" class="tsd-kind-icon">Object<wbr/>Resolver</a></li><li class="tsd-kind-interface"><a href="interfaces/ParsedQs.html" class="tsd-kind-icon">Parsed<wbr/>Qs</a></li><li class="tsd-kind-interface"><a href="interfaces/RawExecutionArgs.html" class="tsd-kind-icon">Raw<wbr/>Execution<wbr/>Args</a></li><li class="tsd-kind-interface"><a href="interfaces/ServerCodeGeneratorOptions.html" class="tsd-kind-icon">Server<wbr/>Code<wbr/>Generator<wbr/>Options</a></li><li class="tsd-kind-interface"><a href="interfaces/SubscribeMessage.html" class="tsd-kind-icon">Subscribe<wbr/>Message</a></li><li class="tsd-kind-interface"><a href="interfaces/TsDirective.html" class="tsd-kind-icon">Ts<wbr/>Directive</a></li><li class="tsd-kind-interface"><a href="interfaces/TypeMapping.html" class="tsd-kind-icon">Type<wbr/>Mapping</a></li><li class="tsd-kind-interface tsd-has-type-parameter"><a href="interfaces/UnionResolver.html" class="tsd-kind-icon">Union<wbr/>Resolver</a></li><li class="tsd-kind-interface"><a href="interfaces/WatchRecursiveOptions.html" class="tsd-kind-icon">Watch<wbr/>Recursive<wbr/>Options</a></li><li class="tsd-kind-type-alias"><a href="modules.html#AcknowledgeFn" class="tsd-kind-icon">Acknowledge<wbr/>Fn</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#AnyResolvers" class="tsd-kind-icon">Any<wbr/>Resolvers</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#AsyncPushIteratorSetup" class="tsd-kind-icon">Async<wbr/>Push<wbr/>Iterator<wbr/>Setup</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#CreateContextFn" class="tsd-kind-icon">Create<wbr/>Context<wbr/>Fn</a></li><li class="tsd-kind-type-alias"><a href="modules.html#CreateWebSocketFn" class="tsd-kind-icon">Create<wbr/>Web<wbr/>Socket<wbr/>Fn</a></li><li class="tsd-kind-type-alias"><a href="modules.html#FragmentMapEntry" class="tsd-kind-icon">Fragment<wbr/>Map<wbr/>Entry</a></li><li class="tsd-kind-type-alias"><a href="modules.html#GraphQLRequestInit" class="tsd-kind-icon">GraphQLRequest<wbr/>Init</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#GraphQLServerOptions" class="tsd-kind-icon">GraphQLServer<wbr/>Options</a></li><li class="tsd-kind-type-alias"><a href="modules.html#GraphQLWebSocketClientMessage" class="tsd-kind-icon">GraphQLWeb<wbr/>Socket<wbr/>Client<wbr/>Message</a></li><li class="tsd-kind-type-alias"><a href="modules.html#GraphQLWebSocketMessage" class="tsd-kind-icon">GraphQLWeb<wbr/>Socket<wbr/>Message</a></li><li class="tsd-kind-type-alias"><a href="modules.html#GraphQLWebSocketServerMessage" class="tsd-kind-icon">GraphQLWeb<wbr/>Socket<wbr/>Server<wbr/>Message</a></li><li class="tsd-kind-type-alias"><a href="modules.html#IntrospectionRequestFn" class="tsd-kind-icon">Introspection<wbr/>Request<wbr/>Fn</a></li><li class="tsd-kind-type-alias"><a href="modules.html#NamedOperationDefinitionNode" class="tsd-kind-icon">Named<wbr/>Operation<wbr/>Definition<wbr/>Node</a></li><li class="tsd-kind-type-alias"><a href="modules.html#ParsedExecutionArgs" class="tsd-kind-icon">Parsed<wbr/>Execution<wbr/>Args</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#ResolverErrorHandler" class="tsd-kind-icon">Resolver<wbr/>Error<wbr/>Handler</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#ResolversInput" class="tsd-kind-icon">Resolvers<wbr/>Input</a></li><li class="tsd-kind-type-alias"><a href="modules.html#SubscribeFn" class="tsd-kind-icon">Subscribe<wbr/>Fn</a></li><li class="tsd-kind-type-alias"><a href="modules.html#SubscribePayload" class="tsd-kind-icon">Subscribe<wbr/>Payload</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#TypeResolver" class="tsd-kind-icon">Type<wbr/>Resolver</a></li><li class="tsd-kind-type-alias"><a href="modules.html#WebSocketLike" class="tsd-kind-icon">Web<wbr/>Socket<wbr/>Like</a></li><li class="tsd-kind-function"><a href="modules.html#assert" class="tsd-kind-icon">assert</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#assertDefined" class="tsd-kind-icon">assert<wbr/>Defined</a></li><li class="tsd-kind-function"><a href="modules.html#assertRecord" class="tsd-kind-icon">assert<wbr/>Record</a></li><li class="tsd-kind-function"><a href="modules.html#cleanOperations" class="tsd-kind-icon">clean<wbr/>Operations</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#getDirective" class="tsd-kind-icon">get<wbr/>Directive</a></li><li class="tsd-kind-function"><a href="modules.html#gql2ts" class="tsd-kind-icon">gql2ts</a></li><li class="tsd-kind-function"><a href="modules.html#importWatchFunctions" class="tsd-kind-icon">import<wbr/>Watch<wbr/>Functions</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#isAsyncIterator" class="tsd-kind-icon">is<wbr/>Async<wbr/>Iterator</a></li><li class="tsd-kind-function"><a href="modules.html#listen" class="tsd-kind-icon">listen</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#mergeResolvers" class="tsd-kind-icon">merge<wbr/>Resolvers</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#parseDirective" class="tsd-kind-icon">parse<wbr/>Directive</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#toError" class="tsd-kind-icon">to<wbr/>Error</a></li><li class="tsd-kind-function"><a href="modules.html#watchRecursive" class="tsd-kind-icon">watch<wbr/>Recursive</a></li><li class="tsd-kind-function"><a href="modules.html#writeTypeScript" class="tsd-kind-icon">write<wbr/>Type<wbr/>Script</a></li></ul></nav></div></div></div><footer class="with-border-bottom"><div class="container"><h2>Legend</h2><div class="tsd-legend-group"><ul class="tsd-legend"><li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li><li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li><li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li><li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li><li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li></ul></div><h2>Settings</h2><p>Theme <select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></p></div></footer><div class="container tsd-generator"><p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div><div class="overlay"></div><script src="assets/main.js"></script></body></html>

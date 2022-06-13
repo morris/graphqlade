@@ -7,6 +7,7 @@
 - Add `OperationTypings` in client-side code generation for simplified client typing
 - Add `fetch`-based, type-safe `GraphQLClient` for queries and mutations
 - Add type-safe `subscribeNamed` method to `GraphQLWebSocketClient`
+- Add API documentation
 
 ## v1.0.0
 

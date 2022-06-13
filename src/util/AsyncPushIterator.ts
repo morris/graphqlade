@@ -1,4 +1,4 @@
-type AsyncPushIteratorSetup<T> = (
+export type AsyncPushIteratorSetup<T> = (
   iterator: AsyncPushIterator<T>
 ) => Promise<(() => unknown) | undefined> | (() => unknown) | undefined;
 
