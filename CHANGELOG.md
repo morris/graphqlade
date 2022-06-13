@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## v1.1.0
 
 - Update deps
 - Fall back to `unknown` for unmapped scalars
