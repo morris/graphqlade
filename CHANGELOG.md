@@ -5,6 +5,7 @@
 - Include JSON body (if any) in `GraphQLRequestError`
 - Add `errorFilter` to `GraphQLClient` options
 - Improve error messages in `GraphQLClient`
+- Update deps
 
 ## v1.1.1
 
