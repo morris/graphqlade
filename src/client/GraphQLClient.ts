@@ -1,5 +1,5 @@
 // keep granular imports here fore browser build
-import type { ExecutionResult } from "graphql";
+import type { ExecutionResult, GraphQLError } from "graphql";
 import { toError } from "../util/toError";
 import { GraphQLRequestError } from "./GraphQLRequestError";
 
@@ -31,6 +31,7 @@ export type GraphQLRequestInit = Omit<
   "headers" | "body" | "method"
 > & {
   headers?: Record<string, string>;
+  errorFilter?: (err: GraphQLError) => boolean;
 };
 
 export class GraphQLClient<
@@ -89,13 +90,13 @@ export class GraphQLClient<
       body: JSON.stringify({ query, variables, operationName }),
     });
 
-    return this.parseResponse<TData>(response);
+    return this.parseResponse<TData>(response, init);
   }
 
-  async parseResponse<TData>(response: Response) {
+  async parseResponse<TData>(response: Response, init?: GraphQLRequestInit) {
     const suffix = response.ok
       ? ""
-      : `; ${response.status} ${response.statusText}`;
+      : ` (${response.status} ${response.statusText})`;
 
     let result: ExecutionResult<TData>;
 
@@ -111,16 +112,28 @@ export class GraphQLClient<
     if (!this.isResult(result)) {
       throw new GraphQLRequestError(
         `Not a GraphQL response${suffix}`,
-        response
+        response,
+        undefined,
+        result
       );
     }
 
-    if (result.errors && result.errors.length > 0) {
-      throw new GraphQLRequestError(
-        `GraphQL error(s)${suffix}`,
-        response,
-        result
-      );
+    let errors = result.errors;
+
+    if (errors) {
+      const errorFilter = init?.errorFilter ?? this.init.errorFilter;
+
+      if (errorFilter) errors = errors.filter(errorFilter);
+
+      if (errors.length > 0) {
+        throw new GraphQLRequestError(
+          `GraphQL error(s): ${errors
+            .map((err) => err.message)
+            .join("; ")}${suffix}`,
+          response,
+          result
+        );
+      }
     }
 
     return result;

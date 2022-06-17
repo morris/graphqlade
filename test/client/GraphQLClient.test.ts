@@ -164,7 +164,7 @@ describe("The GraphQLClient", () => {
       throw new Error("should not succeed");
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.message).toEqual("GraphQL error(s)");
+        expect(err.message).toEqual("GraphQL error(s): failure");
         expect(err.response.ok).toEqual(true);
         expect(err.result).toEqual(expectedResult);
       } else {
@@ -176,7 +176,7 @@ describe("The GraphQLClient", () => {
   it("should handle non-2xx responses correctly", async () => {
     const expectedResult = {
       data: { query2: null },
-      errors: [{ message: "failure" }],
+      errors: [{ message: "failure" }, { message: "failure2" }],
     };
 
     const client = new GraphQLClient({
@@ -194,13 +194,69 @@ describe("The GraphQLClient", () => {
       throw new Error("should not succeed");
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.message).toEqual("GraphQL error(s); 400 Bad request");
+        expect(err.message).toEqual(
+          "GraphQL error(s): failure; failure2 (400 Bad request)"
+        );
         expect(err.response.ok).toEqual(false);
         expect(err.result).toEqual(expectedResult);
       } else {
         throw err;
       }
     }
+  });
+
+  it("should be able to filter errors", async () => {
+    const expectedResult = {
+      data: { query2: null },
+      errors: [{ message: "failure" }, { message: "failure2" }],
+    };
+
+    const client = new GraphQLClient({
+      url,
+      typings,
+      fetch: mockFetchJson(expectedResult),
+      init: {
+        errorFilter(err) {
+          return !err.message.match(/failure2/);
+        },
+      },
+    });
+
+    try {
+      await client.postNamed("Query2", { count: 1 });
+      throw new Error("should not succeed");
+    } catch (err) {
+      if (err instanceof GraphQLRequestError) {
+        expect(err.message).toEqual("GraphQL error(s): failure");
+        expect(err.result).toEqual(expectedResult);
+      } else {
+        throw err;
+      }
+    }
+  });
+
+  it("should not throw if all errors are filtered", async () => {
+    const expectedResult = {
+      data: { query2: null },
+      errors: [{ message: "failure" }, { message: "failure2" }],
+    };
+
+    const client = new GraphQLClient({
+      url,
+      typings,
+      fetch: mockFetchJson(expectedResult),
+    });
+
+    const result = await client.postNamed(
+      "Query2",
+      { count: 1 },
+      {
+        errorFilter() {
+          return false;
+        },
+      }
+    );
+    expect(result).toEqual(expectedResult);
   });
 
   it("should handle non-GraphQL JSON responses correctly", async () => {
@@ -218,6 +274,7 @@ describe("The GraphQLClient", () => {
         expect(err.message).toEqual("Not a GraphQL response");
         expect(err.response.ok).toEqual(true);
         expect(err.result).toBeUndefined();
+        expect(err.json).toEqual({ not: "graphql" });
       } else {
         throw err;
       }
@@ -267,7 +324,7 @@ describe("The GraphQLClient", () => {
       throw new Error("should not succeed");
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.message).toEqual("Not a GraphQL response; 503 Unavailable");
+        expect(err.message).toEqual("Not a GraphQL response (503 Unavailable)");
         expect(err.response.ok).toEqual(false);
         expect(err.result).toBeUndefined();
       } else {

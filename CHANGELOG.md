@@ -1,5 +1,11 @@
 # Changelog
 
+## NEXT
+
+- Include JSON body (if any) in `GraphQLRequestError`
+- Add `errorFilter` to `GraphQLClient` options
+- Improve error messages in `GraphQLClient`
+
 ## v1.1.1
 
 - Fix `GraphQLCLient.setHeaders` to safely reset headers
