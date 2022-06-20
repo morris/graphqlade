@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## v1.2.0
 
 - Include JSON body (if any) in `GraphQLRequestError`
 - Add `errorFilter` to `GraphQLClient` options
