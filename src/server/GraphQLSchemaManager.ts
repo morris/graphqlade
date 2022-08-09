@@ -17,6 +17,7 @@ import {
   isObjectType,
   isScalarType,
   isUnionType,
+  printSchema,
 } from "graphql";
 import { assertDefined, assertRecord, mergeResolvers, toError } from "../util";
 
@@ -103,6 +104,21 @@ export class GraphQLSchemaManager<TContext> {
         if (field.name.startsWith("__")) continue;
 
         if (!field.resolve) field.resolve = defaultFieldResolver;
+      }
+    }
+  }
+
+  protected setStitchingSdlResolver() {
+    this.setResolvers(this.stitchingResolver());
+  }
+
+  stitchingResolver(): ResolversInput<TContext> {
+    const schema = this.schema;
+    return {
+      Query: {
+        _sdl() {
+          return printSchema(schema);
+        }
       }
     }
   }

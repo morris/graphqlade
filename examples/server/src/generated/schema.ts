@@ -209,6 +209,16 @@ export interface RQuery<TContext> {
     context: TContext,
     info: GraphQLResolveInfo
   ) => AsyncResult<Maybe<number>>;
+
+  /**
+   * (String)
+   */
+  _sdl?: (
+    source: TQuery,
+    args: Record<string, never>,
+    context: TContext,
+    info: GraphQLResolveInfo
+  ) => AsyncResult<string>;
 }
 
 export interface RBoss<TContext> {
@@ -1139,6 +1149,11 @@ export interface TQuery {
    * (ESNumber)
    */
   divide?: number;
+
+  /**
+   * (String)
+   */
+  _sdl: string;
 }
 
 export interface TBoss {
@@ -1767,6 +1782,47 @@ export enum T__DirectiveLocation {
    * Location adjacent to an input object field definition.
    */
   INPUT_FIELD_DEFINITION = "INPUT_FIELD_DEFINITION",
+}
+
+export interface KeyDirective {
+  /**
+   * (String)
+   */
+  selectionSet: string;
+}
+
+export interface ComputedDirective {
+  /**
+   * (String)
+   */
+  selectionSet: string;
+}
+
+export interface MergeDirective {
+  /**
+   * (String)
+   */
+  argsExpr?: string;
+
+  /**
+   * (String)
+   */
+  keyArg?: string;
+
+  /**
+   * (String)
+   */
+  keyField?: string;
+
+  /**
+   * (Array<String>)
+   */
+  key?: Array<string>;
+
+  /**
+   * (String)
+   */
+  additionalArgs?: string;
 }
 
 export interface TsDirective {

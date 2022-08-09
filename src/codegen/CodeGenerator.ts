@@ -1,6 +1,7 @@
 import fs from "fs";
 import { validate } from "graphql";
 import * as path from "path";
+import { stitchingDirectives } from "@graphql-tools/stitching-directives";
 import { GraphQLIntrospector, IntrospectionRequestFn } from "../introspect";
 import { GraphQLReader } from "../read";
 import {
@@ -93,6 +94,11 @@ export interface CodeGeneratorCliOptions {
    * The logger used in the CLI. Defaults to console.
    */
   logger?: LoggerLike;
+
+  /*
+   *
+   */
+  useStitchingDirectives?: boolean;
 }
 
 export class CodeGenerator {
@@ -141,6 +147,7 @@ export class CodeGenerator {
 
     try {
       await this.writeTsDirectiveDefinition(options);
+      await this.writeStitchingDirectiveDefinition(options);
       await this.write(options);
 
       if (options.watch) {
@@ -230,6 +237,17 @@ export class CodeGenerator {
     }
   }
 
+  async writeStitchingDirectiveDefinition(
+    options: Omit<CodeGeneratorCliOptions, "watch">
+  ) {
+    if (options.server && options.useStitchingDirectives) {
+      await fs.promises.writeFile(
+        path.join(this.root, this.schema, "_stitching.gql"),
+        this.getStitchingDirectiveDefinition()
+      );
+    }
+  }
+
   //
 
   async writeServer() {
@@ -252,6 +270,16 @@ export class CodeGenerator {
   inputType: String
   from: String
 ) on OBJECT | INTERFACE | ENUM | SCALAR
+`;
+  }
+
+  getStitchingDirectiveDefinition() {
+    const { allStitchingDirectivesTypeDefs } = stitchingDirectives();
+    return `${allStitchingDirectivesTypeDefs}
+
+extend type Query {
+  _sdl: String!
+}
 `;
   }
 

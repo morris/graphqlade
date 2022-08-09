@@ -52,6 +52,11 @@ export interface GraphQLServerBootstrapOptions<TContext>
    * Resolver error handler.
    */
   resolverErrorHandler?: ResolverErrorHandler<TContext>;
+
+  /*
+   * 
+   */
+  useStitchingDirectives?: boolean;
 }
 
 export interface CreateContextFnOptions {
@@ -95,6 +100,10 @@ export class GraphQLServer<TContext> extends GraphQLSchemaManager<TContext> {
 
     if (options.resolverErrorHandler) {
       server.setResolverErrorHandler(options.resolverErrorHandler);
+    }
+
+    if (options.useStitchingDirectives) {
+      server.setStitchingSdlResolver();
     }
 
     return server;
