@@ -59,4 +59,18 @@ describe("The gql2ts function", () => {
     expect(logger.errors).toEqual([]);
     expect(logger.logs).toEqual(["got headers"]);
   });
+
+  it("should generate server-side code with stitching directives", async () => {
+    const logger = new TestLogger();
+
+    await gql2ts({
+      root: "examples/server",
+      server: true,
+      noExit: true,
+      useStitchingDirectives: true,
+      logger,
+    });
+
+    expect(logger.errors).toEqual([]);
+  });
 });

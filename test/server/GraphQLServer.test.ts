@@ -93,4 +93,24 @@ describe("The GraphQLServer", () => {
       },
     });
   });
+
+  it("should resolve the _sdl query by default when using the useStitchingDirectives flag", async () => {
+    const gqlServer = await GraphQLServer.bootstrap<undefined>({
+      root: `${__dirname}/../../examples/server`,
+      createContext() {
+        return undefined;
+      },
+      useStitchingDirectives: true,
+    });
+
+    const result = execute({
+      schema: gqlServer.schema,
+      document: parse(`
+        { _sdl }
+      `),
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((result as any).data._sdl).toBeDefined();
+  });
 });

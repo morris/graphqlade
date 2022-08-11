@@ -96,7 +96,9 @@ export interface CodeGeneratorCliOptions {
   logger?: LoggerLike;
 
   /*
-   *
+   * Create a _stitching.gql file with required directives
+   * and queries to stitch multiple services together.
+   * Best used together with the same flag on bootstrap
    */
   useStitchingDirectives?: boolean;
 }
