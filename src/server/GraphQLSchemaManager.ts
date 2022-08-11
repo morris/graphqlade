@@ -17,8 +17,8 @@ import {
   isObjectType,
   isScalarType,
   isUnionType,
-  printSchema,
 } from "graphql";
+import { printSchemaWithDirectives } from "@graphql-tools/utils";
 import { assertDefined, assertRecord, mergeResolvers, toError } from "../util";
 
 export type ResolversInput<TContext> =
@@ -117,7 +117,7 @@ export class GraphQLSchemaManager<TContext> {
     return {
       Query: {
         _sdl() {
-          return printSchema(schema);
+          return printSchemaWithDirectives(schema);
         }
       }
     }
