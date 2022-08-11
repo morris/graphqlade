@@ -1,7 +1,6 @@
 import fs from "fs";
 import { validate } from "graphql";
 import * as path from "path";
-import { stitchingDirectives } from "@graphql-tools/stitching-directives";
 import { GraphQLIntrospector, IntrospectionRequestFn } from "../introspect";
 import { GraphQLReader } from "../read";
 import {
@@ -276,8 +275,11 @@ export class CodeGenerator {
   }
 
   getStitchingDirectiveDefinition() {
-    const { allStitchingDirectivesTypeDefs } = stitchingDirectives();
-    return `${allStitchingDirectivesTypeDefs}
+    return `
+directive @key(selectionSet: String!) on OBJECT
+directive @computed(selectionSet: String!) on FIELD_DEFINITION
+directive @merge(argsExpr: String, keyArg: String, keyField: String, key: [String!], additionalArgs: String) on FIELD_DEFINITION
+directive @canonical on OBJECT | INTERFACE | INPUT_OBJECT | UNION | ENUM | SCALAR | FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 
 extend type Query {
   _sdl: String!
