@@ -109,7 +109,7 @@ export class GraphQLSchemaManager<TContext> {
   }
 
   protected setSdlResolvers(sdl: string) {
-    const sdlVersion = createHash("sha-1").update(sdl).digest("hex");
+    const sdlVersion = createHash("sha1").update(sdl).digest("hex");
 
     this.setResolvers({
       Query: {
