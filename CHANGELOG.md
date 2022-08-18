@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.3.0
+
+- Add GraphQL stitching support
+  - Code generation for directives and resolvers
+  - SDL resolvers
+- Update deps
+
 ## v1.2.0
 
 - Include JSON body (if any) in `GraphQLRequestError`
