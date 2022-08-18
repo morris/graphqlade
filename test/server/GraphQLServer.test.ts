@@ -1,6 +1,7 @@
-import { execute, GraphQLEnumType, parse } from "graphql";
+import { execute, GraphQLEnumType, GraphQLError, parse } from "graphql";
 import { GraphQLDateTime } from "graphql-scalars";
-import { GraphQLServer } from "../../src";
+import path from "path";
+import { GraphQLReader, GraphQLServer } from "../../src";
 
 describe("The GraphQLServer", () => {
   it("should be able to bootstrap an executable schema", async () => {
@@ -94,23 +95,57 @@ describe("The GraphQLServer", () => {
     });
   });
 
-  it("should resolve the _sdl query by default when using the useStitchingDirectives flag", async () => {
+  it("should not resolve SDL fields when stitching is disabled", async () => {
+    const root = `${__dirname}/../../examples/server`;
     const gqlServer = await GraphQLServer.bootstrap<undefined>({
-      root: `${__dirname}/../../examples/server`,
+      root,
       createContext() {
         return undefined;
       },
-      useStitchingDirectives: true,
     });
 
     const result = execute({
       schema: gqlServer.schema,
       document: parse(`
-        { _sdl }
+        { _sdl _sdlVersion }
       `),
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((result as any).data._sdl).toBeDefined();
+    expect(result).toEqual({
+      data: null,
+      errors: [
+        new GraphQLError(
+          "Cannot return null for non-nullable field Query._sdl."
+        ),
+      ],
+    });
+  });
+
+  it("should resolve SDL fields when stitching is enabled", async () => {
+    const root = `${__dirname}/../../examples/server`;
+    const gqlServer = await GraphQLServer.bootstrap<undefined>({
+      root,
+      createContext() {
+        return undefined;
+      },
+      stitching: true,
+    });
+
+    const result = execute({
+      schema: gqlServer.schema,
+      document: parse(`
+        { _sdl _sdlVersion }
+      `),
+    });
+
+    const reader = new GraphQLReader();
+    const sdl = await reader.readDir(path.join(root, "schema"));
+
+    expect(result).toEqual({
+      data: {
+        _sdl: sdl,
+        _sdlVersion: "79b0cab0ba9ca035d10e57c2d739eace9be2a044",
+      },
+    });
   });
 });

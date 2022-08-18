@@ -219,6 +219,16 @@ export interface RQuery<TContext> {
     context: TContext,
     info: GraphQLResolveInfo
   ) => AsyncResult<string>;
+
+  /**
+   * (String)
+   */
+  _sdlVersion?: (
+    source: TQuery,
+    args: Record<string, never>,
+    context: TContext,
+    info: GraphQLResolveInfo
+  ) => AsyncResult<string>;
 }
 
 export interface RBoss<TContext> {
@@ -1154,6 +1164,11 @@ export interface TQuery {
    * (String)
    */
   _sdl: string;
+
+  /**
+   * (String)
+   */
+  _sdlVersion: string;
 }
 
 export interface TBoss {

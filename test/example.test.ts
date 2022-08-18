@@ -4,6 +4,7 @@ import { requireExampleServer } from "./util";
 
 describe("The example", () => {
   let operations: string;
+  let sdl: string;
 
   requireExampleServer();
 
@@ -12,6 +13,7 @@ describe("The example", () => {
     operations = await reader.readDir(
       `${__dirname}/../examples/client/operations`
     );
+    sdl = await reader.readDir(`${__dirname}/../examples/server/schema`);
   });
 
   it("should run", async () => {
@@ -221,6 +223,23 @@ describe("The example", () => {
             ],
           },
         ],
+      },
+    });
+  });
+
+  it("should resolve SDL fields", async () => {
+    const r = await got("http://localhost:4999/graphql", {
+      method: "POST",
+      json: {
+        query: "{ _sdl _sdlVersion }",
+      },
+      responseType: "json",
+    });
+
+    expect(r.body).toEqual({
+      data: {
+        _sdl: sdl,
+        _sdlVersion: "79b0cab0ba9ca035d10e57c2d739eace9be2a044",
       },
     });
   });

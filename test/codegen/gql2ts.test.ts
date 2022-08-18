@@ -67,7 +67,7 @@ describe("The gql2ts function", () => {
       root: "examples/server",
       server: true,
       noExit: true,
-      useStitchingDirectives: true,
+      stitching: true,
       logger,
     });
 

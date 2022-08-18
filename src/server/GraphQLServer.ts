@@ -1,4 +1,9 @@
-import { GraphQLFieldResolver, GraphQLSchema, isSchema } from "graphql";
+import {
+  buildSchema,
+  GraphQLFieldResolver,
+  GraphQLSchema,
+  isSchema,
+} from "graphql";
 import { IncomingHttpHeaders } from "http";
 import { join } from "path";
 import { GraphQLHttpServer, GraphQLHttpServerOptions } from "../http";
@@ -58,7 +63,7 @@ export interface GraphQLServerBootstrapOptions<TContext>
    * to use stitching directives with a stitching service.
    * Best used together with the same flag on gql2ts
    */
-  useStitchingDirectives?: boolean;
+  stitching?: boolean;
 }
 
 export interface CreateContextFnOptions {
@@ -86,9 +91,16 @@ export class GraphQLServer<TContext> extends GraphQLSchemaManager<TContext> {
     const reader =
       options.reader ?? new GraphQLReader({ disableCaching: true });
     const root = options.root ?? "";
-    const schema = isSchema(options.schema)
-      ? options.schema
-      : await reader.buildSchemaFromDir(join(root, options.schema ?? "schema"));
+
+    let sdl: string | undefined;
+    let schema: GraphQLSchema;
+
+    if (isSchema(options.schema)) {
+      schema = options.schema;
+    } else {
+      sdl = await reader.readDir(join(root, options.schema ?? "schema"));
+      schema = buildSchema(sdl);
+    }
 
     const server = new GraphQLServer({ ...options, schema });
 
@@ -104,8 +116,8 @@ export class GraphQLServer<TContext> extends GraphQLSchemaManager<TContext> {
       server.setResolverErrorHandler(options.resolverErrorHandler);
     }
 
-    if (options.useStitchingDirectives) {
-      server.setStitchingSdlResolver();
+    if (options.stitching && sdl) {
+      server.setSdlResolvers(sdl);
     }
 
     return server;

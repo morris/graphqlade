@@ -4,5 +4,5 @@ const { gql2ts } = require("../.."); // graphqlade in your app
 gql2ts({
   root: __dirname,
   server: true,
-  useStitchingDirectives: true,
+  stitching: true,
 });

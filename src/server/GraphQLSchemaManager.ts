@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import {
   assertScalarType,
   defaultFieldResolver,
@@ -18,7 +19,6 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
-import { printSchemaWithDirectives } from "@graphql-tools/utils";
 import { assertDefined, assertRecord, mergeResolvers, toError } from "../util";
 
 export type ResolversInput<TContext> =
@@ -108,19 +108,19 @@ export class GraphQLSchemaManager<TContext> {
     }
   }
 
-  protected setStitchingSdlResolver() {
-    this.setResolvers(this.stitchingResolver());
-  }
+  protected setSdlResolvers(sdl: string) {
+    const sdlVersion = createHash("sha-1").update(sdl).digest("hex");
 
-  stitchingResolver(): ResolversInput<TContext> {
-    const schema = this.schema;
-    return {
+    this.setResolvers({
       Query: {
         _sdl() {
-          return printSchemaWithDirectives(schema);
-        }
-      }
-    }
+          return sdl;
+        },
+        _sdlVersion() {
+          return sdlVersion;
+        },
+      },
+    });
   }
 
   // type resolvers
