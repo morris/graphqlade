@@ -75,6 +75,7 @@ additional concepts and staying close to the "language" used by GraphQL.js.
     (possibly the future standard)
   - Supports [subscription-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)
     (e.g. [Apollo Client](https://www.apollographql.com/docs/react/))
+- GraphQL stitching support
 
 **[Learn more about GraphQLade's server-side workflow →](https://github.com/morris/graphqlade/wiki/Server-Side-Usage)**
 
@@ -127,3 +128,9 @@ additional concepts and staying close to the "language" used by GraphQL.js.
 - File uploads are out of scope. It's recommended to use regular HTTP endpoints.
 - IDE plug-ins are out of scope or not even required since GraphQLade doesn't
   introduce non-standard concepts. Existing plug-ins work well so far.
+
+## Contributors
+
+- [emargollo](https://github.com/emargollo) - Stitching support
+
+Thanks!
