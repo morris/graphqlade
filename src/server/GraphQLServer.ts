@@ -52,6 +52,13 @@ export interface GraphQLServerBootstrapOptions<TContext>
    * Resolver error handler.
    */
   resolverErrorHandler?: ResolverErrorHandler<TContext>;
+
+  /*
+   * Adds a query resolver for the _sdl query required
+   * to use stitching directives with a stitching service.
+   * Best used together with the same flag on gql2ts
+   */
+  useStitchingDirectives?: boolean;
 }
 
 export interface CreateContextFnOptions {
@@ -95,6 +102,10 @@ export class GraphQLServer<TContext> extends GraphQLSchemaManager<TContext> {
 
     if (options.resolverErrorHandler) {
       server.setResolverErrorHandler(options.resolverErrorHandler);
+    }
+
+    if (options.useStitchingDirectives) {
+      server.setStitchingSdlResolver();
     }
 
     return server;

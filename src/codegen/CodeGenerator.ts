@@ -93,6 +93,13 @@ export interface CodeGeneratorCliOptions {
    * The logger used in the CLI. Defaults to console.
    */
   logger?: LoggerLike;
+
+  /*
+   * Create a _stitching.gql file with required directives
+   * and queries to stitch multiple services together.
+   * Best used together with the same flag on bootstrap
+   */
+  useStitchingDirectives?: boolean;
 }
 
 export class CodeGenerator {
@@ -141,6 +148,7 @@ export class CodeGenerator {
 
     try {
       await this.writeTsDirectiveDefinition(options);
+      await this.writeStitchingDirectiveDefinition(options);
       await this.write(options);
 
       if (options.watch) {
@@ -230,6 +238,17 @@ export class CodeGenerator {
     }
   }
 
+  async writeStitchingDirectiveDefinition(
+    options: Omit<CodeGeneratorCliOptions, "watch">
+  ) {
+    if (options.server && options.useStitchingDirectives) {
+      await fs.promises.writeFile(
+        path.join(this.root, this.schema, "_stitching.gql"),
+        this.getStitchingDirectiveDefinition()
+      );
+    }
+  }
+
   //
 
   async writeServer() {
@@ -252,6 +271,19 @@ export class CodeGenerator {
   inputType: String
   from: String
 ) on OBJECT | INTERFACE | ENUM | SCALAR
+`;
+  }
+
+  getStitchingDirectiveDefinition() {
+    return `
+directive @key(selectionSet: String!) on OBJECT
+directive @computed(selectionSet: String!) on FIELD_DEFINITION
+directive @merge(argsExpr: String, keyArg: String, keyField: String, key: [String!], additionalArgs: String) on FIELD_DEFINITION
+directive @canonical on OBJECT | INTERFACE | INPUT_OBJECT | UNION | ENUM | SCALAR | FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+extend type Query {
+  _sdl: String!
+}
 `;
   }
 

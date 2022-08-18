@@ -15,6 +15,7 @@ export async function main(env: NodeJS.ProcessEnv) {
   const gqlServer = await GraphQLServer.bootstrap<MyContext>({
     root: `${__dirname}/..`,
     resolvers,
+    useStitchingDirectives: true,
     resolverErrorHandler(err) {
       // eslint-disable-next-line no-console
       console.error(err.stack);

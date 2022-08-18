@@ -1,5 +1,5 @@
 import { mkdirSync, rmdirSync, writeFileSync } from "fs";
-import { join } from "path";
+import { join, normalize } from "path";
 import { GraphQLReader, watchRecursive } from "../../src";
 import { TestLogger } from "../util";
 
@@ -61,7 +61,11 @@ describe("The watchRecursive function", () => {
 
     // TODO this used to be a strict array check but it was flaky;
     // switched to checking unique entries for now
-    expect(Array.from(new Set(callbacks)).sort()).toEqual(
+    expect(
+      Array.from(new Set(callbacks))
+        .sort()
+        .map((it) => normalize(it))
+    ).toEqual(
       [
         "/watchRecursive/bar",
         "/watchRecursive/foo",
@@ -71,7 +75,7 @@ describe("The watchRecursive function", () => {
         "/watchRecursive/foo/baz/test.txt",
         "/watchRecursive/foo/test.gql",
         "/watchRecursive/test.graphql",
-      ].map((it) => join(__dirname, it))
+      ].map((it) => normalize(join(__dirname, it)))
     );
   });
 });
