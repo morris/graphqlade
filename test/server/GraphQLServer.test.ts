@@ -1,4 +1,10 @@
-import { execute, GraphQLEnumType, GraphQLError, parse } from "graphql";
+import {
+  execute,
+  executeSync,
+  GraphQLEnumType,
+  GraphQLError,
+  parse,
+} from "graphql";
 import { GraphQLDateTime } from "graphql-scalars";
 import path from "path";
 import { GraphQLReader, GraphQLServer } from "../../src";
@@ -147,5 +153,82 @@ describe("The GraphQLServer", () => {
         _sdlVersion: "79b0cab0ba9ca035d10e57c2d739eace9be2a044",
       },
     });
+  });
+
+  it("should be able to set a resolver error handler", async () => {
+    const errors: Error[] = [];
+
+    const gqlServer = await GraphQLServer.bootstrap<undefined>({
+      root: `${__dirname}/../../examples/server`,
+      createContext() {
+        return undefined;
+      },
+    });
+
+    gqlServer.setResolvers({
+      Query: {
+        praise() {
+          return "the sun!";
+        },
+        boss() {
+          throw new Error("sync thrown error");
+        },
+        bosses() {
+          return new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("rejection")), 50)
+          );
+        },
+        async locations() {
+          throw new Error("async thrown error");
+        },
+      },
+    });
+
+    gqlServer.setResolverErrorHandler((err) => {
+      errors.push(err);
+    });
+
+    const resultSync = executeSync({
+      schema: gqlServer.schema,
+      document: parse(`
+        { praise boss(id: "dont care") }
+      `),
+    });
+
+    expect(resultSync).toEqual({
+      data: {
+        praise: "the sun!",
+        boss: null,
+      },
+      errors: [new GraphQLError("sync thrown error")],
+    });
+
+    const resultAsync = await execute({
+      schema: gqlServer.schema,
+      document: parse(`
+        { praise boss(id: "dont care") bosses { id } locations { id } }
+      `),
+    });
+
+    expect(resultAsync).toEqual({
+      data: {
+        praise: "the sun!",
+        boss: null,
+        bosses: null,
+        locations: null,
+      },
+      errors: [
+        new GraphQLError("sync thrown error"),
+        new GraphQLError("async thrown error"),
+        new GraphQLError("rejection"),
+      ],
+    });
+
+    expect(errors).toEqual([
+      new Error("sync thrown error"),
+      new Error("sync thrown error"),
+      new Error("async thrown error"),
+      new Error("rejection"),
+    ]);
   });
 });

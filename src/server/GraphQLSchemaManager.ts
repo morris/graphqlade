@@ -318,9 +318,23 @@ export class GraphQLSchemaManager<TContext> {
       for (const field of Object.values(type.getFields())) {
         const originalResolve = field.resolve ?? defaultFieldResolver;
 
-        field.resolve = async (data, args, context, info) => {
+        // performance: wrapped resolver must not be an "async function"!
+        // otherwise, any sync resolvers will be unnecessarily wrapped with an async function
+        // and get a performance hit e.g. when instrumented by APM agents
+        field.resolve = (data, args, context, info) => {
           try {
-            return await originalResolve(data, args, context, info);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const result: any = originalResolve(data, args, context, info);
+
+            if (typeof result?.catch === "function") {
+              return result.catch((err: unknown) => {
+                const newErr = handler(toError(err), data, args, context, info);
+
+                throw newErr ?? err;
+              });
+            }
+
+            return result;
           } catch (err) {
             const newErr = handler(toError(err), data, args, context, info);
 

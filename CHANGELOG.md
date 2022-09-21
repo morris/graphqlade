@@ -1,5 +1,9 @@
 # Changelog
 
+## NEXT
+
+- Improve performance of resolver error handlers
+
 ## v1.3.0
 
 - Add GraphQL stitching support
