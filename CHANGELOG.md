@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## v1.3.1
 
 - Improve performance of resolver error handlers
 
