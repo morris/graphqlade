@@ -89,6 +89,8 @@ export class GraphQLSchemaManager<TContext> {
     defaultFieldResolver: GraphQLFieldResolver<unknown, TContext>
   ) {
     for (const type of Object.values(this.schema.getTypeMap())) {
+      if (type.name.startsWith("__")) continue;
+
       this.setDefaultFieldResolverToType(type, defaultFieldResolver);
     }
 
@@ -304,6 +306,8 @@ export class GraphQLSchemaManager<TContext> {
 
   setResolverErrorHandler(handler: ResolverErrorHandler<TContext>) {
     for (const type of Object.values(this.schema.getTypeMap())) {
+      if (type.name.startsWith("__")) continue;
+
       this.setResolverErrorHandlerOnType(type, handler);
     }
 
