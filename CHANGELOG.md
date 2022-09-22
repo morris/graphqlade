@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.2
+
+- Ignore internal types in `GraphQLSchemaManager.setDefaultFieldResolver` and `.setResolverErrorHandler`
+
 ## v1.3.1
 
 - Improve performance of resolver error handlers
