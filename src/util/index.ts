@@ -3,6 +3,7 @@ export * from "./AsyncPushIterator";
 export * from "./cleanOperations";
 export * from "./DeferredPromise";
 export * from "./getDirective";
+export * from "./getProjection";
 export * from "./isAsyncIterator";
 export * from "./listen";
 export * from "./LoggerLike";
