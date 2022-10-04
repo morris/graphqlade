@@ -298,7 +298,8 @@ export class GraphQLSchemaManager<TContext> {
 
     for (const implementedInterface of type.getInterfaces()) {
       const resolver = r[implementedInterface.name];
-      this.setResolversToType(type, resolver);
+
+      if (resolver) this.setResolversToType(type, resolver);
     }
   }
 
