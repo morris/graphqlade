@@ -1,17 +1,10 @@
 {
+  "extends": "./tsconfig.json",
   "include": ["src/browser"],
   "compilerOptions": {
     "outFile": "build/graphqlade.amd.js",
     "target": "ES6",
     "module": "AMD",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "sourceMap": false,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "strict": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true
+    "sourceMap": false
   }
 }

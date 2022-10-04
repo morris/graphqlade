@@ -1,7 +1,7 @@
 set -ex
 
 # dist
-tsc --incremental --tsBuildInfoFile build/dist.tsbuildinfo
+tsc --project tsconfig.build.json --incremental --tsBuildInfoFile build/dist.tsbuildinfo
 
 # browser
 tsc --project tsconfig.browser.json --incremental --tsBuildInfoFile build/browser.tsbuildinfo
