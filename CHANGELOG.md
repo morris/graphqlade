@@ -1,5 +1,10 @@
 # Changelog
 
+## NEXT
+
+- Add `getProjection` utility function to support efficient database lookups
+- Simplify builds
+
 ## v1.3.2
 
 - Ignore internal types in `GraphQLSchemaManager.setDefaultFieldResolver` and `.setResolverErrorHandler`
