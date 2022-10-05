@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "include": ["src/browser"],
   "compilerOptions": {
+    "noEmit": false,
     "outFile": "build/graphqlade.amd.js",
     "target": "ES6",
     "module": "AMD",
