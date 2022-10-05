@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync, writeFileSync } from "fs";
+import { mkdirSync, rmdirSync, writeFileSync } from "fs";
 import { join, normalize } from "path";
 import { GraphQLReader, watchRecursive } from "../../src";
 import { TestLogger } from "../util";
@@ -6,7 +6,7 @@ import { TestLogger } from "../util";
 describe("The watchRecursive function", () => {
   beforeAll(() => {
     try {
-      rmSync(join(__dirname, "watchRecursive"), { recursive: true });
+      rmdirSync(join(__dirname, "watchRecursive"), { recursive: true });
     } catch (err) {
       // ignore
     }
@@ -27,7 +27,7 @@ describe("The watchRecursive function", () => {
     });
 
     mkdirSync(join(__dirname, "watchRecursive/foo"), { recursive: true });
-    mkdirSync(join(__dirname, "watchRecursive/bar"));
+    mkdirSync(join(__dirname, "watchRecursive/bar"), { recursive: true });
     writeFileSync(join(__dirname, "watchRecursive/test.graphql"), "");
 
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -43,7 +43,7 @@ describe("The watchRecursive function", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    rmSync(join(__dirname, "watchRecursive/foo"), { recursive: true });
+    rmdirSync(join(__dirname, "watchRecursive/foo"), { recursive: true });
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
