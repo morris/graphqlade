@@ -137,7 +137,16 @@ export const ReviewsDocument =
 export type XReviews<TExtensions> = ExecutionResult<DReviews, TExtensions>;
 
 export type DReviews = {
-  reviews: Maybe<Array<({} & FReviewData) | ({} & FReviewData)>>;
+  reviews: Maybe<
+    Array<
+      | ({
+          __typename: "BossReview";
+        } & FReviewData)
+      | ({
+          __typename: "LocationReview";
+        } & FReviewData)
+    >
+  >;
 };
 
 export const NewReviewsDocument =
@@ -153,7 +162,97 @@ export type XNewReviews<TExtensions> = ExecutionResult<
 >;
 
 export type DNewReviews = {
-  newReview: ({} & FReviewData) | ({} & FReviewData);
+  newReview:
+    | ({
+        __typename: "BossReview";
+      } & FReviewData)
+    | ({
+        __typename: "LocationReview";
+      } & FReviewData);
+};
+
+export const Reviews2Document =
+  "query Reviews2{reviews{...baseReview2 ...bossReview2}}\n\nfragment baseReview2 on Review{__typename author}\n\nfragment bossReview2 on BossReview{__typename boss{id name}}";
+
+export type XReviews2<TExtensions> = ExecutionResult<DReviews2, TExtensions>;
+
+export type DReviews2 = {
+  reviews: Maybe<
+    Array<
+      | ({
+          __typename: "BossReview";
+        } & (FBaseReview2 & FBossReview2))
+      | ({
+          __typename: "LocationReview";
+        } & FBaseReview2)
+    >
+  >;
+};
+
+export const Reviews3Document =
+  "query Reviews3{reviews{...on Review{__typename}...on BossReview{__typename boss{id name}}}}";
+
+export type XReviews3<TExtensions> = ExecutionResult<DReviews3, TExtensions>;
+
+export type DReviews3 = {
+  reviews: Maybe<
+    Array<
+      | ({
+          __typename: "BossReview";
+        } & ({} & {
+          boss: {
+            id: string;
+
+            name: string;
+          };
+        }))
+      | ({
+          __typename: "LocationReview";
+        } & {})
+    >
+  >;
+};
+
+export const Reviews4Document =
+  "query Reviews4{reviews{...baseReview4 ...on BossReview{boss{id name}}}}\n\nfragment baseReview4 on Review{author}";
+
+export type XReviews4<TExtensions> = ExecutionResult<DReviews4, TExtensions>;
+
+export type DReviews4 = {
+  reviews: Maybe<
+    Array<
+      | ({} & {
+          boss: {
+            id: string;
+
+            name: string;
+          };
+        } & FBaseReview4)
+      | ({} & FBaseReview4)
+    >
+  >;
+};
+
+export const Reviews5Document =
+  "query Reviews5{reviews{...baseReview5 ...on BossReview{__typename boss{id name}}}}\n\nfragment baseReview5 on Review{author}";
+
+export type XReviews5<TExtensions> = ExecutionResult<DReviews5, TExtensions>;
+
+export type DReviews5 = {
+  reviews: Maybe<
+    Array<
+      | ({
+          __typename: "BossReview";
+        } & {
+          boss: {
+            id: string;
+
+            name: string;
+          };
+        } & FBaseReview5)
+      | ({} & FBaseReview5)
+    >
+  >;
 };
 
 export const SearchDocument =
@@ -241,6 +340,44 @@ export type FReviewMetadata =
       author: Maybe<string>;
 
       createdAt: string;
+    };
+
+export type FBaseReview2 =
+  | {
+      author: Maybe<string>;
+
+      __typename: "BossReview";
+    }
+  | {
+      author: Maybe<string>;
+
+      __typename: "LocationReview";
+    };
+
+export type FBossReview2 = {
+  boss: {
+    id: string;
+
+    name: string;
+  };
+
+  __typename: "BossReview";
+};
+
+export type FBaseReview4 =
+  | {
+      author: Maybe<string>;
+    }
+  | {
+      author: Maybe<string>;
+    };
+
+export type FBaseReview5 =
+  | {
+      author: Maybe<string>;
+    }
+  | {
+      author: Maybe<string>;
     };
 
 export interface TCreateBossReviewInput {
@@ -430,6 +567,10 @@ export const OperationNameToDocument = {
   Locations: LocationsDocument,
   Reviews: ReviewsDocument,
   NewReviews: NewReviewsDocument,
+  Reviews2: Reviews2Document,
+  Reviews3: Reviews3Document,
+  Reviews4: Reviews4Document,
+  Reviews5: Reviews5Document,
   Search: SearchDocument,
 };
 
@@ -442,6 +583,10 @@ export interface OperationNameToVariables {
   Locations: VLocations;
   Reviews: undefined;
   NewReviews: VNewReviews;
+  Reviews2: undefined;
+  Reviews3: undefined;
+  Reviews4: undefined;
+  Reviews5: undefined;
   Search: VSearch;
 }
 
@@ -454,6 +599,10 @@ export interface OperationNameToData {
   Locations: DLocations;
   Reviews: DReviews;
   NewReviews: DNewReviews;
+  Reviews2: DReviews2;
+  Reviews3: DReviews3;
+  Reviews4: DReviews4;
+  Reviews5: DReviews5;
   Search: DSearch;
 }
 
@@ -465,6 +614,10 @@ export type QueryName =
   | "Divide"
   | "Locations"
   | "Reviews"
+  | "Reviews2"
+  | "Reviews3"
+  | "Reviews4"
+  | "Reviews5"
   | "Search";
 
 export type MutationName = "CreateBossReview" | "CreateLocationReview";

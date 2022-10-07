@@ -1,0 +1,14 @@
+query Reviews3 {
+  reviews {
+    ... on Review {
+      __typename
+    }
+    ... on BossReview {
+      __typename
+      boss {
+        id
+        name
+      }
+    }
+  }
+}

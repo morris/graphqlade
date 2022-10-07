@@ -4,6 +4,8 @@
 
 - Add `getProjection` utility function to support efficient database lookups
 - Simplify builds
+- Uplift `__typename` from fragments to simplify generated type system
+- Fix issue where no `__typename` in top-level operations lead to type system difficulties
 
 ## v1.3.2
 

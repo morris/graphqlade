@@ -86,6 +86,26 @@ export function App(el: Element) {
     .postNamed("Reviews", undefined)
     .then((x) => update({ reviewData: x.data }));
 
+  client.postNamed("Reviews2", undefined).then((x) => {
+    for (const review of x.data?.reviews ?? []) {
+      if (review.__typename === "BossReview") {
+        // eslint-disable-next-line no-console
+        console.log(review.boss);
+        break;
+      }
+    }
+  });
+
+  client.postNamed("Reviews3", undefined).then((x) => {
+    for (const review of x.data?.reviews ?? []) {
+      if (review.__typename === "BossReview") {
+        // eslint-disable-next-line no-console
+        console.log(review.boss);
+        break;
+      }
+    }
+  });
+
   setTimeout(async () => {
     try {
       for await (const review of socketClient.subscribeNamed(

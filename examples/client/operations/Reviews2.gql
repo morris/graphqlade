@@ -1,0 +1,19 @@
+query Reviews2 {
+  reviews {
+    ...baseReview2
+    ...bossReview2
+  }
+}
+
+fragment baseReview2 on Review {
+  __typename
+  author
+}
+
+fragment bossReview2 on BossReview {
+  __typename
+  boss {
+    id
+    name
+  }
+}

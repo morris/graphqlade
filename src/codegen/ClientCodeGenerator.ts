@@ -395,11 +395,16 @@ export class ClientCodeGenerator {
 
   generateSelectionSetForObject(
     node: SelectionSetNode,
-    parentType: GraphQLObjectType
+    parentType: GraphQLObjectType,
+    withTypeNameField = true
   ): string {
     return this.join(
       [
-        this.generateFields(node, parentType),
+        this.generateFields(
+          node,
+          parentType,
+          withTypeNameField && this.hasTypeNameField(node, parentType)
+        ),
         this.generateInlineFragments(node, parentType),
         this.generateFragmentSpreads(node, parentType),
       ],
@@ -408,23 +413,50 @@ export class ClientCodeGenerator {
     );
   }
 
+  hasTypeNameField(node: SelectionSetNode, parentType: GraphQLObjectType) {
+    for (const selection of node.selections) {
+      if (selection.kind === "Field" && selection.name.value === "__typename") {
+        return true;
+      } else if (
+        selection.kind === "InlineFragment" &&
+        this.checkTypeCondition(selection, parentType) &&
+        this.hasTypeNameField(selection.selectionSet, parentType)
+      ) {
+        return true;
+      } else if (selection.kind === "FragmentSpread") {
+        const fragment = this.requireFragment(selection.name.value);
+
+        if (
+          this.checkTypeCondition(fragment.node, parentType) &&
+          this.hasTypeNameField(fragment.node.selectionSet, parentType)
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   // fields
 
-  generateFields(node: SelectionSetNode, parentType: GraphQLObjectType) {
+  generateFields(
+    node: SelectionSetNode,
+    parentType: GraphQLObjectType,
+    withTypeNameField: boolean
+  ) {
     return `{
       ${this.join(
-        node.selections.map((it) =>
-          it.kind === "Field" ? this.generateField(it, parentType) : undefined
-        )
+        node.selections
+          .filter((it): it is FieldNode => it.kind === "Field")
+          .filter((it) => it.name.value !== "__typename")
+          .map((it) => this.generateField(it, parentType))
+          .concat(withTypeNameField ? [`__typename: "${parentType.name}"`] : [])
       )}
     }`;
   }
 
   generateField(node: FieldNode, parentType: GraphQLObjectType) {
-    if (node.name.value === "__typename") {
-      return `__typename: "${parentType.name}"`;
-    }
-
     const key = node.alias ? node.alias.value : node.name.value;
     const field = this.requireField(parentType, node.name.value);
 
@@ -487,7 +519,11 @@ export class ClientCodeGenerator {
     parentType: GraphQLObjectType
   ) {
     if (this.checkTypeCondition(node, parentType)) {
-      return this.generateSelectionSetForObject(node.selectionSet, parentType);
+      return this.generateSelectionSetForObject(
+        node.selectionSet,
+        parentType,
+        false
+      );
     }
   }
 
