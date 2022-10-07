@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## v1.4.0
 
 - Add `getProjection` utility function to support efficient database lookups
 - Simplify builds
