@@ -6,6 +6,7 @@
 - Simplify builds
 - Uplift `__typename` from fragments to simplify generated type system
 - Fix issue where no `__typename` in top-level operations lead to type system difficulties
+- Update deps
 
 ## v1.3.2
 
