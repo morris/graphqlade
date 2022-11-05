@@ -47,7 +47,7 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
 
     const json = await response.json();
 
-    expect(json).toStrictEqual({
+    expect(json).toEqual({
       data: {
         praise: "the sun!",
       },
@@ -64,7 +64,7 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
 
     const json = await response.json();
 
-    expect(json).toStrictEqual({
+    expect(json).toEqual({
       data: {
         praise: "the sun!",
       },
@@ -98,7 +98,7 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
 
     const json = await response.json();
 
-    expect(json).toStrictEqual({
+    expect(json).toEqual({
       errors: [{ message: "Mutations are not allowed via GET" }],
     });
   });
@@ -119,7 +119,7 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
 
     const json = await response.json();
 
-    expect(json).toStrictEqual({
+    expect(json).toEqual({
       errors: [
         {
           locations: [
@@ -149,7 +149,7 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
 
     const json = await response.json();
 
-    expect(json).toStrictEqual({
+    expect(json).toEqual({
       errors: [{ message: "Invalid query, expected string" }],
     });
   });
