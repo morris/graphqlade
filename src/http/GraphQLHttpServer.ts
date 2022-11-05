@@ -117,7 +117,16 @@ export class GraphQLHttpServer<TContext> {
       );
     } catch (err_) {
       const err = toError(err_);
-      const status = typeof err.status === "number" ? err.status : 500;
+
+      let status = 500;
+
+      if (err instanceof TypeError && err.message.match(/^Invalid/)) {
+        status = 400;
+      }
+
+      if (typeof err.status === "number") {
+        status = err.status;
+      }
 
       return {
         status,

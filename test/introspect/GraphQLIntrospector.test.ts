@@ -1,5 +1,4 @@
 import got from "got";
-import nodeFetch from "node-fetch";
 import { GraphQLIntrospector } from "../../src";
 import { requireExampleServer } from "../util";
 
@@ -28,9 +27,7 @@ describe("The GraphQLIntrospector", () => {
   });
 
   it("should be able to build a client schema from an introspection result (using node-fetch)", async () => {
-    const introspector = new GraphQLIntrospector({
-      fetch: nodeFetch as unknown as typeof fetch,
-    });
+    const introspector = new GraphQLIntrospector();
 
     const schema = await introspector.buildClientSchemaFromIntrospection(
       "http://localhost:4999/graphql",

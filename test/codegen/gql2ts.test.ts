@@ -1,5 +1,4 @@
 import got from "got";
-import nodeFetch from "node-fetch";
 import { gql2ts } from "../../src";
 import { requireExampleServer, TestLogger } from "../util";
 
@@ -44,7 +43,6 @@ describe("The gql2ts function", () => {
       root: "examples/client",
       introspection: {
         url: "http://localhost:4999/graphql",
-        fetch: nodeFetch as unknown as typeof fetch,
         async getHeaders() {
           logger.log("got headers");
 

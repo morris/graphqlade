@@ -1,4 +1,3 @@
-import got from "got";
 import { ExecutionResult } from "graphql";
 import WebSocket from "ws";
 import {
@@ -151,9 +150,10 @@ describe("The example (ws)", () => {
 
     await sleep(300);
 
-    await got("http://localhost:4999/graphql", {
+    await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: operations,
         operationName: "CreateBossReview",
         variables: {
@@ -164,15 +164,15 @@ describe("The example (ws)", () => {
             theme: "ALRIGHT",
           },
         },
-      },
-      responseType: "json",
-    });
+      }),
+    }).then((response) => response.json());
 
     await sleep(300);
 
-    await got("http://localhost:4999/graphql", {
+    await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: operations,
         operationName: "CreateLocationReview",
         variables: {
@@ -183,9 +183,8 @@ describe("The example (ws)", () => {
             design: "STELLAR",
           },
         },
-      },
-      responseType: "json",
-    });
+      }),
+    }).then((response) => response.json());
 
     await sleep(300);
 
@@ -271,9 +270,10 @@ describe("The example (ws)", () => {
 
     await sleep(300);
 
-    await got("http://localhost:4999/graphql", {
+    await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: operations,
         operationName: "CreateBossReview",
         variables: {
@@ -284,9 +284,8 @@ describe("The example (ws)", () => {
             theme: "ALRIGHT",
           },
         },
-      },
-      responseType: "json",
-    });
+      }),
+    }).then((response) => response.json());
 
     await sleep(300);
 
@@ -294,9 +293,10 @@ describe("The example (ws)", () => {
 
     await sleep(800);
 
-    await got("http://localhost:4999/graphql", {
+    await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: operations,
         operationName: "CreateLocationReview",
         variables: {
@@ -307,9 +307,8 @@ describe("The example (ws)", () => {
             design: "STELLAR",
           },
         },
-      },
-      responseType: "json",
-    });
+      }),
+    }).then((response) => response.json());
 
     await sleep(300);
 

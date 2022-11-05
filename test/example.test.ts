@@ -1,4 +1,3 @@
-import got from "got";
 import { GraphQLReader } from "../src";
 import { requireExampleServer } from "./util";
 
@@ -17,16 +16,18 @@ describe("The example", () => {
   });
 
   it("should run", async () => {
-    const r = await got("http://localhost:4999/graphql", {
+    const response = await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: operations,
         operationName: "Bosses",
-      },
-      responseType: "json",
+      }),
     });
 
-    expect(r.body).toEqual({
+    const json = await response.json();
+
+    expect(json).toEqual({
       data: {
         bosses: [
           {
@@ -59,18 +60,18 @@ describe("The example", () => {
   });
 
   it("should reject invalid queries", async () => {
-    const response = await got("http://localhost:4999/graphql", {
+    const response = await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      headers: {},
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: `{ invalid }`,
-      },
-      responseType: "json",
-      throwHttpErrors: false,
+      }),
     });
 
-    expect(response.statusCode).toEqual(400);
-    expect(response.body).toEqual({
+    expect(response.status).toEqual(400);
+
+    const json = await response.json();
+    expect(json).toEqual({
       errors: [
         {
           locations: [
@@ -86,19 +87,21 @@ describe("The example", () => {
   });
 
   it("should respect @skip directives", async () => {
-    const r = await got("http://localhost:4999/graphql", {
+    const response = await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: operations,
         operationName: "Locations",
         variables: {
           skipBosses: true,
         },
-      },
-      responseType: "json",
+      }),
     });
 
-    expect(r.body).toEqual({
+    const json = await response.json();
+
+    expect(json).toEqual({
       data: {
         locations: [
           {
@@ -119,19 +122,21 @@ describe("The example", () => {
   });
 
   it("should respect @skip directives (negative case)", async () => {
-    const r = await got("http://localhost:4999/graphql", {
+    const response = await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: operations,
         operationName: "Locations",
         variables: {
           skipBosses: false,
         },
-      },
-      responseType: "json",
+      }),
     });
 
-    expect(r.body).toEqual({
+    const json = await response.json();
+
+    expect(json).toEqual({
       data: {
         locations: [
           {
@@ -170,19 +175,21 @@ describe("The example", () => {
   });
 
   it("should respect @include directives", async () => {
-    const r = await got("http://localhost:4999/graphql", {
+    const response = await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: operations,
         operationName: "Locations",
         variables: {
           includeReviews: true,
         },
-      },
-      responseType: "json",
+      }),
     });
 
-    expect(r.body).toEqual({
+    const json = await response.json();
+
+    expect(json).toEqual({
       data: {
         locations: [
           {
@@ -228,15 +235,17 @@ describe("The example", () => {
   });
 
   it("should resolve SDL fields", async () => {
-    const r = await got("http://localhost:4999/graphql", {
+    const response = await fetch("http://localhost:4999/graphql", {
       method: "POST",
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: "{ _sdl _sdlVersion }",
-      },
-      responseType: "json",
+      }),
     });
 
-    expect(r.body).toEqual({
+    const json = await response.json();
+
+    expect(json).toEqual({
       data: {
         _sdl: sdl,
         _sdlVersion: "79b0cab0ba9ca035d10e57c2d739eace9be2a044",

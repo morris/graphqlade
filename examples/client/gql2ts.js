@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const got = require("got");
 const { gql2ts } = require("../.."); // graphqlade in your app
+const fetch = require("node-fetch");
 
 gql2ts({
   root: __dirname,
-  introspection: {
-    url: "http://localhost:4000/graphql",
-    request: got,
-  },
+  introspection: { url: "http://localhost:4000/graphql", fetch },
   client: true,
 });

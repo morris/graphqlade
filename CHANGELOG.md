@@ -1,5 +1,11 @@
 # Changelog
 
+## NEXT
+
+- Fix issue where bad requests would result in responses with status code 500
+- Switch all tests to `fetch`
+- Update deps
+
 ## v1.4.0
 
 - Add `getProjection` utility function to support efficient database lookups

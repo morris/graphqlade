@@ -1,5 +1,4 @@
 import KoaRouter from "@koa/router";
-import got from "got";
 import { Server } from "http";
 import Koa from "koa";
 import KoaBodyParser from "koa-bodyparser";
@@ -8,6 +7,7 @@ import { GraphQLServer } from "../../src";
 import { bootstrapExample } from "../util";
 
 describe("The GraphQLHttpServer exposed via Koa", () => {
+  const url = "http://localhost:5999/graphql";
   let gqlServer: GraphQLServer<MyContext>;
   let app: Koa;
   let server: Server;
@@ -32,123 +32,125 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
   });
 
   it("should be able to handle POST GraphQL requests", async () => {
-    const { statusCode, headers, body } = await got({
+    const response = await fetch(url, {
       method: "POST",
-      url: "http://localhost:5999/graphql",
-      headers: {},
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: "{ praise }",
-      },
-      responseType: "json",
+      }),
     });
 
-    expect({ statusCode, headers, body }).toMatchObject({
-      statusCode: 200,
-      headers: { "content-type": "application/json; charset=utf-8" },
-      body: {
-        data: {
-          praise: "the sun!",
-        },
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe(
+      "application/json; charset=utf-8"
+    );
+
+    const json = await response.json();
+
+    expect(json).toStrictEqual({
+      data: {
+        praise: "the sun!",
       },
     });
   });
 
   it("should be able to handle GET GraphQL requests", async () => {
-    const { statusCode, headers, body } = await got({
-      method: "GET",
-      url: "http://localhost:5999/graphql",
-      headers: {},
-      searchParams: {
-        query: `{ praise }`,
-      },
-      responseType: "json",
-    });
+    const response = await fetch(`${url}?query={praise}`);
 
-    expect({ statusCode, headers, body }).toMatchObject({
-      statusCode: 200,
-      headers: { "content-type": "application/json; charset=utf-8" },
-      body: {
-        data: {
-          praise: "the sun!",
-        },
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe(
+      "application/json; charset=utf-8"
+    );
+
+    const json = await response.json();
+
+    expect(json).toStrictEqual({
+      data: {
+        praise: "the sun!",
       },
     });
   });
 
   it("should reject unsupported methods", async () => {
-    const { statusCode, headers, body } = await got({
+    const response = await fetch(url, {
       method: "PUT",
-      url: "http://localhost:5999/graphql",
-      headers: {},
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: `{ praise }`,
         operationName: "String",
-      },
-      responseType: "json",
-      throwHttpErrors: false,
+      }),
     });
 
-    expect({ statusCode, headers, body }).toMatchObject({
-      statusCode: 405,
-      headers: {},
-      body: "Method Not Allowed",
-    });
+    expect(response.status).toBe(405);
+
+    const text = await response.text();
+
+    expect(text).toEqual("Method Not Allowed");
   });
 
   it("should reject mutations via GET", async () => {
-    const { statusCode, headers, body } = await got({
-      method: "GET",
-      url: "http://localhost:5999/graphql",
-      headers: {},
-      searchParams: {
-        query: "mutation Test { youDied }",
-        operationName: "Test",
-      },
-      responseType: "json",
-      throwHttpErrors: false,
-    });
+    const response = await fetch(`${url}?query=mutation{youDied}`);
 
-    expect({ statusCode, headers, body }).toMatchObject({
-      statusCode: 400,
-      headers: { "content-type": "application/json; charset=utf-8" },
-      body: {
-        errors: [
-          {
-            message: "Mutations are not allowed via GET",
-          },
-        ],
-      },
+    expect(response.status).toBe(400);
+    expect(response.headers.get("content-type")).toBe(
+      "application/json; charset=utf-8"
+    );
+
+    const json = await response.json();
+
+    expect(json).toStrictEqual({
+      errors: [{ message: "Mutations are not allowed via GET" }],
     });
   });
 
   it("should reject invalid queries", async () => {
-    const { statusCode, headers, body } = await got({
+    const response = await fetch(url, {
       method: "POST",
-      url: "http://localhost:5999/graphql",
-      headers: {},
-      json: {
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
         query: `{ invalid }`,
-      },
-      responseType: "json",
-      throwHttpErrors: false,
+      }),
     });
 
-    expect({ statusCode, headers, body }).toMatchObject({
-      statusCode: 400,
-      headers: { "content-type": "application/json; charset=utf-8" },
-      body: {
-        errors: [
-          {
-            locations: [
-              {
-                column: 3,
-                line: 1,
-              },
-            ],
-            message: 'Cannot query field "invalid" on type "Query".',
-          },
-        ],
-      },
+    expect(response.status).toBe(400);
+    expect(response.headers.get("content-type")).toBe(
+      "application/json; charset=utf-8"
+    );
+
+    const json = await response.json();
+
+    expect(json).toStrictEqual({
+      errors: [
+        {
+          locations: [
+            {
+              column: 3,
+              line: 1,
+            },
+          ],
+          message: 'Cannot query field "invalid" on type "Query".',
+        },
+      ],
+    });
+  });
+
+  it("should reject bad requests (e.g. no content-type) with status code 400", async () => {
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        query: `{ invalid }`,
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.headers.get("content-type")).toBe(
+      "application/json; charset=utf-8"
+    );
+
+    const json = await response.json();
+
+    expect(json).toStrictEqual({
+      errors: [{ message: "Invalid query, expected string" }],
     });
   });
 });

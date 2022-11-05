@@ -1,4 +1,3 @@
-import nodeFetch from "node-fetch";
 import { typings as exampleTypings } from "../../examples/client/src/generated/operations";
 import { GraphQLClient, GraphQLRequestError } from "../../src";
 import {
@@ -337,7 +336,6 @@ describe("The GraphQLClient", () => {
     const client = new GraphQLClient({
       url,
       typings: exampleTypings,
-      fetch: nodeFetch as unknown as typeof fetch,
     });
 
     const result = await client.postNamed("Divide", {
@@ -356,7 +354,6 @@ describe("The GraphQLClient", () => {
     const client = new GraphQLClient({
       url,
       typings: exampleTypings,
-      fetch: nodeFetch as unknown as typeof fetch,
     });
 
     try {
