@@ -29,11 +29,11 @@ export interface IntrospectionRequestFnOptions {
 }
 
 export class GraphQLIntrospector {
-  protected customFetch?: typeof fetch;
+  protected fetch?: typeof fetch;
   protected request?: IntrospectionRequestFn;
 
   constructor(options?: GraphQLIntrospectorOptions) {
-    this.customFetch = options?.fetch;
+    this.fetch = options?.fetch;
     this.request = options?.request;
   }
 
@@ -72,9 +72,10 @@ export class GraphQLIntrospector {
 
     const client = new GraphQLClient({
       url,
-      fetch: this.customFetch,
+      fetch: this.fetch,
       init: { headers },
     });
+
     const result = await client.post(
       this.getIntrospectionQueryBody(introspectionOptions)
     );

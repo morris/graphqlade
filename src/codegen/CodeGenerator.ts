@@ -1,5 +1,5 @@
-import fs from "fs";
-import { validate } from "graphql";
+import * as fs from "fs";
+import { buildClientSchema, validate } from "graphql";
 import * as path from "path";
 import { GraphQLIntrospector, IntrospectionRequestFn } from "../introspect";
 import { GraphQLReader } from "../read";
@@ -54,6 +54,12 @@ export interface IntrospectionOptions {
    * URL of GraphQL API to fetch introspection from.
    */
   url: string;
+
+  /**
+   * Write introspection to this file when successful.
+   * Also used as fallback in case introspection via URL fails.
+   */
+  file?: string;
 
   fetch?: typeof fetch;
 
@@ -341,11 +347,32 @@ extend type Query {
       throw new Error("Missing 'introspection' option");
     }
 
-    return this.introspector.buildClientSchemaFromIntrospection(
-      this.introspection.url,
-      this.introspection.getHeaders
-        ? await this.introspection.getHeaders()
-        : undefined
-    );
+    try {
+      const introspection = await this.introspector.introspect(
+        this.introspection.url,
+        this.introspection.getHeaders
+          ? await this.introspection.getHeaders()
+          : undefined
+      );
+
+      if (this.introspection.file) {
+        await fs.promises.writeFile(
+          this.introspection.file,
+          JSON.stringify(introspection)
+        );
+      }
+
+      return buildClientSchema(introspection);
+    } catch (err) {
+      if (this.introspection.file) {
+        const introspection = JSON.parse(
+          await fs.promises.readFile(this.introspection.file, "utf-8")
+        );
+
+        return buildClientSchema(introspection);
+      }
+
+      throw err;
+    }
   }
 }

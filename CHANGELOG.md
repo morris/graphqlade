@@ -1,5 +1,9 @@
 # Changelog
 
+## NEXT
+
+- Add option to write introspection to local file during code generation
+
 ## 1.4.1
 
 - Fix issue where bad requests would result in responses with status code 500
