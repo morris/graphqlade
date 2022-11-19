@@ -357,7 +357,10 @@ describe("The GraphQLClient", () => {
     });
 
     try {
-      await client.postNamed("Divide", { dividend: {}, divisor: "2" });
+      await client.postNamed("Divide", {
+        dividend: {} as string,
+        divisor: "2",
+      });
 
       throw new Error("should not succeed");
     } catch (err) {

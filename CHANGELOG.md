@@ -3,6 +3,7 @@
 ## NEXT
 
 - Add option to write introspection to local file during code generation
+- Add option to define scalar types without directives in client-side code generation
 
 ## 1.4.1
 

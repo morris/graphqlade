@@ -6,6 +6,15 @@ import { requireExampleServer, TestLogger } from "../util";
 describe("The gql2ts function", () => {
   requireExampleServer();
 
+  const scalarTypes = {
+    Date: "string",
+    DateTime: "string",
+    Time: "string",
+    UUID: "string",
+    JSON: "any",
+    ESNumber: "number | string",
+  };
+
   it("should generate server-side code for the example server", async () => {
     const logger = new TestLogger();
 
@@ -30,6 +39,7 @@ describe("The gql2ts function", () => {
         request: got,
       },
       client: true,
+      scalarTypes,
       noExit: true,
       logger,
     });
@@ -51,6 +61,7 @@ describe("The gql2ts function", () => {
         },
       },
       client: true,
+      scalarTypes,
       noExit: true,
       logger,
     });
@@ -86,6 +97,7 @@ describe("The gql2ts function", () => {
         file,
       },
       client: true,
+      scalarTypes,
       noExit: true,
       logger,
     });
@@ -99,6 +111,7 @@ describe("The gql2ts function", () => {
         file,
       },
       client: true,
+      scalarTypes,
       noExit: true,
       logger,
     });

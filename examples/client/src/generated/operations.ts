@@ -87,14 +87,14 @@ export const DivideDocument =
   "query Divide($dividend:ESNumber!$divisor:ESNumber!){divide(dividend:$dividend divisor:$divisor)}";
 
 export interface VDivide {
-  dividend: unknown;
-  divisor: unknown;
+  dividend: number | string;
+  divisor: number | string;
 }
 
 export type XDivide<TExtensions> = ExecutionResult<DDivide, TExtensions>;
 
 export type DDivide = {
-  divide: Maybe<unknown>;
+  divide: Maybe<number | string>;
 };
 
 export const LocationsDocument =

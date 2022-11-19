@@ -39,6 +39,7 @@ import { ImportCodeGenerator } from "./ImportCodeGenerator";
 export interface ClientCodeGeneratorOptions {
   schema: GraphQLSchema;
   operations: DocumentNode;
+  scalarTypes?: Record<string, string | { type: string; from?: string }>;
   commonCodeGenerator?: CommonCodeGenerator;
 }
 
@@ -54,12 +55,17 @@ export type FragmentMapEntry = {
 export class ClientCodeGenerator {
   protected schema: GraphQLSchema;
   protected operations: DocumentNode;
+  protected scalarTypes: Record<
+    string,
+    string | { type: string; from?: string }
+  >;
   protected commonCodeGenerator: CommonCodeGenerator;
   protected fragmentMap = new Map<string, FragmentMapEntry>();
 
   constructor(options: ClientCodeGeneratorOptions) {
     this.schema = options.schema;
     this.operations = options.operations;
+    this.scalarTypes = options.scalarTypes ?? {};
     this.commonCodeGenerator =
       options.commonCodeGenerator ?? new CommonCodeGenerator(options);
 
@@ -70,6 +76,7 @@ export class ClientCodeGenerator {
   //
 
   mapScalars() {
+    // TODO remove this in 2.0 in favor of options.scalarTypes
     visit(this.operations, {
       ScalarTypeDefinition: (node) => {
         const tsDirective = getDirective<TsDirective>(node, "ts");
@@ -89,6 +96,14 @@ export class ClientCodeGenerator {
         }
       },
     });
+
+    for (const [gqlType, tsType] of Object.entries(this.scalarTypes)) {
+      this.commonCodeGenerator.addTypeMapping({
+        gqlType,
+        tsType: typeof tsType === "string" ? tsType : tsType.type,
+        from: typeof tsType === "string" ? undefined : tsType.from,
+      });
+    }
   }
 
   initFragmentMap() {

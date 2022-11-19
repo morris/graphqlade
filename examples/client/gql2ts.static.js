@@ -5,4 +5,9 @@ gql2ts({
   root: __dirname,
   schema: "../server/schema",
   client: true,
+  scalarTypes: {
+    UUID: "string",
+    JSON: "any",
+    ESNumber: "number",
+  },
 });

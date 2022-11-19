@@ -1,4 +1,0 @@
-scalar Date @ts(type: "string")
-scalar Time @ts(type: "string")
-scalar DateTime @ts(type: "string")
-scalar UUID

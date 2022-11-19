@@ -47,6 +47,8 @@ export interface CodeGeneratorOptions {
   reader?: GraphQLReader;
 
   introspector?: GraphQLIntrospector;
+
+  scalarTypes?: Record<string, string | { type: string; from?: string }>;
 }
 
 export interface IntrospectionOptions {
@@ -112,6 +114,10 @@ export class CodeGenerator {
   protected root: string;
   protected schema: string;
   protected operations: string;
+  protected scalarTypes?: Record<
+    string,
+    string | { type: string; from?: string }
+  >;
   protected introspection?: IntrospectionOptions;
   protected out: string;
   protected reader: GraphQLReader;
@@ -121,6 +127,7 @@ export class CodeGenerator {
     this.root = options?.root ?? "";
     this.schema = options?.schema ?? "schema";
     this.operations = options?.operations ?? "operations";
+    this.scalarTypes = options?.scalarTypes;
     this.introspection = options?.introspection;
     this.out = options?.out ?? "src/generated";
 
@@ -327,6 +334,7 @@ extend type Query {
     const clientCodeGenerator = new ClientCodeGenerator({
       schema,
       operations,
+      scalarTypes: this.scalarTypes,
     });
 
     return clientCodeGenerator.generateClient();
