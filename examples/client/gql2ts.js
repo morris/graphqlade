@@ -7,8 +7,11 @@ gql2ts({
   introspection: { url: "http://localhost:4000/graphql", fetch },
   client: true,
   scalarTypes: {
+    Date: "string",
+    DateTime: "string",
+    Time: "string",
     UUID: "string",
     JSON: "any",
-    ESNumber: "number",
+    ESNumber: "number | string",
   },
 });

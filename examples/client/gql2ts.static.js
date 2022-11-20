@@ -6,8 +6,11 @@ gql2ts({
   schema: "../server/schema",
   client: true,
   scalarTypes: {
+    Date: "string",
+    DateTime: "string",
+    Time: "string",
     UUID: "string",
     JSON: "any",
-    ESNumber: "number",
+    ESNumber: "number | string",
   },
 });
