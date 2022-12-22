@@ -1,5 +1,11 @@
 # Changelog
 
+## NEXT
+
+- Improve README and docs
+- Chores in examples and scripts
+- Update deps
+
 ## 1.5.0
 
 - Add option to write introspection to local file during code generation

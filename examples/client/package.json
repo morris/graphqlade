@@ -1,12 +1,12 @@
 {
   "name": "graphqlade-example-client",
   "version": "0.1.0",
-  "description": "GraphQLade Example Client",
+  "description": "GraphQLade Example Client App",
   "private": true,
   "license": "ISC",
   "scripts": {
     "build": "tsc",
-    "gql2ts": "node gql2ts.js"
+    "gql2ts": "node gql2ts.mjs"
   },
   "devDependencies": {
     "graphqlade": "../..",

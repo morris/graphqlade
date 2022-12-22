@@ -1,12 +1,8 @@
 /* eslint-disable no-console */
 
-if (require.main === module) {
-  runAmdToUmd();
-}
-
 // TODO support source maps
 
-function runAmdToUmd() {
+export function runAmdToUmd() {
   const rootModule = process.argv[2];
   const globalName = process.argv[3];
   const chunks = [];
@@ -23,7 +19,7 @@ function runAmdToUmd() {
   });
 }
 
-function amdToUmd(amdCode, rootModule, globalName) {
+export function amdToUmd(amdCode, rootModule, globalName) {
   return `(function (root, factory) {
     var definitions = {};
 
@@ -89,7 +85,10 @@ function stripSourceMap(code) {
   return code.replace(/\/\/# sourceMappingURL=[^\r\n]*/, "");
 }
 
-module.exports = {
-  runAmdToUmd,
-  amdToUmd,
-};
+//
+
+import { pathToFileURL } from "url";
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  runAmdToUmd();
+}
