@@ -18,7 +18,7 @@ import {
   ExpressRequestLike,
   ExpressResponseLike,
 } from "./express";
-import { KoaContextLike } from "./koa";
+import { KoaContextLike, KoaNextFunctionLike } from "./koa";
 
 export interface GraphQLHttpServerOptions<TContext> {
   /**
@@ -92,15 +92,17 @@ export class GraphQLHttpServer<TContext> {
   // koa helpers
 
   koaHandler() {
-    return (ctx: KoaContextLike) => this.handleKoa(ctx);
+    return (ctx: KoaContextLike, next: KoaNextFunctionLike) =>
+      this.handleKoa(ctx, next);
   }
 
-  async handleKoa(ctx: KoaContextLike) {
+  async handleKoa(ctx: KoaContextLike, next: KoaNextFunctionLike) {
     const response = await this.execute(ctx.request);
 
     ctx.status = response.status;
     ctx.set(response.headers);
     ctx.body = response.body;
+    await next();
   }
 
   // execution

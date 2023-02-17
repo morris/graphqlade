@@ -8,6 +8,8 @@ import { bootstrapExample } from "../util";
 
 describe("The GraphQLHttpServer exposed via Koa", () => {
   const url = "http://localhost:5999/graphql";
+  const router = new KoaRouter();
+
   let gqlServer: GraphQLServer<MyContext>;
   let app: Koa;
   let server: Server;
@@ -16,8 +18,6 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
     gqlServer = await bootstrapExample();
 
     app = new Koa();
-
-    const router = new KoaRouter();
 
     router.get("/graphql", gqlServer.http.koaHandler());
     router.post("/graphql", KoaBodyParser(), gqlServer.http.koaHandler());
@@ -29,6 +29,10 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
 
   afterAll(() => {
     if (server) server.close();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   it("should be able to handle POST GraphQL requests", async () => {
@@ -152,5 +156,26 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
     expect(json).toEqual({
       errors: [{ message: "Invalid query, expected string" }],
     });
+  });
+
+  it("should respect koa middleware queued in after the graphql handler", async () => {
+    const postGraphqlHandlerMiddleware = jest.fn();
+
+    const appWithAdditionalMiddleware: Koa = new Koa();
+    appWithAdditionalMiddleware
+      .use(router.allowedMethods())
+      .use(router.routes());
+    appWithAdditionalMiddleware.use(postGraphqlHandlerMiddleware);
+    const anotherServer = appWithAdditionalMiddleware.listen(6001);
+
+    try {
+      const response = await fetch(
+        `http://localhost:6001/graphql?query={praise}`
+      );
+      expect(response.status).toBe(200);
+      expect(postGraphqlHandlerMiddleware).toBeCalledTimes(1);
+    } finally {
+      anotherServer.close();
+    }
   });
 });

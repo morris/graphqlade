@@ -12,3 +12,5 @@ export interface KoaContextLike {
   set: (headers: Record<string, string>) => unknown;
   body?: unknown;
 }
+
+export type KoaNextFunctionLike = () => Promise<unknown>;
