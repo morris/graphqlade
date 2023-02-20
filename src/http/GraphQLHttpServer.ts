@@ -84,7 +84,7 @@ export class GraphQLHttpServer<TContext> {
       const response = await this.execute(req);
 
       res.status(response.status).set(response.headers).json(response.body);
-      await next();
+      next();
     } catch (err) {
       next(toError(err));
     }
@@ -103,7 +103,10 @@ export class GraphQLHttpServer<TContext> {
     ctx.status = response.status;
     ctx.set(response.headers);
     ctx.body = response.body;
-    await next();
+
+    if (next) {
+      await next();
+    }
   }
 
   // execution
