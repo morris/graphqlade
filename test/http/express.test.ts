@@ -1,11 +1,11 @@
-import { Server } from "http";
 import express, { Express } from "express";
+import { Server } from "http";
 import { MyContext } from "../../examples/server/src/MyContext";
 import { GraphQLServer } from "../../src";
 import { bootstrapExample } from "../util";
 
 describe("The GraphQLHttpServer exposed via Express", () => {
-  const url = "http://localhost:6000/graphql";
+  const url = "http://localhost:6004/graphql";
 
   let gqlServer: GraphQLServer<MyContext>;
   let app: Express;
@@ -19,7 +19,7 @@ describe("The GraphQLHttpServer exposed via Express", () => {
     app.get("/graphql", gqlServer.http.expressHandler());
     app.post("/graphql", express.json(), gqlServer.http.expressHandler());
 
-    server = app.listen(6000);
+    server = app.listen(6004);
   });
 
   afterAll(() => {
