@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## 1.5.1
 
 - Improve README and docs
 - Chores in examples and scripts
