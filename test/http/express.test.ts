@@ -1,30 +1,25 @@
-import KoaRouter from "@koa/router";
 import { Server } from "http";
-import Koa from "koa";
-import KoaBodyParser from "koa-bodyparser";
+import express, { Express } from "express";
 import { MyContext } from "../../examples/server/src/MyContext";
 import { GraphQLServer } from "../../src";
 import { bootstrapExample } from "../util";
 
-describe("The GraphQLHttpServer exposed via Koa", () => {
-  const url = "http://localhost:5999/graphql";
-  const router = new KoaRouter();
+describe("The GraphQLHttpServer exposed via Express", () => {
+  const url = "http://localhost:6000/graphql";
 
   let gqlServer: GraphQLServer<MyContext>;
-  let app: Koa;
+  let app: Express;
   let server: Server;
 
   beforeAll(async () => {
     gqlServer = await bootstrapExample();
 
-    app = new Koa();
+    app = express();
 
-    router.get("/graphql", gqlServer.http.koaHandler());
-    router.post("/graphql", KoaBodyParser(), gqlServer.http.koaHandler());
+    app.get("/graphql", gqlServer.http.expressHandler());
+    app.post("/graphql", express.json(), gqlServer.http.expressHandler());
 
-    app.use(router.allowedMethods()).use(router.routes());
-
-    server = app.listen(5999);
+    server = app.listen(6000);
   });
 
   afterAll(() => {
@@ -85,11 +80,7 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
       }),
     });
 
-    expect(response.status).toBe(405);
-
-    const text = await response.text();
-
-    expect(text).toEqual("Method Not Allowed");
+    expect(response.status).toBe(404);
   });
 
   it("should reject mutations via GET", async () => {
@@ -158,19 +149,21 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
     });
   });
 
-  it("should respect koa middleware queued in after the graphql handler", async () => {
+  it("should continue with any express middleware queued in after the graphql handler", async () => {
     const postGraphqlHandlerMiddleware = jest.fn();
+    const anotherApp = express();
 
-    const appWithAdditionalMiddleware: Koa = new Koa();
-    appWithAdditionalMiddleware
-      .use(router.allowedMethods())
-      .use(router.routes());
-    appWithAdditionalMiddleware.use(postGraphqlHandlerMiddleware);
-    const anotherServer = appWithAdditionalMiddleware.listen(6001);
+    anotherApp.get(
+      "/graphql",
+      gqlServer.http.expressHandler(),
+      postGraphqlHandlerMiddleware
+    );
+
+    const anotherServer = anotherApp.listen(6002);
 
     try {
       const response = await fetch(
-        `http://localhost:6001/graphql?query={praise}`
+        `http://localhost:6002/graphql?query={praise}`
       );
       expect(response.status).toBe(200);
       expect(postGraphqlHandlerMiddleware).toBeCalledTimes(1);
