@@ -5,6 +5,7 @@
 - Improve README and docs
 - Chores in examples and scripts
 - Update deps
+- Fix calling `next` functions for both Koa and Express ([sreedhap](https://github.com/sreedhap))
 
 ## 1.5.0
 
@@ -36,7 +37,7 @@
 
 ## 1.3.0
 
-- Add GraphQL stitching support
+- Add GraphQL stitching support ([emargollo](https://github.com/emargollo))
   - Code generation for directives and resolvers
   - SDL resolvers
 - Update deps

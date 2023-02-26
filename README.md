@@ -53,5 +53,6 @@ improvements to the ecosystem.
 ## Contributors
 
 - [emargollo](https://github.com/emargollo) - Stitching support
+- [sreedhap](https://github.com/sreedhap) - Fix calling `next` in Koa/Express
 
 Thanks!
