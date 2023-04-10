@@ -1,4 +1,4 @@
-// keep granular imports here fore browser build
+// keep granular imports here for browser build
 import type { ExecutionResult, GraphQLError } from "graphql";
 import { toError } from "../util/toError";
 import { GraphQLRequestError } from "./GraphQLRequestError";

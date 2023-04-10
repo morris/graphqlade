@@ -1,5 +1,10 @@
 # Changelog
 
+## NEXT
+
+- Support `typescript@5` (#5)
+- Update deps
+
 ## 1.5.1
 
 - Improve README and docs

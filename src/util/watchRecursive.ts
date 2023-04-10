@@ -59,7 +59,7 @@ export async function watchRecursive(options: WatchRecursiveOptions) {
     if (match && !match(path, stats)) return;
 
     if (stats.isFile()) {
-      watchers.add(watchFile(path, () => callback(path)));
+      watchers.add(watchFile(path, () => callback(path), 500));
     } else if (stats.isDirectory()) {
       await watchRecursive({
         dirname: path,

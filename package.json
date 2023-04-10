@@ -47,7 +47,7 @@
   "peerDependencies": {
     "graphql": "^16",
     "prettier": "^2",
-    "typescript": "^4",
+    "typescript": ">=4",
     "ws": "^8"
   },
   "devDependencies": {
@@ -81,8 +81,8 @@
     "terser": "^5.14.1",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.8.1",
-    "typedoc": "^0.23.20",
-    "typescript": "4.8",
+    "typedoc": "^0.24.1",
+    "typescript": "^5.0.4",
     "ws": "^8.8.0"
   }
 }
