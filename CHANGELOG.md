@@ -3,6 +3,7 @@
 ## NEXT
 
 - Support `typescript@5` (#5)
+- Improve error coercion in `toError`
 - Update deps
 
 ## 1.5.1

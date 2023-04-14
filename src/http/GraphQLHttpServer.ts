@@ -19,6 +19,7 @@ import {
   ExpressResponseLike,
 } from "./express";
 import { KoaContextLike, KoaNextFunctionLike } from "./koa";
+import { MethodNotAllowedError } from "./MethodNotAllowedError";
 
 export interface GraphQLHttpServerOptions<TContext> {
   /**
@@ -97,7 +98,7 @@ export class GraphQLHttpServer<TContext> {
       this.handleKoa(ctx, next);
   }
 
-  async handleKoa(ctx: KoaContextLike, next: KoaNextFunctionLike) {
+  async handleKoa(ctx: KoaContextLike, next?: KoaNextFunctionLike) {
     const response = await this.execute(ctx.request);
 
     ctx.status = response.status;
@@ -130,7 +131,7 @@ export class GraphQLHttpServer<TContext> {
         status = 400;
       }
 
-      if (typeof err.status === "number") {
+      if ("status" in err && typeof err.status === "number") {
         status = err.status;
       }
 
@@ -214,16 +215,9 @@ export class GraphQLHttpServer<TContext> {
       case "POST":
         return this.parsePost(request);
       default:
-        try {
-          throw new Error(
-            `Unsupported method: ${request.method.toUpperCase()}`
-          );
-        } catch (err_) {
-          const err = toError(err_);
-          err.status = 405;
-
-          throw err;
-        }
+        throw new MethodNotAllowedError(
+          `Unsupported method: ${request.method.toUpperCase()}`
+        );
     }
   }
 
