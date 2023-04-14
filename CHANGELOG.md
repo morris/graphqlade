@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## 1.5.2
 
 - Support `typescript@5` (#5)
 - Improve error coercion in `toError`
