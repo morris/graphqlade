@@ -3,12 +3,12 @@ import type { IncomingMessage } from "http";
 import type WebSocket from "ws";
 import type { RawExecutionArgs } from "../server";
 import {
-  assert,
-  assertDefined,
-  assertRecord,
   DeferredPromise,
-  isAsyncIterator,
   LoggerLike,
+  assert,
+  defined,
+  isAsyncIterator,
+  isRecord,
   toError,
 } from "../util";
 import type {
@@ -139,7 +139,7 @@ export class GraphQLServerWebSocket {
     try {
       const message = JSON.parse(data.toString());
 
-      assertRecord(message);
+      assert(isRecord(message));
 
       switch (message.type) {
         case "connection_init":
@@ -232,15 +232,13 @@ export class GraphQLServerWebSocket {
 
           return result;
         } else {
-          assertDefined(
-            result.errors,
-            "Received non-async-iterable without errors"
-          );
-
           this.send({
             type: "error",
             id: message.id,
-            payload: result.errors,
+            payload: defined(
+              result.errors,
+              "Received non-async-iterable without errors"
+            ),
           });
 
           return {} as AsyncIterableIterator<ExecutionResult>;
@@ -265,7 +263,7 @@ export class GraphQLServerWebSocket {
     message: Record<string, unknown>
   ): ConnectionInitMessage {
     if (typeof message.payload !== "undefined" && message.payload !== null) {
-      assertRecord(message.payload);
+      assert(isRecord(message.payload));
     }
 
     return {
@@ -276,7 +274,7 @@ export class GraphQLServerWebSocket {
 
   parseSubscribeMessage(message: Record<string, unknown>): SubscribeMessage {
     assert(typeof message.id === "string");
-    assertRecord(message.payload);
+    assert(isRecord(message.payload));
 
     const payload = message.payload;
 
@@ -293,7 +291,7 @@ export class GraphQLServerWebSocket {
       typeof payload.variables !== "undefined" &&
       payload.variables !== null
     ) {
-      assertRecord(payload.variables);
+      assert(isRecord(payload.variables));
     }
 
     return {

@@ -1,0 +1,5 @@
+mutation CreateBossReview($input: CreateBossReviewInput!) {
+  createBossReview(input: $input) {
+    id
+  }
+}

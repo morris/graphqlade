@@ -1,0 +1,16 @@
+query CompareBossDifficulty($left: ID!, $right: ID!) {
+  left: boss(id: $left) {
+    ...compareBossDifficultyData
+  }
+  right: boss(id: $right) {
+    ...compareBossDifficultyData
+  }
+}
+
+fragment compareBossDifficultyData on Boss {
+  id
+  name
+  reviews {
+    difficulty
+  }
+}

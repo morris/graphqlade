@@ -32,7 +32,7 @@ import {
   VariableDefinitionNode,
   visit,
 } from "graphql";
-import { assertDefined, getDirective } from "../util";
+import { assert, defined, getDirective } from "../util";
 import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
 import { ImportCodeGenerator } from "./ImportCodeGenerator";
 
@@ -507,9 +507,7 @@ export class ClientCodeGenerator {
   }
 
   generateFieldCompositeType(node: FieldNode, type: GraphQLCompositeType) {
-    assertDefined(node.selectionSet);
-
-    return this.generateSelectionSet(node.selectionSet, type);
+    return this.generateSelectionSet(defined(node.selectionSet), type);
   }
 
   // inline fragments
@@ -628,12 +626,10 @@ export class ClientCodeGenerator {
     node: InlineFragmentNode | FragmentDefinitionNode,
     parentType: GraphQLObjectType
   ) {
-    assertDefined(
+    const name = defined(
       node.typeCondition,
       "Missing type condition in fragment spread" // should never happen
-    );
-
-    const name = node.typeCondition.name.value;
+    ).name.value;
 
     return (
       parentType.name === name ||
@@ -644,9 +640,7 @@ export class ClientCodeGenerator {
   requireOperationType(node: OperationDefinitionNode) {
     const type = this.getOperationType(node);
 
-    assertDefined(type, `Schema does not define a ${node.operation} type`);
-
-    return type;
+    return defined(type, `Schema does not define a ${node.operation} type`);
   }
 
   getOperationType(node: OperationDefinitionNode) {
@@ -680,28 +674,20 @@ export class ClientCodeGenerator {
   }
 
   requireField(type: GraphQLObjectType | GraphQLInterfaceType, name: string) {
-    const field = type.getFields()[name];
-
-    assertDefined(field, `Undefined field ${name} on ${type.name}`);
-
-    return field;
+    return defined(
+      type.getFields()[name],
+      `Undefined field ${name} on ${type.name}`
+    );
   }
 
   requireFragment(name: string) {
-    const entry = this.fragmentMap.get(name);
-
-    assertDefined(entry, `${name} not in fragment map`);
-
-    return entry;
+    return defined(this.fragmentMap.get(name), `${name} not in fragment map`);
   }
 
   assertNamedOperationDefinition(
     node: OperationDefinitionNode
   ): asserts node is NamedOperationDefinitionNode {
-    assertDefined(
-      node.name,
-      "Cannot generate client code for unnamed operations"
-    );
+    assert(node.name, "Cannot generate client code for unnamed operations");
   }
 
   join(parts: (string | undefined)[], separator = "\n\n", braces?: string) {

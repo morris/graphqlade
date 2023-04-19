@@ -1,0 +1,5 @@
+directive @ts(
+  type: String!
+  inputType: String
+  from: String
+) on OBJECT | INTERFACE | ENUM | SCALAR

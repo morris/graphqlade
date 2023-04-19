@@ -1,0 +1,10 @@
+query Bosses {
+  bosses {
+    id
+    name
+    location {
+      id
+      name
+    }
+  }
+}

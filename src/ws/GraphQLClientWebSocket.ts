@@ -1,8 +1,9 @@
 // keep granular imports here for browser build
 import type { ExecutionResult } from "graphql";
-import { assert, assertRecord } from "../util/assert";
 import { AsyncPushIterator } from "../util/AsyncPushIterator";
 import { DeferredPromise } from "../util/DeferredPromise";
+import { assert } from "../util/assert";
+import { isRecord } from "../util/isRecord";
 import { toError } from "../util/toError";
 import type {
   CompleteMessage,
@@ -122,7 +123,7 @@ export class GraphQLClientWebSocket {
     try {
       const message = JSON.parse(event.data.toString());
 
-      assertRecord(message);
+      assert(isRecord(message));
 
       switch (message.type) {
         case "connection_ack":
@@ -184,7 +185,7 @@ export class GraphQLClientWebSocket {
     message: Record<string, unknown>
   ): ConnectionAckMessage {
     if (typeof message.payload !== "undefined" && message.payload !== null) {
-      assertRecord(message.payload);
+      assert(isRecord(message.payload));
     }
 
     return {
@@ -195,7 +196,7 @@ export class GraphQLClientWebSocket {
 
   parseNextMessage(message: Record<string, unknown>): NextMessage {
     assert(typeof message.id === "string");
-    assertRecord(message.payload);
+    assert(isRecord(message.payload));
 
     return {
       type: "next",

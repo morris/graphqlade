@@ -245,6 +245,127 @@ describe("The example (ws)", () => {
     ]);
   });
 
+  it("should serve GraphQL subscriptions over web sockets (async w/ callbacks)", async () => {
+    const client = new GraphQLWebSocketClient({
+      url,
+      createWebSocket,
+      connectionInitPayload: {
+        keys: ["MASTER_KEY"],
+      },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const results: any[] = [];
+    const errors: Error[] = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stop = client.subscribeAsync<any>(
+      {
+        query: operations,
+        operationName: "NewReviews",
+      },
+      {
+        onData(data) {
+          results.push(data);
+        },
+        onError(err) {
+          errors.push(err);
+        },
+      }
+    );
+
+    await sleep(300);
+
+    await fetch("http://localhost:4999/graphql", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        query: operations,
+        operationName: "CreateBossReview",
+        variables: {
+          input: {
+            author: "tester",
+            bossId: "1",
+            difficulty: "IMPOSSIBLE",
+            theme: "ALRIGHT",
+          },
+        },
+      }),
+    }).then((response) => response.json());
+
+    await sleep(300);
+
+    await fetch("http://localhost:4999/graphql", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        query: operations,
+        operationName: "CreateLocationReview",
+        variables: {
+          input: {
+            author: "tester",
+            locationId: "13",
+            difficulty: "HARD",
+            design: "STELLAR",
+          },
+        },
+      }),
+    }).then((response) => response.json());
+
+    await sleep(300);
+
+    stop();
+
+    client.close();
+
+    expect(
+      await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket)
+    ).toEqual([1000, "Normal Closure"]);
+
+    expect(errors).toEqual([]);
+    expect(results.length).toEqual(2);
+
+    expect(
+      results.map((it) => ({
+        ...it,
+        newReview: {
+          ...it.newReview,
+          createdAt: "test",
+          id: "test",
+        },
+      }))
+    ).toEqual([
+      {
+        newReview: {
+          __typename: "BossReview",
+          author: "tester",
+          boss: {
+            id: "1",
+            name: "Asylum Demon",
+          },
+          createdAt: "test",
+          difficulty: "IMPOSSIBLE",
+          id: "test",
+          theme: "ALRIGHT",
+        },
+      },
+      {
+        newReview: {
+          __typename: "LocationReview",
+          author: "tester",
+          location: {
+            id: "13",
+            name: "Undead Parish",
+          },
+          createdAt: "test",
+          difficulty: "HARD",
+          id: "test",
+          design: "STELLAR",
+        },
+      },
+    ]);
+  });
+
   it("should reconnect on non-error closures", async () => {
     const client = new GraphQLWebSocketClient({
       url,

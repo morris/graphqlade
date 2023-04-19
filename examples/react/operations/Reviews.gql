@@ -1,0 +1,39 @@
+query Reviews {
+  reviews {
+    ...reviewData
+  }
+}
+
+subscription NewReviews($limit: Int) {
+  newReview(limit: $limit) {
+    ...reviewData
+  }
+}
+
+fragment reviewData on Review {
+  __typename
+  ... on BossReview {
+    boss {
+      id
+      name
+    }
+    difficulty
+    theme
+    ...reviewMetadata
+  }
+  ... on LocationReview {
+    location {
+      id
+      name
+    }
+    difficulty
+    design
+    ...reviewMetadata
+  }
+}
+
+fragment reviewMetadata on Review {
+  id
+  author
+  createdAt
+}

@@ -198,7 +198,7 @@ export function App(el: Element) {
             <dd>${data.difficulty}</dd>
             <dt>Music</dt>
             <dd>${data.theme}</dd>
-          </ul>
+          </dl>
         </div>`;
       case "LocationReview":
         return `<div>
@@ -209,7 +209,7 @@ export function App(el: Element) {
             <dd>${data.difficulty}</dd>
             <dt>Design</dt>
             <dd>${data.design}</dd>
-          </ul>
+          </dl>
         </div>`;
     }
   }

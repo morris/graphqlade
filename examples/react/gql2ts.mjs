@@ -1,14 +1,10 @@
-import fetch from "node-fetch"; // only if your Node.js version does not have fetch
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { gql2ts } from "graphqlade";
 
 gql2ts({
   root: dirname(fileURLToPath(import.meta.url)),
-  introspection: {
-    url: "http://localhost:4000/graphql",
-    fetch, // only if your Node.js version does not have fetch
-  },
+  schema: "../server/schema",
   client: true,
   scalarTypes: {
     Date: "string",

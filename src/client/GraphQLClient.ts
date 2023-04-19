@@ -38,13 +38,13 @@ export class GraphQLClient<
   TTypings extends GraphQLClientTypings = GraphQLClientTypings
 > {
   protected url: string;
-  protected customFetch?: typeof fetch;
+  protected fetch: typeof fetch;
   protected init: GraphQLRequestInit;
   protected operations: TTypings["OperationNameToDocument"];
 
   constructor(options: GraphQLClientOptions<TTypings>) {
     this.url = options.url;
-    this.customFetch = options.fetch;
+    this.fetch = options.fetch ?? fetch;
     this.init = { ...options.init, headers: { ...options.init?.headers } };
     this.operations = options.typings?.OperationNameToDocument ?? {};
   }
@@ -75,9 +75,8 @@ export class GraphQLClient<
     headers,
     ...init
   }: GraphQLRequestOptions) {
-    const fetch_ = this.customFetch ?? fetch;
-
-    const response = await fetch_(this.url, {
+    const fetch = this.fetch;
+    const response = await fetch(this.url, {
       ...this.init,
       ...init,
       method: "POST",

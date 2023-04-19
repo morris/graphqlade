@@ -12,7 +12,7 @@ import {
   GraphQLExecutionArgsParser,
   ParsedExecutionArgs,
 } from "../server";
-import { assertRecord, toError } from "../util";
+import { assert, isRecord, toError } from "../util";
 import {
   ExpressNextFunctionLike,
   ExpressRequestLike,
@@ -240,7 +240,7 @@ export class GraphQLHttpServer<TContext> {
   }
 
   parseBody(body: unknown) {
-    assertRecord(body, "Invalid body, expected object");
+    assert(isRecord(body), "Invalid body, expected object");
 
     return body;
   }

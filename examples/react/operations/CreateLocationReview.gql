@@ -1,0 +1,5 @@
+mutation CreateLocationReview($input: CreateLocationReviewInput!) {
+  createLocationReview(input: $input) {
+    id
+  }
+}

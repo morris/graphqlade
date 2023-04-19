@@ -19,7 +19,7 @@ import {
   isScalarType,
   isUnionType,
 } from "graphql";
-import { assertDefined, assertRecord, mergeResolvers, toError } from "../util";
+import { assert, defined, isRecord, mergeResolvers, toError } from "../util";
 
 export type ResolversInput<TContext> =
   | AnyResolvers<TContext>
@@ -141,12 +141,13 @@ export class GraphQLSchemaManager<TContext> {
     ) as CustomResolvers<TContext>;
 
     for (const typeName of Object.keys(mergedResolvers)) {
-      const resolver = mergedResolvers[typeName];
-      const type = this.schema.getType(typeName);
-
-      assertDefined(type, `Cannot set resolver for undefined type ${typeName}`);
-
-      this.setResolversToType(type, resolver);
+      this.setResolversToType(
+        defined(
+          this.schema.getType(typeName),
+          `Cannot set resolver for undefined type ${typeName}`
+        ),
+        mergedResolvers[typeName]
+      );
     }
 
     return this;
@@ -172,7 +173,7 @@ export class GraphQLSchemaManager<TContext> {
         resolver as UnionResolver<unknown, TContext>
       );
     } else if (isEnumType(type)) {
-      if (!isEnumType(resolver)) assertRecord(resolver);
+      if (!isEnumType(resolver)) assert(isRecord(resolver));
 
       this.setResolversToEnumType(type, resolver);
     } else if (isScalarType(type)) {
@@ -214,10 +215,8 @@ export class GraphQLSchemaManager<TContext> {
       if (fieldName.startsWith("__")) continue;
 
       const fields = type.getFields();
-      const field = fields[fieldName];
-
-      assertDefined(
-        field,
+      const field = defined(
+        fields[fieldName],
         `Cannot set field resolver for undefined field ${type.name}.${fieldName}`
       );
 
@@ -278,11 +277,13 @@ export class GraphQLSchemaManager<TContext> {
     ) as CustomResolvers<TContext>;
 
     for (const typeName of Object.keys(mergedResolvers)) {
-      const type = this.schema.getType(typeName);
-
-      assertDefined(type, `Cannot set resolver for undefined type ${typeName}`);
-
-      this.setInheritedResolversToType(type, mergedResolvers);
+      this.setInheritedResolversToType(
+        defined(
+          this.schema.getType(typeName),
+          `Cannot set resolver for undefined type ${typeName}`
+        ),
+        mergedResolvers
+      );
     }
 
     return this;

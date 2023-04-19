@@ -1,0 +1,13 @@
+query Search($q: String!, $types: [SearchType!]) {
+  search(q: $q, types: $types) {
+    __typename
+    ... on Boss {
+      id
+      name
+    }
+    ... on Location {
+      id
+      name
+    }
+  }
+}

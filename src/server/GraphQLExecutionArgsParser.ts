@@ -1,5 +1,5 @@
 import { DocumentNode, ExecutionArgs, parse } from "graphql";
-import { assert, assertRecord, cleanOperations } from "../util";
+import { assert, cleanOperations, isRecord } from "../util";
 
 export interface GraphQLExecutionArgsParserOptions {
   cacheSize?: number;
@@ -109,7 +109,7 @@ export class GraphQLExecutionArgsParser {
       }
     }
 
-    assertRecord(parsed, "Invalid variables, expected object");
+    assert(isRecord(parsed), "Invalid variables, expected object");
 
     return parsed;
   }

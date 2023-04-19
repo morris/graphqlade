@@ -6,7 +6,7 @@ import {
   IntrospectionQuery,
 } from "graphql";
 import { GraphQLClient } from "../client";
-import { assert, assertRecord } from "../util";
+import { assert, isRecord } from "../util";
 
 export interface GraphQLIntrospectorOptions {
   fetch?: typeof fetch;
@@ -85,8 +85,8 @@ export class GraphQLIntrospector {
 
   validateIntrospectionQueryResult(result: unknown): IntrospectionQuery {
     // TODO a lot of this is covered by the GraphQLClient; simplify in 2.0
-    assert(!!result, "Introspection failed: Empty response body");
-    assertRecord(result, "Introspection failed: Invalid response body");
+    assert(result, "Introspection failed: Empty response body");
+    assert(isRecord(result), "Introspection failed: Invalid response body");
 
     if (Array.isArray(result.errors) && result.errors.length > 0) {
       const errors = result.errors as GraphQLError[];
@@ -97,8 +97,8 @@ export class GraphQLIntrospector {
       );
     }
 
-    assert(!!result.data, "Introspection failed: No data");
-    assertRecord(result.data, "Introspection failed: Invalid data");
+    assert(result.data, "Introspection failed: No data");
+    assert(isRecord(result.data), "Introspection failed: Invalid data");
 
     return result.data as unknown as IntrospectionQuery;
   }

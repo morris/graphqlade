@@ -1,6 +1,7 @@
 // keep granular imports here for browser build
 import type { ExecutionResult } from "graphql";
 import { AsyncPushIterator } from "../util/AsyncPushIterator";
+import { GraphQLResultError } from "../util/GraphQLResultError";
 import { toError } from "../util/toError";
 import {
   GraphQLClientWebSocket,
@@ -130,6 +131,57 @@ export class GraphQLWebSocketClient<
 
   setConnectionInitPayload(connectionInitPayload: Record<string, unknown>) {
     this.connectionInitPayload = connectionInitPayload;
+  }
+
+  subscribeAsyncNamed<TSubscriptionName extends TTypings["SubscriptionName"]>(
+    operationName: TSubscriptionName,
+    variables: TTypings["OperationNameToVariables"][TSubscriptionName],
+    options: {
+      onData: (
+        data: TTypings["OperationNameToData"][TSubscriptionName]
+      ) => unknown;
+      onError: (error: Error) => unknown;
+    }
+  ) {
+    return this.subscribeAsync(
+      {
+        operationName,
+        query: this.operations[operationName],
+        variables,
+      },
+      options
+    );
+  }
+
+  subscribeAsync<TData>(
+    payload: SubscribePayload,
+    options: {
+      onData: (data: TData) => unknown;
+      onError: (error: Error) => unknown;
+    }
+  ) {
+    const iterator = this.subscribe<TData>(payload);
+
+    const timeout = setTimeout(async () => {
+      try {
+        for await (const result of iterator) {
+          const errors = result.errors ?? [];
+
+          if (errors.length > 0) {
+            options.onError(new GraphQLResultError(result));
+          } else if (result.data) {
+            options.onData(result.data);
+          }
+        }
+      } catch (err) {
+        options.onError(toError(err));
+      }
+    }, 1);
+
+    return () => {
+      clearTimeout(timeout);
+      iterator.return();
+    };
   }
 
   subscribeNamed<TSubscriptionName extends TTypings["SubscriptionName"]>(

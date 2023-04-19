@@ -1,5 +1,12 @@
 # Changelog
 
+## NEXT
+
+- Add `GraphQLWebSocketClient.subscribeAsync` and `GraphQLWebSocketClient.subscribeAsyncNamed` for async, callback-based subscriptions
+- Add `assert()` and `defined()` to browser build
+- Add React example
+- Update deps
+
 ## 1.5.2
 
 - Support `typescript@5` (#5)
