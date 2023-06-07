@@ -4,8 +4,8 @@ import * as path from "path";
 import { GraphQLIntrospector, IntrospectionRequestFn } from "../introspect";
 import { GraphQLReader } from "../read";
 import {
-  cleanOperations,
   LoggerLike,
+  cleanOperations,
   toError,
   watchRecursive,
   writeTypeScript,

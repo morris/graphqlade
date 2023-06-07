@@ -474,8 +474,12 @@ export class ClientCodeGenerator {
   generateField(node: FieldNode, parentType: GraphQLObjectType) {
     const key = node.alias ? node.alias.value : node.name.value;
     const field = this.requireField(parentType, node.name.value);
+    const nonNull = isNonNullType(field.type);
 
-    return `${key}: ${this.generateFieldType(node, field.type)}`;
+    return `${key}${nonNull ? "" : "?"}: ${this.generateFieldType(
+      node,
+      field.type
+    )}`;
   }
 
   generateFieldType(

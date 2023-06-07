@@ -26,7 +26,7 @@ describe("The ClientCodeGenerator", () => {
               parser: "typescript",
             })
           ).toEqual(`export type DReviews2 = {
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<
       | ({
           __typename: "BossReview";
@@ -66,7 +66,7 @@ describe("The ClientCodeGenerator", () => {
               parser: "typescript",
             })
           ).toEqual(`export type DReviews3 = {
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<
       | ({
           __typename: "BossReview";
@@ -112,7 +112,7 @@ describe("The ClientCodeGenerator", () => {
               parser: "typescript",
             })
           ).toEqual(`export type DReviews4 = {
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<
       | ({} & {
           boss: {
@@ -154,7 +154,7 @@ describe("The ClientCodeGenerator", () => {
               parser: "typescript",
             })
           ).toEqual(`export type DReviews5 = {
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<
       | ({
           __typename: "BossReview";

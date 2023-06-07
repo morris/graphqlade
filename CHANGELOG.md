@@ -5,6 +5,7 @@
 - Add `GraphQLWebSocketClient.subscribeAsync` and `GraphQLWebSocketClient.subscribeAsyncNamed` for async, callback-based subscriptions
 - Add `assert()` and `defined()` to browser build
 - Add React example
+- Make nullable fields in generated operation types optional
 - Update deps
 
 ## 1.5.2

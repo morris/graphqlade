@@ -13,7 +13,7 @@ export const BossesDocument = "query Bosses{bosses{id name location{id name}}}";
 export type XBosses<TExtensions> = ExecutionResult<DBosses, TExtensions>;
 
 export type DBosses = {
-  bosses: Maybe<
+  bosses?: Maybe<
     Array<{
       id: string;
 
@@ -42,9 +42,9 @@ export type XCompareBossDifficulty<TExtensions> = ExecutionResult<
 >;
 
 export type DCompareBossDifficulty = {
-  left: Maybe<{} & FCompareBossDifficultyData>;
+  left?: Maybe<{} & FCompareBossDifficultyData>;
 
-  right: Maybe<{} & FCompareBossDifficultyData>;
+  right?: Maybe<{} & FCompareBossDifficultyData>;
 };
 
 export const CreateBossReviewDocument =
@@ -60,7 +60,7 @@ export type XCreateBossReview<TExtensions> = ExecutionResult<
 >;
 
 export type DCreateBossReview = {
-  createBossReview: Maybe<{
+  createBossReview?: Maybe<{
     id: string;
   }>;
 };
@@ -78,7 +78,7 @@ export type XCreateLocationReview<TExtensions> = ExecutionResult<
 >;
 
 export type DCreateLocationReview = {
-  createLocationReview: Maybe<{
+  createLocationReview?: Maybe<{
     id: string;
   }>;
 };
@@ -94,7 +94,7 @@ export interface VDivide {
 export type XDivide<TExtensions> = ExecutionResult<DDivide, TExtensions>;
 
 export type DDivide = {
-  divide: Maybe<number | string>;
+  divide?: Maybe<number | string>;
 };
 
 export const LocationsDocument =
@@ -108,19 +108,19 @@ export interface VLocations {
 export type XLocations<TExtensions> = ExecutionResult<DLocations, TExtensions>;
 
 export type DLocations = {
-  locations: Maybe<
+  locations?: Maybe<
     Array<{
       id: string;
 
       name: string;
 
-      bosses: Maybe<
+      bosses?: Maybe<
         Array<{
           id: string;
 
           name: string;
 
-          reviews: Maybe<
+          reviews?: Maybe<
             Array<{
               difficulty: TDifficulty;
             }>
@@ -137,7 +137,7 @@ export const ReviewsDocument =
 export type XReviews<TExtensions> = ExecutionResult<DReviews, TExtensions>;
 
 export type DReviews = {
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<
       | ({
           __typename: "BossReview";
@@ -177,7 +177,7 @@ export const Reviews2Document =
 export type XReviews2<TExtensions> = ExecutionResult<DReviews2, TExtensions>;
 
 export type DReviews2 = {
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<
       | ({
           __typename: "BossReview";
@@ -195,7 +195,7 @@ export const Reviews3Document =
 export type XReviews3<TExtensions> = ExecutionResult<DReviews3, TExtensions>;
 
 export type DReviews3 = {
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<
       | ({
           __typename: "BossReview";
@@ -219,7 +219,7 @@ export const Reviews4Document =
 export type XReviews4<TExtensions> = ExecutionResult<DReviews4, TExtensions>;
 
 export type DReviews4 = {
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<
       | ({} & {
           boss: {
@@ -239,7 +239,7 @@ export const Reviews5Document =
 export type XReviews5<TExtensions> = ExecutionResult<DReviews5, TExtensions>;
 
 export type DReviews5 = {
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<
       | ({
           __typename: "BossReview";
@@ -266,7 +266,7 @@ export interface VSearch {
 export type XSearch<TExtensions> = ExecutionResult<DSearch, TExtensions>;
 
 export type DSearch = {
-  search: Maybe<
+  search?: Maybe<
     Array<
       | ({
           __typename: "Boss";
@@ -291,7 +291,7 @@ export type FCompareBossDifficultyData = {
 
   name: string;
 
-  reviews: Maybe<
+  reviews?: Maybe<
     Array<{
       difficulty: TDifficulty;
     }>
@@ -330,26 +330,26 @@ export type FReviewMetadata =
   | {
       id: string;
 
-      author: Maybe<string>;
+      author?: Maybe<string>;
 
       createdAt: string;
     }
   | {
       id: string;
 
-      author: Maybe<string>;
+      author?: Maybe<string>;
 
       createdAt: string;
     };
 
 export type FBaseReview2 =
   | {
-      author: Maybe<string>;
+      author?: Maybe<string>;
 
       __typename: "BossReview";
     }
   | {
-      author: Maybe<string>;
+      author?: Maybe<string>;
 
       __typename: "LocationReview";
     };
@@ -366,18 +366,18 @@ export type FBossReview2 = {
 
 export type FBaseReview4 =
   | {
-      author: Maybe<string>;
+      author?: Maybe<string>;
     }
   | {
-      author: Maybe<string>;
+      author?: Maybe<string>;
     };
 
 export type FBaseReview5 =
   | {
-      author: Maybe<string>;
+      author?: Maybe<string>;
     }
   | {
-      author: Maybe<string>;
+      author?: Maybe<string>;
     };
 
 export interface TCreateBossReviewInput {
