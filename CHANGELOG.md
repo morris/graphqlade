@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## 1.6.0
 
 - Add `GraphQLWebSocketClient.subscribeAsync` and `GraphQLWebSocketClient.subscribeAsyncNamed` for async, callback-based subscriptions
 - Add `assert()` and `defined()` to browser build
