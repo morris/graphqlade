@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import got from "got";
 import { gql2ts } from "../../src";
 import { requireExampleServer, TestLogger } from "../util";
 
@@ -21,25 +20,6 @@ describe("The gql2ts function", () => {
     await gql2ts({
       root: "examples/server",
       server: true,
-      noExit: true,
-      logger,
-    });
-
-    expect(logger.errors).toEqual([]);
-  });
-
-  // TODO remove in 2.0
-  it("DEPRECATED should generate client-code for the example client", async () => {
-    const logger = new TestLogger();
-
-    await gql2ts({
-      root: "examples/client",
-      introspection: {
-        url: "http://localhost:4999/graphql",
-        request: got,
-      },
-      client: true,
-      scalarTypes,
       noExit: true,
       logger,
     });
