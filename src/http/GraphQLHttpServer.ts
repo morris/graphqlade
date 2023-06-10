@@ -99,7 +99,12 @@ export class GraphQLHttpServer<TContext> {
   }
 
   async handleKoa(ctx: KoaContextLike, next?: KoaNextFunctionLike) {
-    const response = await this.execute(ctx.request);
+    const response = await this.execute({
+      method: ctx.request.method,
+      headers: ctx.request.headers,
+      body: ctx.request.body,
+      query: ctx.request.query,
+    });
 
     ctx.status = response.status;
     ctx.set(response.headers);

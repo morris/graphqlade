@@ -38,7 +38,10 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
   it("should be able to handle POST GraphQL requests", async () => {
     const response = await fetch(url, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer of a ring",
+      },
       body: JSON.stringify({
         query: "{ praise }",
       }),
