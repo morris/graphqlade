@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## 1.7.0
 
 - Create context after successful parsing of execution args
 - Pass parsed execution args to `createContext`
