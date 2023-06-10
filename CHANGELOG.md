@@ -2,7 +2,7 @@
 
 ## 1.7.1
 
-- Fix `koaHandler` not passing headers
+- Fix headers not being passed in Express and Koa handlers
 
 ## 1.7.0
 

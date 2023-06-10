@@ -82,9 +82,15 @@ export class GraphQLHttpServer<TContext> {
     next: ExpressNextFunctionLike
   ) {
     try {
-      const response = await this.execute(req);
+      const response = await this.execute({
+        method: req.method,
+        headers: req.headers,
+        body: req.body,
+        query: req.query,
+      });
 
       res.status(response.status).set(response.headers).json(response.body);
+
       next();
     } catch (err) {
       next(toError(err));
