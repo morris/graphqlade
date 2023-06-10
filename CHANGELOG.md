@@ -1,5 +1,10 @@
 # Changelog
 
+## NEXT
+
+- Create context after successful parsing of execution args
+- Pass parsed execution args to `createContext`
+
 ## 1.6.0
 
 - Add `GraphQLWebSocketClient.subscribeAsync` and `GraphQLWebSocketClient.subscribeAsyncNamed` for async, callback-based subscriptions

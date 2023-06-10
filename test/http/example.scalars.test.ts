@@ -10,12 +10,11 @@ describe("The example server", () => {
   });
 
   it("should support custom scalar parsing and serialization", async () => {
-    const response = await gqlServer.http.execute(
-      {
-        method: "POST",
-        headers: {},
-        body: {
-          query: `{
+    const response = await gqlServer.http.execute({
+      method: "POST",
+      headers: {},
+      body: {
+        query: `{
             zero: isFinite(input: 0) { input result }
             one: isFinite(input: 1.0) { input result }
             minusOne: isFinite(input: -1) { input result }
@@ -23,10 +22,8 @@ describe("The example server", () => {
             negativeInfinity: isFinite(input: "-Infinity") { input result }
             nan: isFinite(input: "NaN") { input result }
           }`,
-        },
       },
-      undefined
-    );
+    });
 
     expect(response).toEqual({
       status: 200,
@@ -45,19 +42,16 @@ describe("The example server", () => {
   });
 
   it("should support custom scalar parsing and serialization (2)", async () => {
-    const response = await gqlServer.http.execute(
-      {
-        method: "POST",
-        headers: {},
-        body: {
-          query: `{
+    const response = await gqlServer.http.execute({
+      method: "POST",
+      headers: {},
+      body: {
+        query: `{
             infinity: divide(dividend: 1 divisor: 0)
             negativeInfinity: divide(dividend: -1 divisor: 0)
           }`,
-        },
       },
-      undefined
-    );
+    });
 
     expect(response).toEqual({
       status: 200,

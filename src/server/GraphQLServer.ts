@@ -9,6 +9,7 @@ import { join } from "path";
 import { GraphQLHttpServer, GraphQLHttpServerOptions } from "../http";
 import { GraphQLReader } from "../read";
 import { GraphQLWebSocketServer, GraphQLWebSocketServerOptions } from "../ws";
+import { ParsedExecutionArgs } from "./GraphQLExecutionArgsParser";
 import {
   GraphQLSchemaManager,
   ResolverErrorHandler,
@@ -66,7 +67,7 @@ export interface GraphQLServerBootstrapOptions<TContext>
   stitching?: boolean;
 }
 
-export interface CreateContextFnOptions {
+export interface CreateContextFnOptions extends ParsedExecutionArgs {
   headers?: IncomingHttpHeaders;
   connectionInitPayload?: Record<string, unknown> | null;
 }

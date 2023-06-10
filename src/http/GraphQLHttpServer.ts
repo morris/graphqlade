@@ -113,15 +113,10 @@ export class GraphQLHttpServer<TContext> {
   // execution
 
   async execute(
-    request: GraphQLHttpServerRequest,
-    contextValue?: TContext
+    request: GraphQLHttpServerRequest
   ): Promise<GraphQLHttpServerResponse> {
     try {
-      return this.executeParsed(
-        request,
-        this.parse(request),
-        contextValue ?? this.createContext(request)
-      );
+      return this.executeParsed(request, this.parse(request));
     } catch (err_) {
       const err = toError(err_);
 
@@ -147,9 +142,9 @@ export class GraphQLHttpServer<TContext> {
 
   async executeParsed(
     request: GraphQLHttpServerRequest,
-    args: ParsedExecutionArgs,
-    contextValue?: TContext
+    args: ParsedExecutionArgs
   ) {
+    const contextValue = this.createContext({ ...request, ...args });
     const errors = await this.validate(request, args);
 
     if (errors.length > 0) {
@@ -162,21 +157,17 @@ export class GraphQLHttpServer<TContext> {
       };
     }
 
-    return this.executeValidated(
-      request,
-      args,
-      contextValue ?? this.createContext(request)
-    );
+    return this.executeValidated(request, args, contextValue);
   }
 
   async executeValidated(
     request: GraphQLHttpServerRequest,
     args: ParsedExecutionArgs,
-    contextValue?: TContext
+    contextValue: TContext
   ) {
     const body = await execute({
       schema: this.schema,
-      contextValue: contextValue ?? this.createContext(request),
+      contextValue,
       ...args,
     });
 

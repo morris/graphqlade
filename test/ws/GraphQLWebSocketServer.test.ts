@@ -49,7 +49,7 @@ describe("The GraphQLWebSocketServer", () => {
       // ignore
     });
 
-    server.listen(5000);
+    server.listen(7777);
   });
 
   afterAll(() => {
@@ -74,7 +74,7 @@ describe("The GraphQLWebSocketServer", () => {
     const counters: number[] = [];
 
     const gqlWsClient = new GraphQLWebSocketClient({
-      url: "ws://localhost:5000/graphql",
+      url: "ws://localhost:7777/graphql",
       connectionInitPayload: {
         authorization: "it me",
       },

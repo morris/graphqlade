@@ -104,7 +104,7 @@ export class GraphQLWebSocketServer<TContext> {
     try {
       return await this.subscribeParsed(
         this.parse(args),
-        this.createContext({ connectionInitPayload })
+        connectionInitPayload
       );
     } catch (err) {
       return {
@@ -113,7 +113,11 @@ export class GraphQLWebSocketServer<TContext> {
     }
   }
 
-  async subscribeParsed(args: ParsedExecutionArgs, contextValue: TContext) {
+  async subscribeParsed(
+    args: ParsedExecutionArgs,
+    connectionInitPayload?: Record<string, unknown> | null
+  ) {
+    const contextValue = this.createContext({ connectionInitPayload, ...args });
     const errors = await this.validate(args);
 
     if (errors.length > 0) {
@@ -122,10 +126,14 @@ export class GraphQLWebSocketServer<TContext> {
       };
     }
 
-    return this.subscribeValidated(args, contextValue);
+    return this.subscribeValidated(args, connectionInitPayload, contextValue);
   }
 
-  async subscribeValidated(args: ParsedExecutionArgs, contextValue: TContext) {
+  async subscribeValidated(
+    args: ParsedExecutionArgs,
+    connectionInitPayload: Record<string, unknown> | undefined | null,
+    contextValue: TContext
+  ) {
     return subscribe({
       schema: this.schema,
       contextValue,
