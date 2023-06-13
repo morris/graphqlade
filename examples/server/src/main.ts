@@ -34,6 +34,9 @@ export async function main(env: NodeJS.ProcessEnv) {
 
       return { version: 1 };
     },
+    parserOptions: {
+      maxTokens: 1000,
+    },
   });
 
   // setup web server (express in this case)

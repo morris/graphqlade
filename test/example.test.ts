@@ -252,4 +252,31 @@ describe("The example", () => {
       },
     });
   });
+
+  it("should reject queries with more than 1000 tokens", async () => {
+    const response = await fetch("http://localhost:4999/graphql", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        query: `{ ${" x".repeat(1000)} }`,
+      }),
+    });
+
+    const json = await response.json();
+
+    expect(json).toEqual({
+      errors: [
+        {
+          locations: [
+            {
+              column: 2002,
+              line: 1,
+            },
+          ],
+          message:
+            "Syntax Error: Document contains more that 1000 tokens. Parsing aborted.",
+        },
+      ],
+    });
+  });
 });

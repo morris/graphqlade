@@ -9,7 +9,11 @@ import { join } from "path";
 import { GraphQLHttpServer, GraphQLHttpServerOptions } from "../http";
 import { GraphQLReader } from "../read";
 import { GraphQLWebSocketServer, GraphQLWebSocketServerOptions } from "../ws";
-import { ParsedExecutionArgs } from "./GraphQLExecutionArgsParser";
+import {
+  GraphQLExecutionArgsParser,
+  GraphQLExecutionArgsParserOptions,
+  ParsedExecutionArgs,
+} from "./GraphQLExecutionArgsParser";
 import {
   GraphQLSchemaManager,
   ResolverErrorHandler,
@@ -21,6 +25,11 @@ export type GraphQLServerOptions<TContext> =
     GraphQLWebSocketServerOptions<TContext> & {
       http?: GraphQLHttpServer<TContext>;
       ws?: GraphQLWebSocketServer<TContext>;
+
+      /**
+       * Execution args parser options.
+       */
+      parserOptions?: GraphQLExecutionArgsParserOptions;
     };
 
 export interface GraphQLServerBootstrapOptions<TContext>
@@ -82,8 +91,10 @@ export class GraphQLServer<TContext> extends GraphQLSchemaManager<TContext> {
 
   constructor(options: GraphQLServerOptions<TContext>) {
     super(options.schema);
-    this.http = options.http ?? new GraphQLHttpServer(options);
-    this.ws = options.ws ?? new GraphQLWebSocketServer(options);
+    const parser =
+      options.parser ?? new GraphQLExecutionArgsParser(options.parserOptions);
+    this.http = options.http ?? new GraphQLHttpServer({ ...options, parser });
+    this.ws = options.ws ?? new GraphQLWebSocketServer({ ...options, parser });
   }
 
   static async bootstrap<TContext>(

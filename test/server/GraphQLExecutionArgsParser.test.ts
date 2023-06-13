@@ -99,4 +99,16 @@ describe("The GraphQLExecutionArgsParser", () => {
     expect(cache.size).toEqual(3);
     expect(cache.get(queryB)).toBeUndefined();
   });
+
+  it("should support setting maxTokens", async () => {
+    const gqlExecutionArgsParser = new GraphQLExecutionArgsParser({
+      maxTokens: 3,
+    });
+
+    gqlExecutionArgsParser.parse({ query: "{ praise }" });
+
+    expect(() =>
+      gqlExecutionArgsParser.parse({ query: "{ dont praise }" })
+    ).toThrow();
+  });
 });

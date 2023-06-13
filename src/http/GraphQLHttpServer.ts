@@ -10,6 +10,7 @@ import { IncomingHttpHeaders } from "http";
 import {
   CreateContextFn,
   GraphQLExecutionArgsParser,
+  GraphQLExecutionArgsParserOptions,
   ParsedExecutionArgs,
 } from "../server";
 import { assert, isRecord, toError } from "../util";
@@ -36,6 +37,11 @@ export interface GraphQLHttpServerOptions<TContext> {
    * Overrides execution args parser.
    */
   parser?: GraphQLExecutionArgsParser;
+
+  /**
+   * Execution args parser options.
+   */
+  parserOptions?: GraphQLExecutionArgsParserOptions;
 }
 
 export interface GraphQLHttpServerRequest {
@@ -63,7 +69,8 @@ export class GraphQLHttpServer<TContext> {
   constructor(options: GraphQLHttpServerOptions<TContext>) {
     this.schema = options.schema;
     this.createContext = options.createContext;
-    this.parser = options.parser ?? new GraphQLExecutionArgsParser();
+    this.parser =
+      options.parser ?? new GraphQLExecutionArgsParser(options.parserOptions);
   }
 
   // express helpers

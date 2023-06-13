@@ -1,7 +1,7 @@
-import { DocumentNode, ExecutionArgs, parse } from "graphql";
+import { DocumentNode, ExecutionArgs, ParseOptions, parse } from "graphql";
 import { assert, cleanOperations, isRecord } from "../util";
 
-export interface GraphQLExecutionArgsParserOptions {
+export interface GraphQLExecutionArgsParserOptions extends ParseOptions {
   cacheSize?: number;
 }
 
@@ -28,9 +28,12 @@ export class GraphQLExecutionArgsParser {
   protected cache = new Map<string, GraphQLExecutionArgsParserCacheEntry>();
   protected cacheSize: number;
   protected cacheIndex = 0;
+  protected parseOptions: ParseOptions;
 
   constructor(options?: GraphQLExecutionArgsParserOptions) {
-    this.cacheSize = options?.cacheSize ?? 50;
+    const { cacheSize, ...parseOptions } = options ?? {};
+    this.cacheSize = cacheSize ?? 50;
+    this.parseOptions = parseOptions;
   }
 
   parse(args: RawExecutionArgs): ParsedExecutionArgs {
@@ -52,7 +55,7 @@ export class GraphQLExecutionArgsParser {
       return cached.document;
     }
 
-    const document = cleanOperations(parse(query));
+    const document = cleanOperations(parse(query, this.parseOptions));
 
     this.cache.set(query, {
       document,

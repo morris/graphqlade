@@ -1,5 +1,9 @@
 # Changelog
 
+## NEXT
+
+- Add support for parser options `maxTokens` and `noLocation`
+
 ## 1.7.1
 
 - Fix headers not being passed in Express and Koa handlers
