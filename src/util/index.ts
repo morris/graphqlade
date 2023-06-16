@@ -9,6 +9,7 @@ export * from "./getDirective";
 export * from "./getProjection";
 export * from "./isAsyncIterator";
 export * from "./isRecord";
+export * from "./limitDepth";
 export * from "./listen";
 export * from "./mergeResolvers";
 export * from "./parseDirective";

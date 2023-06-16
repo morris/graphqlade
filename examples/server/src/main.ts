@@ -36,6 +36,7 @@ export async function main(env: NodeJS.ProcessEnv) {
     },
     parserOptions: {
       maxTokens: 1000,
+      maxDepth: 15,
     },
   });
 

@@ -1,8 +1,9 @@
 import { DocumentNode, ExecutionArgs, ParseOptions, parse } from "graphql";
-import { assert, cleanOperations, isRecord } from "../util";
+import { assert, cleanOperations, isRecord, limitDepth } from "../util";
 
 export interface GraphQLExecutionArgsParserOptions extends ParseOptions {
   cacheSize?: number;
+  maxDepth?: number;
 }
 
 export interface GraphQLExecutionArgsParserCacheEntry {
@@ -29,11 +30,13 @@ export class GraphQLExecutionArgsParser {
   protected cacheSize: number;
   protected cacheIndex = 0;
   protected parseOptions: ParseOptions;
+  protected maxDepth?: number;
 
   constructor(options?: GraphQLExecutionArgsParserOptions) {
-    const { cacheSize, ...parseOptions } = options ?? {};
+    const { cacheSize, maxDepth, ...parseOptions } = options ?? {};
     this.cacheSize = cacheSize ?? 50;
     this.parseOptions = parseOptions;
+    this.maxDepth = maxDepth;
   }
 
   parse(args: RawExecutionArgs): ParsedExecutionArgs {
@@ -56,6 +59,10 @@ export class GraphQLExecutionArgsParser {
     }
 
     const document = cleanOperations(parse(query, this.parseOptions));
+
+    if (this.maxDepth) {
+      limitDepth(document, this.maxDepth);
+    }
 
     this.cache.set(query, {
       document,
