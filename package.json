@@ -41,7 +41,8 @@
     "lint": "eslint .",
     "maybe-publish": "bash scripts/maybe-publish.sh",
     "pipeline": "bash scripts/pipeline.sh",
-    "test": "jest --runInBand --collectCoverage",
+    "test": "jest --runInBand",
+    "test-coverage": "jest --runInBand --coverage",
     "docs": "typedoc src/index.ts --excludeProtected --excludePrivate"
   },
   "peerDependencies": {
