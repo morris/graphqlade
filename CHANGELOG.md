@@ -4,6 +4,8 @@
 
 - Add `maxDepth` option and `limitDepth` function
 - Add support for parser options `maxTokens` and `noLocation`
+- Remove implicit dependency on `@types/ws`
+- Update deps
 
 ## 1.7.1
 

@@ -1,6 +1,5 @@
 import { GraphQLError, GraphQLSchema, subscribe, validate } from "graphql";
 import type { IncomingMessage } from "http";
-import type WebSocket from "ws";
 import {
   CreateContextFn,
   GraphQLExecutionArgsParser,
@@ -85,10 +84,10 @@ export class GraphQLWebSocketServer<TContext> {
 
     this.graphqlSockets.add(graphqlSocket);
 
-    graphqlSocket.socket.on("close", () =>
+    graphqlSocket.socket.addEventListener("close", () =>
       this.graphqlSockets.delete(graphqlSocket)
     );
-    graphqlSocket.socket.on("error", () =>
+    graphqlSocket.socket.addEventListener("error", () =>
       this.graphqlSockets.delete(graphqlSocket)
     );
 

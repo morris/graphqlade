@@ -1,6 +1,5 @@
 import type { ExecutionResult, GraphQLError } from "graphql";
 import type { IncomingMessage } from "http";
-import type WebSocket from "ws";
 import type { RawExecutionArgs } from "../server";
 import {
   DeferredPromise,
@@ -79,11 +78,15 @@ export class GraphQLServerWebSocket {
     switch (this.socket.protocol) {
       case "graphql-transport-ws":
       case "graphql-ws": // legacy
-        this.socket.on("close", (code, reason) =>
-          this.handleCloseEvent(code, reason.toString())
+        this.socket.addEventListener("close", (event) =>
+          this.handleCloseEvent(event)
         );
-        this.socket.on("error", (error) => this.handleErrorEvent(error));
-        this.socket.on("message", (data) => this.handleMessageEvent(data));
+        this.socket.addEventListener("error", (event) =>
+          this.handleErrorEvent(event as ErrorEvent)
+        );
+        this.socket.addEventListener("message", (event) =>
+          this.handleMessageEvent(event)
+        );
 
         this.connectionInitWaitTimeoutId = setTimeout(() => {
           this.close(4408, "Connection initialization timeout");
@@ -100,13 +103,13 @@ export class GraphQLServerWebSocket {
   // event handlers
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleCloseEvent(code: number, reason: string) {
+  async handleCloseEvent(event: CloseEvent) {
     if (this.connectionInitWaitTimeoutId) {
       clearTimeout(this.connectionInitWaitTimeoutId);
     }
 
     this.connectionInitPayloadPromise.reject(
-      this.makeClosingError(code, reason)
+      this.makeClosingError(event.code, event.reason)
     );
 
     for (const [, subscription] of this.subscriptions) {
@@ -119,12 +122,12 @@ export class GraphQLServerWebSocket {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleErrorEvent(err: Error) {
+  async handleErrorEvent(event: ErrorEvent) {
     if (this.connectionInitWaitTimeoutId) {
       clearTimeout(this.connectionInitWaitTimeoutId);
     }
 
-    this.connectionInitPayloadPromise.reject(err);
+    this.connectionInitPayloadPromise.reject(event.error);
 
     for (const [, subscription] of this.subscriptions) {
       try {
@@ -135,9 +138,9 @@ export class GraphQLServerWebSocket {
     }
   }
 
-  async handleMessageEvent(data: WebSocket.Data) {
+  async handleMessageEvent(event: MessageEvent) {
     try {
-      const message = JSON.parse(data.toString());
+      const message = JSON.parse(event.data?.toString());
 
       assert(isRecord(message));
 
@@ -317,7 +320,7 @@ export class GraphQLServerWebSocket {
   // helpers
 
   async requireAck() {
-    if (this.socket.protocol === "graphql-ws-transport" && !this.acknowledged) {
+    if (this.socket.protocol === "graphql-transport-ws" && !this.acknowledged) {
       throw this.makeClosingError(4401, "Unauthorized");
     }
 
