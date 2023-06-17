@@ -1,4 +1,4 @@
-import { parse } from "graphql";
+import { getIntrospectionQuery, parse } from "graphql";
 import { limitDepth } from "../../src";
 
 describe("The getDepth function", () => {
@@ -64,5 +64,9 @@ describe("The getDepth function", () => {
         999
       )
     ).toThrow("Invalid query, contains circular fragment spreads");
+  });
+
+  it("should ignore introspection queries", () => {
+    expect(() => limitDepth(parse(getIntrospectionQuery()), 1)).not.toThrow();
   });
 });

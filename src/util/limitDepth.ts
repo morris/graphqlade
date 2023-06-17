@@ -21,7 +21,9 @@ export function limitDepth(document: DocumentNode, maxDepth: number) {
         }
       },
       Field: {
-        enter() {
+        enter(node) {
+          if (node.name.value.match(/^__/)) return false;
+
           ++currentDepth;
 
           if (currentDepth > maxDepth) {
