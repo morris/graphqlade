@@ -83,7 +83,7 @@ export interface CreateContextFnOptions extends ParsedExecutionArgs {
 
 export type CreateContextFn<TContext> = (
   options: CreateContextFnOptions
-) => TContext;
+) => TContext | Promise<TContext>;
 
 export class GraphQLServer<TContext> extends GraphQLSchemaManager<TContext> {
   public readonly http: GraphQLHttpServer<TContext>;

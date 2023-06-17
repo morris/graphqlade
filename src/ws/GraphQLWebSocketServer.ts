@@ -122,8 +122,7 @@ export class GraphQLWebSocketServer<TContext> {
     args: ParsedExecutionArgs,
     connectionInitPayload?: Record<string, unknown> | null
   ) {
-    const contextValue = this.createContext({ connectionInitPayload, ...args });
-    const errors = await this.validate(args);
+    const errors = this.validate(args);
 
     if (errors.length > 0) {
       return {
@@ -131,14 +130,18 @@ export class GraphQLWebSocketServer<TContext> {
       };
     }
 
-    return this.subscribeValidated(args, connectionInitPayload, contextValue);
+    return this.subscribeValidated(args, connectionInitPayload);
   }
 
   async subscribeValidated(
     args: ParsedExecutionArgs,
-    connectionInitPayload: Record<string, unknown> | undefined | null,
-    contextValue: TContext
+    connectionInitPayload: Record<string, unknown> | undefined | null
   ) {
+    const contextValue = await this.createContext({
+      connectionInitPayload,
+      ...args,
+    });
+
     return subscribe({
       schema: this.schema,
       contextValue,
@@ -148,7 +151,7 @@ export class GraphQLWebSocketServer<TContext> {
 
   // validation
 
-  async validate(args: ParsedExecutionArgs) {
+  validate(args: ParsedExecutionArgs) {
     return validate(this.schema, args.document) as GraphQLError[];
   }
 

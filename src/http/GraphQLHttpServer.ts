@@ -162,8 +162,7 @@ export class GraphQLHttpServer<TContext> {
     request: GraphQLHttpServerRequest,
     args: ParsedExecutionArgs
   ) {
-    const contextValue = this.createContext({ ...request, ...args });
-    const errors = await this.validate(request, args);
+    const errors = this.validate(request, args);
 
     if (errors.length > 0) {
       return {
@@ -175,14 +174,15 @@ export class GraphQLHttpServer<TContext> {
       };
     }
 
-    return this.executeValidated(request, args, contextValue);
+    return this.executeValidated(request, args);
   }
 
   async executeValidated(
     request: GraphQLHttpServerRequest,
-    args: ParsedExecutionArgs,
-    contextValue: TContext
+    args: ParsedExecutionArgs
   ) {
+    const contextValue = await this.createContext({ ...request, ...args });
+
     const body = await execute({
       schema: this.schema,
       contextValue,
@@ -198,7 +198,7 @@ export class GraphQLHttpServer<TContext> {
 
   // validation
 
-  async validate(request: GraphQLHttpServerRequest, args: ParsedExecutionArgs) {
+  validate(request: GraphQLHttpServerRequest, args: ParsedExecutionArgs) {
     const errors = validate(this.schema, args.document) as GraphQLError[];
     const operation = getOperationAST(args.document, args.operationName);
 
