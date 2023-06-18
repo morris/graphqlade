@@ -1,7 +1,9 @@
 /build
 /coverage
 /dist
-/docs
+/docs/reference
+/docs/_includes
+/docs/_layouts
 /examples/client/public
 /examples/server/public/graphql/*.umd.*
 node_modules

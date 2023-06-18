@@ -1,3 +1,9 @@
+---
+title: GraphQLade
+---
+
+# GraphQLade
+
 GraphQLade is a lightweight but **complete** TypeScript library for
 **GraphQL** development on server- and client-side.
 It emphasizes a **GraphQL first** approach with **maximum type-safety** through

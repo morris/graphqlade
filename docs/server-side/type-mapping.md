@@ -2,6 +2,8 @@
 title: Type Mapping
 ---
 
+# Type Mapping
+
 Usually, your _source_ data (e.g. from a database or an external endpoint)
 will not exactly match the types defined in your schema. In the example app,
 a `Customer` references `Contracts` internally through IDs, whereas

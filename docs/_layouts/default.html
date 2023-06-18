@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en-US" }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% seo %}
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <style type="text/css">
+      @media screen and (min-width: 1024px) {
+        .layout {
+          display: flex;
+          flex-direction: row-reverse;
+          width: 100vw;
+          height: 100vh;
+        }
+
+        .main {
+          overflow-y: auto;
+          flex-grow: 1;
+        }
+
+        .sidebar {
+          width: 320px;
+          overflow-y: auto;
+        }
+      }
+    </style>
+    {% include head-custom.html %}
+  </head>
+  <body>
+    <div class="layout">
+      <div class="main px-3 my-5 markdown-body">
+        {{ content }}
+
+        {% if site.github.private != true and site.github.license %}
+          <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray">
+            This site is open source. {% github_edit_link "Improve this page" %}.
+          </div>
+        {% endif %}
+      </div>
+      <div class="sidebar px-3 my-5">
+        <p>
+          <a href="{{ "/" | absolute_url }}">
+            <img src="{{ "/assets/img/logo.png" | relative_url }}" alt="{{ site.title }}" width="168">
+          </a>
+        </p>
+        <hr>
+        {% include navigation.html %}
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

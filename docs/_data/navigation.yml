@@ -2,7 +2,7 @@
   url: /
 
 - title: Server-Side
-  url: /server-side
+  url: /server-side/getting-started
   children:
     - title: Getting Started
       url: /server-side/getting-started
@@ -10,7 +10,7 @@
       url: /server-side/type-mapping
 
 - title: Client-Side
-  url: /client-side
+  url: /client-side/getting-started
   children:
     - title: Getting Started
       url: /client-side/getting-started

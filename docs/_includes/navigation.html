@@ -1,9 +1,10 @@
 <nav>
+  <h4>Navigation</h4>
   <ul>
     {% for entry in site.data.navigation %}
       {% if entry.children %}
         <li>
-          <a href="{{ site.baseurl }}{{ entry.url }}">{{ entry.title }}</a>
+          <a href="{{ site.baseurl }}{{ entry.url }}"><strong>{{ entry.title }}</strong></a>
           <ul>
             {% for children in entry.children %}
               <li><a href="{{ site.baseurl }}{{ children.url }}">{{ children.title }}</a></li>

@@ -2,6 +2,8 @@
 title: Getting Started (Client-Side)
 ---
 
+# Getting Started (Client-Side)
+
 ## 1. Install Dependencies
 
 - `npm install graphql graphqlade prettier typescript --save-dev`
@@ -38,7 +40,7 @@ gql2ts({
 });
 ```
 
-There are more advanced options discussed throughout the Wiki.
+There are more advanced options discussed throughout the documentation.
 Type completion/IntelliSense should be available.
 
 Add an entry under `scripts` of your `package.json`:
@@ -47,7 +49,7 @@ Add an entry under `scripts` of your `package.json`:
 {
   "scripts": {
     "gql2ts": "node gql2ts.mjs"
-  },
+  }
 }
 ```
 
@@ -66,10 +68,10 @@ import { typings } from "./generated/operations";
 
 const client = new GraphQLClient({
   url: "http://localhost:3000/graphql",
-  typings
+  typings,
 });
 
-client.postNamed("Praise").then(data => console.log(data));
+client.postNamed("Praise").then((data) => console.log(data));
 ```
 
 ## 6. Iterate on user interface

@@ -2,7 +2,9 @@
 title: Getting Started (Server-Side)
 ---
 
-## 1. Install Dependencies
+# Getting Started (Server-Side)
+
+## 1. Install dependencies
 
 - `npm install graphql graphqlade`
 - `npm install prettier typescript --save-dev`
@@ -41,7 +43,7 @@ Add an entry under `scripts` of your `package.json`:
 {
   "scripts": {
     "gql2ts": "node gql2ts.mjs"
-  },
+  }
 }
 ```
 
