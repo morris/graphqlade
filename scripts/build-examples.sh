@@ -6,7 +6,6 @@ mv graphqlade-$(node -p "require('./package.json').version").tgz graphqlade.tgz
 
 # server
 node examples/server/gql2ts.mjs
-cp dist/*.umd.* examples/server/public/graphql
 
 # client
 npm install --prefix examples/client
