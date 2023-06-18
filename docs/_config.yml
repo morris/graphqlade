@@ -1,0 +1,4 @@
+theme: minimal
+title: GraphQLade
+description: A complete TypeScript library for GraphQL development on server- and client-side
+show_downloads: false

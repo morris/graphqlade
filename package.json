@@ -1,7 +1,7 @@
 {
   "name": "graphqlade",
   "version": "1.7.1",
-  "description": "A complete library for GraphQL + TypeScript development on server- and client-side",
+  "description": "A complete TypeScript library for GraphQL development on server- and client-side",
   "keywords": [
     "graphql",
     "typescript",
@@ -43,7 +43,7 @@
     "pipeline": "bash scripts/pipeline.sh",
     "test": "jest --runInBand",
     "test-coverage": "jest --runInBand --coverage",
-    "docs": "typedoc src/index.ts --excludeProtected --excludePrivate"
+    "docs": "typedoc src/index.ts --excludeProtected --excludePrivate --out docs/reference"
   },
   "peerDependencies": {
     "graphql": "^16",
