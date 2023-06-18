@@ -12,6 +12,12 @@
       url: /server-side/error-handling
     - title: Security
       url: /server-side/security
+    - title: Stitching
+      url: /server-side/stitching
+    - title: GraphiQL
+      url: /server-side/graphiql
+    - title: Performance
+      url: /server-side/performance
 
 - title: Client-Side
   url: /client-side/getting-started
