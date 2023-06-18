@@ -25,13 +25,12 @@ This control is especially important for schemas where circular operations can b
 ## Example (Express)
 
 ```ts
-import { GraphQLServer } from "graphqlade";
 import rateLimit from "express-rate-limit";
-import { MyContext } from "./MyContext";
+import { GraphQLServer } from "graphqlade";
+import { GraphQLContext } from "./GraphQLContext";
 import { resolvers } from "./resolvers";
 
-const gqlServer = await GraphQLServer.bootstrap<MyContext>({
-  root: `${__dirname}/..`,
+const gqlServer = await GraphQLServer.bootstrap<GraphQLContext>({
   resolvers,
   createContext({ headers }) {
     return { headers };
