@@ -6,7 +6,7 @@ export interface GraphQLExecutionArgsParserOptions extends ParseOptions {
   maxDepth?: number;
 }
 
-export interface GraphQLExecutionArgsParserCacheEntry {
+interface CacheEntry {
   document: DocumentNode;
   index: number;
 }
@@ -26,7 +26,7 @@ export type ParsedExecutionArgs = Pick<
  * query/operationName/variables parser with LRU caching for operations
  */
 export class GraphQLExecutionArgsParser {
-  protected cache = new Map<string, GraphQLExecutionArgsParserCacheEntry>();
+  protected cache = new Map<string, CacheEntry>();
   protected cacheSize: number;
   protected cacheIndex = 0;
   protected parseOptions: ParseOptions;
