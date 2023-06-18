@@ -8,6 +8,8 @@
       url: /server-side/getting-started
     - title: Type Mapping
       url: /server-side/type-mapping
+    - title: Security
+      url: /server-side/security
 
 - title: Client-Side
   url: /client-side/getting-started

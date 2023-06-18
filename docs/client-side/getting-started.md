@@ -4,7 +4,7 @@ title: Getting Started (Client-Side)
 
 # Getting Started (Client-Side)
 
-## 1. Install Dependencies
+## 1. Install dependencies
 
 - `npm install graphql graphqlade prettier typescript --save-dev`
 
@@ -27,7 +27,7 @@ query Praise {
 
 ## 3. Create a code generation script
 
-Create a `gql2ts.mjs` script:
+Create a `scripts/gql2ts.mjs` script:
 
 ```js
 import { gql2ts } from "graphqlade";
@@ -48,7 +48,7 @@ Add an entry under `scripts` of your `package.json`:
 ```json
 {
   "scripts": {
-    "gql2ts": "node gql2ts.mjs"
+    "gql2ts": "node scripts/gql2ts.mjs"
   }
 }
 ```

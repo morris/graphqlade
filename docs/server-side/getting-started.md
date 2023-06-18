@@ -26,7 +26,7 @@ type Query {
 
 ## 3. Create a code generation script
 
-Create a `gql2ts.mjs` script:
+Create a `scripts/gql2ts.mjs` script:
 
 ```js
 import { gql2ts } from "graphqlade";
@@ -42,7 +42,7 @@ Add an entry under `scripts` of your `package.json`:
 ```json
 {
   "scripts": {
-    "gql2ts": "node gql2ts.mjs"
+    "gql2ts": "node scripts/gql2ts.mjs"
   }
 }
 ```
@@ -54,7 +54,7 @@ Add an entry under `scripts` of your `package.json`:
 
 ## 5. Define context
 
-Technically optional, but you will almost always need a GraphQL context class (instantiated per request):
+Technically optional, but you will almost always need a GraphQL context (instantiated per request):
 
 ```ts
 // src/MyContext.ts
@@ -129,9 +129,3 @@ For actual deployments you'll want to follow TypeScript/Node.js best practices, 
 
 - Changes to your schema will be reflected in generated types.
 - Adjust implementation to fulfill resolver interfaces.
-
-## Next Steps
-
-See
-
-- [Type Mapping](https://morris.github.io/graphqlade/server-side/type-mapping)
