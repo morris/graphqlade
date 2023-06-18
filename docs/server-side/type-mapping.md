@@ -1,4 +1,4 @@
-# Type Mapping
+## Type Mapping
 
 Usually, your _source_ data (e.g. from a database or an external endpoint)
 will not exactly match the types defined in your schema. In the example app,
@@ -47,7 +47,7 @@ Note how almost none of the types in `src/resolvers/*.ts`
 have to be made explicit, which makes the code very readable and
 greatly reduces the chance of programmer errors.
 
-## Input Type Mapping
+### Input Type Mapping
 
 For some scalars, it is useful to be able to return multiple types
 in resolvers. A `DateTime`-scalar may be returned as a JavaScript
