@@ -43,7 +43,7 @@
     "pipeline": "bash scripts/pipeline.sh",
     "test": "jest --runInBand",
     "test-coverage": "jest --runInBand --coverage",
-    "docs": "typedoc src/index.ts --excludeProtected --excludePrivate --out docs/reference"
+    "docs": "typedoc src/index.ts --excludeProtected --excludePrivate --readme none --out docs/reference"
   },
   "peerDependencies": {
     "graphql": "^16",
