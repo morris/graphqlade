@@ -22,7 +22,7 @@
         }
 
         .sidebar {
-          width: 320px;
+          min-width: 320px;
           overflow-y: auto;
         }
       }
@@ -31,7 +31,7 @@
   </head>
   <body>
     <div class="layout">
-      <div class="main px-3 my-5 markdown-body">
+      <div class="main px-3 py-5 markdown-body">
         {{ content }}
 
         {% if site.github.private != true and site.github.license %}
@@ -40,7 +40,7 @@
           </div>
         {% endif %}
       </div>
-      <div class="sidebar px-3 my-5">
+      <div class="sidebar px-3 py-5 markdown-body">
         <p>
           <a href="{{ "/" | absolute_url }}">
             <img src="{{ "/assets/img/logo.png" | relative_url }}" alt="{{ site.title }}" width="168">

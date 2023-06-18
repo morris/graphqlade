@@ -2,18 +2,15 @@
   <h4>Navigation</h4>
   <ul>
     {% for entry in site.data.navigation %}
-      {% if entry.children %}
-        <li>
-          <a href="{{ site.baseurl }}{{ entry.url }}"><strong>{{ entry.title }}</strong></a>
+      <li>
+        <a href="{{ site.baseurl }}{{ entry.url }}"><strong>{{ entry.title }}</strong></a>
+        {% if entry.children %}
           <ul>
-            {% for children in entry.children %}
-              <li><a href="{{ site.baseurl }}{{ children.url }}">{{ children.title }}</a></li>
+            {% for child in entry.children %}
+              <li><a href="{{ site.baseurl }}{{ child.url }}">{{ child.title }}</a></li>
             {% endfor %}
           </ul>
-        </li>
-      {% else %}
-        <li><a href="{{ site.baseurl }}{{ entry.url }}">{{ entry.title }}</a></li>
-      {% endif %}
-    {% endfor %}
+        {% endif %}
+      </li>
   </ul>
 </nav>
