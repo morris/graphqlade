@@ -1,0 +1,16 @@
+- title: Home
+  url: /
+
+- title: Server-Side
+  url: /server-side
+  children:
+    - title: Getting Started
+      url: /server-side/getting-started
+    - title: Type Mapping
+      url: /server-side/type-mapping
+
+- title: Client-Side
+  url: /client-side
+  children:
+    - title: Getting Started
+      url: /client-side/getting-started

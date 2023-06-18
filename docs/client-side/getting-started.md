@@ -1,10 +1,12 @@
-## Getting Started (Client-Side)
+---
+title: Getting Started (Client-Side)
+---
 
-### 1. Install Dependencies
+## 1. Install Dependencies
 
 - `npm install graphql graphqlade prettier typescript --save-dev`
 
-### 2. Design GraphQL operations
+## 2. Design GraphQL operations
 
 - Write one file per _named_ GraphQL operation.
   - Unnamed operations are not supported (nor recommended).
@@ -21,7 +23,7 @@ query Praise {
 }
 ```
 
-### 3. Create a code generation script
+## 3. Create a code generation script
 
 Create a `gql2ts.mjs` script:
 
@@ -49,12 +51,12 @@ Add an entry under `scripts` of your `package.json`:
 }
 ```
 
-### 4. Run code generation (in watch mode)
+## 4. Run code generation (in watch mode)
 
 - `npm run gql2ts`
 - OR `npm run gql2ts -- --watch`
 
-### 5. Create a GraphQL client
+## 5. Create a GraphQL client
 
 Create a type-safe `GraphQLClient` instance by using the generated typings and operations:
 
@@ -70,7 +72,7 @@ const client = new GraphQLClient({
 client.postNamed("Praise").then(data => console.log(data));
 ```
 
-### 6. Iterate on user interface
+## 6. Iterate on user interface
 
 You can now use the client to issue operations against your GraphQL server
 in a type-safe way. Changes to your operations will be reflected in the client.

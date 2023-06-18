@@ -1,11 +1,13 @@
-## Getting Started (Server-Side)
+---
+title: Getting Started (Server-Side)
+---
 
-### 1. Install Dependencies
+## 1. Install Dependencies
 
 - `npm install graphql graphqlade`
 - `npm install prettier typescript --save-dev`
 
-### 2. Design a GraphQL schema using GraphQL SDL
+## 2. Design a GraphQL schema using GraphQL SDL
 
 - Put all GraphQL schema documents in one directory (`schema` is recommended).
 - Non-standard import statements (as comments) are not required.
@@ -20,7 +22,7 @@ type Query {
 }
 ```
 
-### 3. Create a code generation script
+## 3. Create a code generation script
 
 Create a `gql2ts.mjs` script:
 
@@ -43,12 +45,12 @@ Add an entry under `scripts` of your `package.json`:
 }
 ```
 
-#### 4. Run code generation (in watch mode)
+### 4. Run code generation (in watch mode)
 
 - `npm run gql2ts`
 - OR `npm run gql2ts -- --watch`
 
-### 5. Define context
+## 5. Define context
 
 Technically optional, but you will almost always need a GraphQL context class (instantiated per request):
 
@@ -60,7 +62,7 @@ class MyContext {
 }
 ```
 
-### 6. Implement resolvers
+## 6. Implement resolvers
 
 You can now write resolvers for any GraphQL types using the generated
 `Resolvers<TContext>` interface for type-safety and type-inference.
@@ -82,7 +84,7 @@ export const resolvers: Resolvers<MyContext> = {
 };
 ```
 
-### 7. Set up server
+## 7. Set up server
 
 ```ts
 // src/start.ts
@@ -111,7 +113,7 @@ app.listen(3000);
 Koa is also supported via `gqlServer.http.koaHandler()`.
 Other frameworks may call `gqlServer.http.execute(req)` and use the result to form an HTTP response.
 
-### 8. Start server
+## 8. Start server
 
 For example:
 
@@ -121,7 +123,7 @@ npx ts-node src/start.ts
 
 For actual deployments you'll want to follow TypeScript/Node.js best practices, depending on your web server framework.
 
-### 9. Iterate on schema and resolvers
+## 9. Iterate on schema and resolvers
 
 - Changes to your schema will be reflected in generated types.
 - Adjust implementation to fulfill resolver interfaces.
