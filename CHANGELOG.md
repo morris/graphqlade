@@ -6,6 +6,7 @@
 - Add support for parser options `maxTokens` and `noLocation`
 - Remove implicit dependency on `@types/ws`
 - Allow async `createContext`
+- Add basic GraphiQL HTML
 - Update deps
 
 ## 1.7.1

@@ -5,7 +5,7 @@ title: Error Handling
 # Error Handling
 
 GraphQLade servers allow passing a `resolverErrorHandler` function
-which will handle any error thrown in resolvers.
+which will handle errors thrown in resolvers.
 
 This is useful for reporting errors (to the console or another logger)
 and security (for masking errors that clients should not see).
@@ -20,10 +20,7 @@ import { GraphQLContext } from "./GraphQLContext";
 import { resolvers } from "./resolvers";
 
 const gqlServer = await GraphQLServer.bootstrap<GraphQLContext>({
-  resolvers,
-  createContext({ headers }) {
-    return { headers };
-  },
+  // ... other options ...
   resolverErrorHandler(err, source, args, context, info) {
     // report error
     console.error(err.stack, context.headers["x-request-id"]);

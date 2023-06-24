@@ -3,6 +3,10 @@ set -ex
 # dist
 tsc --project tsconfig.build.json --incremental --tsBuildInfoFile build/dist.tsbuildinfo
 
+# graphiql
+mkdir -p dist/graphiql/public
+cp src/graphiql/public/index.html dist/graphiql/public/index.html
+
 # browser
 tsc --project tsconfig.browser.json --incremental --tsBuildInfoFile build/browser.tsbuildinfo
 cat build/graphqlade.amd.js | node scripts/amd2umd.mjs graphqlade/dist/browser graphqlade | prettier --parser babel > dist/graphqlade.umd.js

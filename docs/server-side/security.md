@@ -22,9 +22,9 @@ Restricts the number of parse tokens in GraphQL operations to the specified numb
 Restricts the number of levels in GraphQL operations.
 This control is especially important for schemas where circular operations can be constructed.
 
-## Error Masking
+## Error masking
 
-Use `resolverErrorHandler` to mask errors unsafe for clients.
+Use `resolverErrorHandler` (see below) to mask errors unsafe for clients.
 
 ## Example (Express)
 
@@ -35,10 +35,7 @@ import { GraphQLContext } from "./GraphQLContext";
 import { resolvers } from "./resolvers";
 
 const gqlServer = await GraphQLServer.bootstrap<GraphQLContext>({
-  resolvers,
-  createContext({ headers }) {
-    return { headers };
-  },
+  // ... other options ...
   parserOptions: {
     maxTokens: 1000,
     maxDepth: 10,

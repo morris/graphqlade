@@ -20,6 +20,10 @@
       href="https://cdn.jsdelivr.net/npm/graphiql@2/graphiql.min.css"
       crossorigin
     />
+  </head>
+
+  <body>
+    <div id="graphiql"></div>
 
     <script
       src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"
@@ -29,23 +33,21 @@
       src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"
       crossorigin
     ></script>
-  </head>
-
-  <body>
-    <div id="graphiql">Loading...</div>
     <script
       src="https://cdn.jsdelivr.net/npm/graphiql@2/graphiql.min.js"
       crossorigin
     ></script>
+
     <script>
       const root = ReactDOM.createRoot(document.getElementById("graphiql"));
+
       root.render(
         React.createElement(GraphiQL, {
           fetcher: GraphiQL.createFetcher({
             url: window.location.href,
             subscriptionUrl: window.location.href
               .replace(/^http/i, "ws")
-              .replace(/\/$/, ""), // remove trailing slash
+              .replace(/\/$/, ""),
           }),
           defaultEditorToolsVisibility: true,
         })

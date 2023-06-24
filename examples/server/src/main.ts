@@ -45,7 +45,10 @@ export async function main(env: NodeJS.ProcessEnv) {
 
   app.use(cors());
   app.use("/", express.static(`${__dirname}/../../client/public`));
-  app.use("/graphql", express.static(`${__dirname}/../public/graphql`));
+  app.use(
+    "/graphql",
+    express.static(`${__dirname}/../../../src/graphiql/public`)
+  );
   app.get("/graphql", gqlServer.http.expressHandler());
   app.post("/graphql", express.json(), gqlServer.http.expressHandler());
 
