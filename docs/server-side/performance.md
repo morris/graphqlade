@@ -2,6 +2,8 @@
 title: Performance
 ---
 
+# Performance
+
 GraphQLade comes with a few built-in performance optimizations.
 Other than that, performance should be optimized at
 resolver level (e.g. [data loader pattern](https://github.com/graphql/dataloader))
