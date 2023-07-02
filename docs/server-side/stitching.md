@@ -17,8 +17,8 @@ building downstream GraphQL servers in stitching scenarios.
 ## Downstream
 
 When setting `stitching: true` in both code generation and during server bootstrap,
-the server's schema will provide stitching-related fields and directives (e.g. `__sdl`).
-Additionally, GraphQLade provides `Query.__sdlVersion` which is useful for
+the server's schema will provide stitching-related fields and directives (e.g. `_sdl`).
+Additionally, GraphQLade provides `Query._sdlVersion` which is useful for
 polling the schemas of downstream servers efficiently.
 
 _TODO_
