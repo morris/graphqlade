@@ -1,6 +1,6 @@
 # Changelog
 
-## NEXT
+## 1.8.0
 
 - Add `maxDepth` option and `limitDepth` function
 - Add support for parser options `maxTokens` and `noLocation`
