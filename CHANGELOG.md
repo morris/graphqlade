@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.1
+
+- Allow `prettier` 3.x and beyond as peer dependency ([jayne-mast](https://github.com/jayne-mast))
+
 ## 1.8.0
 
 - Add `maxDepth` option and `limitDepth` function

@@ -54,5 +54,6 @@ improvements to the ecosystem.
 
 - [emargollo](https://github.com/emargollo) - Stitching support
 - [sreedhap](https://github.com/sreedhap) - Fix calling `next` in Koa/Express
+- [jayne-mast](https://github.com/jayne-mast) - Allow `prettier` >= 2
 
 Thanks!
