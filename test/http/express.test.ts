@@ -3,7 +3,7 @@ import { Server } from 'http';
 import { AddressInfo } from 'net';
 import { MyContext } from '../../examples/server/src/MyContext';
 import { GraphQLServer } from '../../src';
-import { bootstrapExample } from '../util';
+import { bootstrapExample, serverClosed } from '../util';
 
 describe('The GraphQLHttpServer exposed via Express', () => {
   let gqlServer: GraphQLServer<MyContext>;
@@ -176,7 +176,7 @@ describe('The GraphQLHttpServer exposed via Express', () => {
       expect(response.status).toBe(200);
       expect(postGraphqlHandlerMiddleware).toHaveBeenCalledTimes(1);
     } finally {
-      anotherServer.close();
+      await serverClosed(anotherServer);
     }
   });
 });

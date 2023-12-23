@@ -5,7 +5,7 @@ import KoaBodyParser from 'koa-bodyparser';
 import { AddressInfo } from 'net';
 import { MyContext } from '../../examples/server/src/MyContext';
 import { GraphQLServer } from '../../src';
-import { bootstrapExample } from '../util';
+import { bootstrapExample, serverClosed } from '../util';
 
 describe('The GraphQLHttpServer exposed via Koa', () => {
   const router = new KoaRouter();
@@ -185,9 +185,9 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
     try {
       const response = await fetch(`${url}?query={praise}`);
       expect(response.status).toBe(200);
-      expect(postGraphqlHandlerMiddleware).toBeCalledTimes(1);
+      expect(postGraphqlHandlerMiddleware).toHaveBeenCalledTimes(1);
     } finally {
-      anotherServer.close();
+      await serverClosed(anotherServer);
     }
   });
 });

@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { Server } from 'http';
 import WebSocket from 'ws';
 import { MyContext } from '../examples/server/src/MyContext';
 import { main } from '../examples/server/src/main';
@@ -28,9 +29,7 @@ export function requireExampleServer(env?: NodeJS.ProcessEnv) {
   afterAll(async () => {
     const { server } = await ready;
 
-    return new Promise<void>((resolve, reject) =>
-      server.close((err) => (err ? reject(err) : resolve())),
-    );
+    return serverClosed(server);
   });
 
   return ready.then((r) => ({
@@ -38,6 +37,12 @@ export function requireExampleServer(env?: NodeJS.ProcessEnv) {
     url: `http://localhost:${r.port}/graphql`,
     wsUrl: `ws://localhost:${r.port}/graphql`,
   }));
+}
+
+export function serverClosed(server: Server) {
+  return new Promise<void>((resolve, reject) =>
+    server.close((err) => (err ? reject(err) : resolve())),
+  );
 }
 
 export function wsClosed(socket: WebSocket): Promise<[number, string]> {

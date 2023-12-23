@@ -7,6 +7,7 @@ import {
   GraphQLWebSocketServer,
   listen,
 } from '../../src';
+import { serverClosed } from '../util';
 
 describe('The GraphQLWebSocketServer', () => {
   let schema: GraphQLSchema;
@@ -55,8 +56,8 @@ describe('The GraphQLWebSocketServer', () => {
     url = `http://localhost:${port}/graphql`;
   });
 
-  afterAll(() => {
-    server.close();
+  afterAll(async () => {
+    await serverClosed(server);
   });
 
   it('should work', async () => {
