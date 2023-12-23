@@ -234,11 +234,11 @@ export class ServerCodeGenerator {
   generateUnion(node: GraphQLUnionType) {
     return `${this.commonCodeGenerator.generateDescription(node)}
       export type T${node.name} = ${this.join(
-      node
-        .getTypes()
-        .map((it) => this.commonCodeGenerator.generateNamedOutputRef(it)),
-      " | "
-    )}`;
+        node
+          .getTypes()
+          .map((it) => this.commonCodeGenerator.generateNamedOutputRef(it)),
+        " | "
+      )}`;
   }
 
   // subscription resolver interface

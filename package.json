@@ -41,8 +41,8 @@
     "lint": "eslint .",
     "maybe-publish": "bash scripts/maybe-publish.sh",
     "pipeline": "bash scripts/pipeline.sh",
-    "test": "jest --runInBand",
-    "test-coverage": "jest --runInBand --coverage",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "test-coverage": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
     "docs": "typedoc src/index.ts --excludeProtected --excludePrivate --readme none --out docs/reference"
   },
   "peerDependencies": {
@@ -61,10 +61,9 @@
     "@types/koa-bodyparser": "^4.3.7",
     "@types/node": "^14.18.21",
     "@types/node-fetch": "^2.6.2",
-    "@types/prettier": "^2.6.3",
     "@types/ws": "^8.5.3",
-    "@typescript-eslint/eslint-plugin": "^5.28.0",
-    "@typescript-eslint/parser": "^5.28.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "eslint": "^8.18.0",
@@ -75,13 +74,13 @@
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "node-fetch": "^2.6.7",
-    "prettier": "^2.7.1",
+    "prettier": "^3.1.0",
     "source-map-support": "^0.5.21",
     "terser": "^5.14.1",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.8.1",
-    "typedoc": "^0.24.1",
-    "typescript": "^5.0.4",
+    "typedoc": "^0.25.4",
+    "typescript": "^5.3.2",
     "ws": "^8.8.0"
   }
 }

@@ -10,7 +10,8 @@ import {
 } from "./GraphQLClientWebSocket";
 
 export interface GraphQLWebSocketClientOptions<
-  TTypings extends GraphQLWebSocketClientTypings = GraphQLWebSocketClientTypings
+  TTypings extends
+    GraphQLWebSocketClientTypings = GraphQLWebSocketClientTypings,
 > {
   /**
    * URL to GraphQL API.
@@ -88,7 +89,8 @@ export type CreateWebSocketFn = (
 ) => WebSocketLike;
 
 export class GraphQLWebSocketClient<
-  TTypings extends GraphQLWebSocketClientTypings = GraphQLWebSocketClientTypings
+  TTypings extends
+    GraphQLWebSocketClientTypings = GraphQLWebSocketClientTypings,
 > {
   public readonly url: string;
   public readonly protocol: string;

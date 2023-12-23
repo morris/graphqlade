@@ -1,8 +1,13 @@
 # Changelog
 
+## NEXT
+
+- Fix compatibility issue with `prettier@3.x` (`format` became async)
+- Update deps
+
 ## 1.8.1
 
-- Allow `prettier` 3.x and beyond as peer dependency ([jayne-mast](https://github.com/jayne-mast))
+- Allow `prettier@3.x` and beyond as peer dependency ([jayne-mast](https://github.com/jayne-mast))
 
 ## 1.8.0
 

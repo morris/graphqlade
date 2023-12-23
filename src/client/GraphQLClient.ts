@@ -35,7 +35,7 @@ export type GraphQLRequestInit = Omit<
 };
 
 export class GraphQLClient<
-  TTypings extends GraphQLClientTypings = GraphQLClientTypings
+  TTypings extends GraphQLClientTypings = GraphQLClientTypings,
 > {
   protected url: string;
   protected fetch: typeof fetch;
@@ -54,7 +54,7 @@ export class GraphQLClient<
   }
 
   async postNamed<
-    TOperationName extends TTypings["QueryName"] | TTypings["MutationName"]
+    TOperationName extends TTypings["QueryName"] | TTypings["MutationName"],
   >(
     operationName: TOperationName,
     variables: TTypings["OperationNameToVariables"][TOperationName],

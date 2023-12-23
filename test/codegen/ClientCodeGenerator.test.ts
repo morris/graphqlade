@@ -1,6 +1,11 @@
 import { visit } from "graphql";
 import { format } from "prettier";
-import { ClientCodeGenerator, GraphQLReader } from "../../src";
+import {
+  ClientCodeGenerator,
+  GraphQLReader,
+  NamedOperationDefinitionNode,
+  assert,
+} from "../../src";
 
 describe("The ClientCodeGenerator", () => {
   const reader = new GraphQLReader();
@@ -13,19 +18,25 @@ describe("The ClientCodeGenerator", () => {
       operations,
     });
 
-    let found = false;
+    let found: NamedOperationDefinitionNode | undefined;
 
     visit(operations, {
       OperationDefinition: (node) => {
         generator.assertNamedOperationDefinition(node);
 
         if (node.name?.value === "Reviews2") {
-          found = true;
-          expect(
-            format(generator.generateOperationDataType(node), {
-              parser: "typescript",
-            })
-          ).toEqual(`export type DReviews2 = {
+          found = node;
+        }
+      },
+    });
+
+    assert(found);
+
+    expect(
+      await format(generator.generateOperationDataType(found), {
+        parser: "typescript",
+      })
+    ).toEqual(`export type DReviews2 = {
   reviews?: Maybe<
     Array<
       | ({
@@ -38,11 +49,6 @@ describe("The ClientCodeGenerator", () => {
   >;
 };
 `);
-        }
-      },
-    });
-
-    expect(found).toBeTruthy();
   });
 
   it("should uplift __typename from inline fragments", async () => {
@@ -53,19 +59,25 @@ describe("The ClientCodeGenerator", () => {
       operations,
     });
 
-    let found = false;
+    let found: NamedOperationDefinitionNode | undefined;
 
     visit(operations, {
       OperationDefinition: (node) => {
         generator.assertNamedOperationDefinition(node);
 
         if (node.name?.value === "Reviews3") {
-          found = true;
-          expect(
-            format(generator.generateOperationDataType(node), {
-              parser: "typescript",
-            })
-          ).toEqual(`export type DReviews3 = {
+          found = node;
+        }
+      },
+    });
+
+    assert(found);
+
+    expect(
+      await format(generator.generateOperationDataType(found), {
+        parser: "typescript",
+      })
+    ).toEqual(`export type DReviews3 = {
   reviews?: Maybe<
     Array<
       | ({
@@ -84,11 +96,6 @@ describe("The ClientCodeGenerator", () => {
   >;
 };
 `);
-        }
-      },
-    });
-
-    expect(found).toBeTruthy();
   });
 
   it("should not uplift __typename if it is not requested", async () => {
@@ -99,19 +106,25 @@ describe("The ClientCodeGenerator", () => {
       operations,
     });
 
-    let found = false;
+    let found: NamedOperationDefinitionNode | undefined;
 
     visit(operations, {
       OperationDefinition: (node) => {
         generator.assertNamedOperationDefinition(node);
 
         if (node.name?.value === "Reviews4") {
-          found = true;
-          expect(
-            format(generator.generateOperationDataType(node), {
-              parser: "typescript",
-            })
-          ).toEqual(`export type DReviews4 = {
+          found = node;
+        }
+      },
+    });
+
+    assert(found);
+
+    expect(
+      await format(generator.generateOperationDataType(found), {
+        parser: "typescript",
+      })
+    ).toEqual(`export type DReviews4 = {
   reviews?: Maybe<
     Array<
       | ({} & {
@@ -126,11 +139,6 @@ describe("The ClientCodeGenerator", () => {
   >;
 };
 `);
-        }
-      },
-    });
-
-    expect(found).toBeTruthy();
   });
 
   it("should only uplift __typename for possible types where it is requested", async () => {
@@ -141,19 +149,25 @@ describe("The ClientCodeGenerator", () => {
       operations,
     });
 
-    let found = false;
+    let found: NamedOperationDefinitionNode | undefined;
 
     visit(operations, {
       OperationDefinition: (node) => {
         generator.assertNamedOperationDefinition(node);
 
         if (node.name?.value === "Reviews5") {
-          found = true;
-          expect(
-            format(generator.generateOperationDataType(node), {
-              parser: "typescript",
-            })
-          ).toEqual(`export type DReviews5 = {
+          found = node;
+        }
+      },
+    });
+
+    assert(found);
+
+    expect(
+      await format(generator.generateOperationDataType(found), {
+        parser: "typescript",
+      })
+    ).toEqual(`export type DReviews5 = {
   reviews?: Maybe<
     Array<
       | ({
@@ -170,10 +184,5 @@ describe("The ClientCodeGenerator", () => {
   >;
 };
 `);
-        }
-      },
-    });
-
-    expect(found).toBeTruthy();
   });
 });

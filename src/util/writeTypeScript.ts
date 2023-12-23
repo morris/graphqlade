@@ -11,7 +11,7 @@ export async function writeTypeScript(filename: string, code: string) {
     const { format, resolveConfig } = await import("prettier");
 
     const prettierConfig = await resolveConfig(filename);
-    output = format(code, {
+    output = await format(code, {
       ...prettierConfig,
       parser: "typescript",
     });

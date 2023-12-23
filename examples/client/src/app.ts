@@ -123,9 +123,9 @@ export function App(el: Element) {
     }
   }, 100);
 
-  el.querySelector<HTMLFormElement>(".add-review")?.addEventListener(
-    "submit",
-    (e) => {
+  el
+    .querySelector<HTMLFormElement>(".add-review")
+    ?.addEventListener("submit", (e) => {
       e.preventDefault();
 
       client.postNamed("CreateBossReview", {
@@ -138,8 +138,7 @@ export function App(el: Element) {
             ?.value as TRating,
         },
       });
-    }
-  );
+    });
 
   function update(next: Partial<AppState>) {
     Object.assign(state, next);

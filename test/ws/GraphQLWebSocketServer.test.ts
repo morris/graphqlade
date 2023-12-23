@@ -84,7 +84,7 @@ describe("The GraphQLWebSocketServer", () => {
     });
 
     try {
-      for await (const result of gqlWsClient.subscribe<any>({
+      for await (const result of gqlWsClient.subscribe<{ counter: number }>({
         query: `subscription { counter }`,
       })) {
         if (!result.data) throw new Error("No data");
