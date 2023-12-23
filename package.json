@@ -41,8 +41,8 @@
     "lint": "eslint .",
     "maybe-publish": "bash scripts/maybe-publish.sh",
     "pipeline": "bash scripts/pipeline.sh",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
-    "test-coverage": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test-coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "docs": "typedoc src/index.ts --excludeProtected --excludePrivate --readme none --out docs/reference"
   },
   "peerDependencies": {
