@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <title>GraphiQL</title>
@@ -39,18 +39,18 @@
     ></script>
 
     <script>
-      const root = ReactDOM.createRoot(document.getElementById("graphiql"));
+      const root = ReactDOM.createRoot(document.getElementById('graphiql'));
 
       root.render(
         React.createElement(GraphiQL, {
           fetcher: GraphiQL.createFetcher({
             url: window.location.href,
             subscriptionUrl: window.location.href
-              .replace(/^http/i, "ws")
-              .replace(/\/$/, ""),
+              .replace(/^http/i, 'ws')
+              .replace(/\/$/, ''),
           }),
           defaultEditorToolsVisibility: true,
-        })
+        }),
       );
     </script>
   </body>

@@ -1,13 +1,11 @@
-import { useGqlQuery } from "../graphql";
+import { useGqlQuery } from '../graphql';
 
 export function LocationList() {
-  const { data } = useGqlQuery("Locations", {});
+  const { data } = useGqlQuery('Locations', {});
 
   return (
     <ul className="locations">
-      {data?.locations?.map((it) => (
-        <li key={it.id}>{it.name}</li>
-      ))}
+      {data?.locations?.map((it) => <li key={it.id}>{it.name}</li>)}
     </ul>
   );
 }

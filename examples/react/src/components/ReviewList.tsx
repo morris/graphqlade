@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { FReviewData } from "../generated/operations";
-import { useGqlQuery, useGqlSubscription } from "../graphql";
-import { BossReview } from "./BossReview";
-import { LocationReview } from "./LocationReview";
+import { useState } from 'react';
+import { FReviewData } from '../generated/operations';
+import { useGqlQuery, useGqlSubscription } from '../graphql';
+import { BossReview } from './BossReview';
+import { LocationReview } from './LocationReview';
 
 export function ReviewList() {
-  const { data } = useGqlQuery("Reviews", undefined, {
+  const { data } = useGqlQuery('Reviews', undefined, {
     onSuccess() {
       setNewReviews([]);
     },
@@ -13,7 +13,7 @@ export function ReviewList() {
   const [newReviews, setNewReviews] = useState<FReviewData[]>([]);
 
   useGqlSubscription(
-    "NewReviews",
+    'NewReviews',
     {},
     {
       onData(data) {
@@ -23,7 +23,7 @@ export function ReviewList() {
         // eslint-disable-next-line no-console
         console.error(err);
       },
-    }
+    },
   );
 
   const reviews = [...(data?.reviews || []), ...newReviews];
@@ -31,11 +31,11 @@ export function ReviewList() {
   return (
     <div className="reviews">
       {reviews.map((it) =>
-        it.__typename === "BossReview" ? (
+        it.__typename === 'BossReview' ? (
           <BossReview key={it.id} data={it} />
         ) : (
           <LocationReview key={it.id} data={it} />
-        )
+        ),
       )}
     </div>
   );

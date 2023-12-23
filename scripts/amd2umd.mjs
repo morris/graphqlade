@@ -7,13 +7,13 @@ export function runAmdToUmd() {
   const globalName = process.argv[3];
   const chunks = [];
 
-  process.stdin.on("data", (data) => chunks.push(data));
-  process.stdin.on("end", () => {
+  process.stdin.on('data', (data) => chunks.push(data));
+  process.stdin.on('end', () => {
     const buffer = Buffer.concat(chunks);
     console.log(amdToUmd(buffer.toString(), rootModule, globalName));
     process.exit(0);
   });
-  process.stdin.on("error", (err) => {
+  process.stdin.on('error', (err) => {
     console.error(err.stack);
     process.exit(1);
   });
@@ -82,12 +82,12 @@ ${stripSourceMap(amdCode)}
 }
 
 function stripSourceMap(code) {
-  return code.replace(/\/\/# sourceMappingURL=[^\r\n]*/, "");
+  return code.replace(/\/\/# sourceMappingURL=[^\r\n]*/, '');
 }
 
 //
 
-import { pathToFileURL } from "url";
+import { pathToFileURL } from 'url';
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   runAmdToUmd();

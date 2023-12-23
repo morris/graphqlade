@@ -11,9 +11,9 @@ The path to this directory can be retrieved with `GraphiQL.path()`.
 For example:
 
 ```ts
-import { GraphQLServer, GraphiQL } from "graphqlade";
-import { GraphQLContext } from "./GraphQLContext";
-import { resolvers } from "./resolvers";
+import { GraphQLServer, GraphiQL } from 'graphqlade';
+import { GraphQLContext } from './GraphQLContext';
+import { resolvers } from './resolvers';
 
 const gqlServer = await GraphQLServer.bootstrap<GraphQLContext>({
   // ... options ...
@@ -22,9 +22,9 @@ const gqlServer = await GraphQLServer.bootstrap<GraphQLContext>({
 // setup web server (express in this case)
 const app = express();
 
-app.use("/graphql", express.static(GraphiQL.path()));
-app.get("/graphql", gqlServer.http.expressHandler());
-app.post("/graphql", express.json(), gqlServer.http.expressHandler());
+app.use('/graphql', express.static(GraphiQL.path()));
+app.get('/graphql', gqlServer.http.expressHandler());
+app.post('/graphql', express.json(), gqlServer.http.expressHandler());
 
 app.listen(3000);
 ```

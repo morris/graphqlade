@@ -1,7 +1,7 @@
-import { AddReviewForm } from "./AddReviewForm";
-import { BossList } from "./BossList";
-import { LocationList } from "./LocationList";
-import { ReviewList } from "./ReviewList";
+import { AddReviewForm } from './AddReviewForm';
+import { BossList } from './BossList';
+import { LocationList } from './LocationList';
+import { ReviewList } from './ReviewList';
 
 export function App() {
   return (

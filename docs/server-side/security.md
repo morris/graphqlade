@@ -29,10 +29,10 @@ Use `resolverErrorHandler` (see below) to mask errors unsafe for clients.
 ## Example (Express)
 
 ```ts
-import rateLimit from "express-rate-limit";
-import { GraphQLServer } from "graphqlade";
-import { GraphQLContext } from "./GraphQLContext";
-import { resolvers } from "./resolvers";
+import rateLimit from 'express-rate-limit';
+import { GraphQLServer } from 'graphqlade';
+import { GraphQLContext } from './GraphQLContext';
+import { resolvers } from './resolvers';
 
 const gqlServer = await GraphQLServer.bootstrap<GraphQLContext>({
   // ... other options ...
@@ -44,7 +44,7 @@ const gqlServer = await GraphQLServer.bootstrap<GraphQLContext>({
     // ... report error ...
 
     // return client-safe error
-    return new Error("Internal server error");
+    return new Error('Internal server error');
   },
 });
 
@@ -57,14 +57,14 @@ const rateLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-app.get("/graphql", rateLimiter, gqlServer.http.expressHandler());
+app.get('/graphql', rateLimiter, gqlServer.http.expressHandler());
 app.post(
-  "/graphql",
+  '/graphql',
   rateLimiter,
   express.json({
-    limit: "10kb",
+    limit: '10kb',
   }),
-  gqlServer.http.expressHandler()
+  gqlServer.http.expressHandler(),
 );
 
 app.listen(3000);

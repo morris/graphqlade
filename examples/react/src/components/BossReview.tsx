@@ -1,11 +1,11 @@
-import { FReviewData } from "../generated/operations";
+import { FReviewData } from '../generated/operations';
 
 export function BossReview({
   data,
 }: {
-  data: FReviewData & { __typename: "BossReview" };
+  data: FReviewData & { __typename: 'BossReview' };
 }) {
-  const author = data.author ?? "anonymous";
+  const author = data.author ?? 'anonymous';
 
   return (
     <div>

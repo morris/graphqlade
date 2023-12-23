@@ -1,7 +1,7 @@
-import { useGqlQuery } from "../graphql";
+import { useGqlQuery } from '../graphql';
 
 export function BossList() {
-  const { data } = useGqlQuery("Bosses", undefined);
+  const { data } = useGqlQuery('Bosses', undefined);
 
   return (
     <ul className="bosses">

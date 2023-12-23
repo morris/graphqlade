@@ -1,11 +1,11 @@
-import { FReviewData } from "../generated/operations";
+import { FReviewData } from '../generated/operations';
 
 export function LocationReview({
   data,
 }: {
-  data: FReviewData & { __typename: "LocationReview" };
+  data: FReviewData & { __typename: 'LocationReview' };
 }) {
-  const author = data.author ?? "anonymous";
+  const author = data.author ?? 'anonymous';
 
   return (
     <div>

@@ -3,14 +3,14 @@ import {
   UseQueryOptions,
   useMutation,
   useQuery,
-} from "@tanstack/react-query";
-import type { ExecutionResult } from "graphql";
+} from '@tanstack/react-query';
+import type { ExecutionResult } from 'graphql';
 import {
   GraphQLClient,
   GraphQLRequestInit,
   GraphQLWebSocketClient,
-} from "graphqlade/dist/browser";
-import { useEffect, useState } from "react";
+} from 'graphqlade/dist/browser';
+import { useEffect, useState } from 'react';
 import {
   MutationName,
   OperationNameToData,
@@ -18,9 +18,9 @@ import {
   QueryName,
   SubscriptionName,
   typings,
-} from "./generated/operations";
+} from './generated/operations';
 
-export const url = "http://localhost:4000/graphql";
+export const url = 'http://localhost:4000/graphql';
 
 export const gqlClient = new GraphQLClient({
   url,
@@ -33,7 +33,7 @@ export function useGqlQuery<TQueryName extends QueryName>(
   name: TQueryName,
   variables: OperationNameToVariables[TQueryName],
   options?: GraphQLRequestInit &
-    UseQueryOptions<ExecutionResult<OperationNameToData[TQueryName]>, Error>
+    UseQueryOptions<ExecutionResult<OperationNameToData[TQueryName]>, Error>,
 ) {
   const result = useQuery<
     ExecutionResult<OperationNameToData[TQueryName]>,
@@ -41,7 +41,7 @@ export function useGqlQuery<TQueryName extends QueryName>(
   >(
     [name, variables],
     async () => gqlClient.postNamed(name, variables, options),
-    options
+    options,
   );
 
   return {
@@ -59,7 +59,7 @@ export function useGqlMutation<TMutationName extends MutationName>(
       ExecutionResult<OperationNameToData[TMutationName]>,
       Error,
       OperationNameToVariables[TMutationName]
-    >
+    >,
 ) {
   const result = useMutation<
     ExecutionResult<OperationNameToData[TMutationName]>,
@@ -68,7 +68,7 @@ export function useGqlMutation<TMutationName extends MutationName>(
   >(
     [name],
     (variables) => gqlClient.postNamed(name, variables, options),
-    options
+    options,
   );
 
   return {
@@ -84,7 +84,7 @@ export function useGqlMutation<TMutationName extends MutationName>(
 export const gqlWsClient = new GraphQLWebSocketClient({
   url,
   typings,
-  connectionInitPayload: { keys: ["MASTER_KEY"] },
+  connectionInitPayload: { keys: ['MASTER_KEY'] },
 });
 
 export function useGqlSubscription<TSubscriptionName extends SubscriptionName>(
@@ -94,7 +94,7 @@ export function useGqlSubscription<TSubscriptionName extends SubscriptionName>(
     onData: (data: OperationNameToData[TSubscriptionName]) => unknown;
     onError: (error: Error) => unknown;
     enabled?: boolean;
-  }
+  },
 ) {
   const [stop, setStop] = useState<() => void>();
   const enabled = options.enabled;
@@ -107,7 +107,7 @@ export function useGqlSubscription<TSubscriptionName extends SubscriptionName>(
     const nextStop = gqlWsClient.subscribeAsyncNamed<TSubscriptionName>(
       name,
       variables,
-      options
+      options,
     );
 
     setStop(() => nextStop);

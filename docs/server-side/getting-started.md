@@ -29,7 +29,7 @@ type Query {
 Create a `scripts/gql2ts.mjs` script:
 
 ```js
-import { gql2ts } from "graphqlade";
+import { gql2ts } from 'graphqlade';
 
 gql2ts({ server: true });
 ```
@@ -74,13 +74,13 @@ For example:
 ```ts
 // src/resolvers.ts
 
-import { Resolvers } from "./generated/schema";
-import { MyContext } from "./MyContext";
+import { Resolvers } from './generated/schema';
+import { MyContext } from './MyContext';
 
 export const resolvers: Resolvers<MyContext> = {
   Query: {
     praise() {
-      return "the sun!";
+      return 'the sun!';
     },
   },
 };
@@ -91,9 +91,9 @@ export const resolvers: Resolvers<MyContext> = {
 ```ts
 // src/start.ts
 
-import { GraphQLServer } from "graphqlade";
-import { MyContext } from "./MyContext";
-import { resolvers } from "./resolvers";
+import { GraphQLServer } from 'graphqlade';
+import { MyContext } from './MyContext';
+import { resolvers } from './resolvers';
 
 const gqlServer = await GraphQLServer.bootstrap<MyContext>({
   root: `${__dirname}/..`,
@@ -106,8 +106,8 @@ const gqlServer = await GraphQLServer.bootstrap<MyContext>({
 // setup web server (express in this case)
 const app = express();
 
-app.get("/graphql", gqlServer.http.expressHandler());
-app.post("/graphql", express.json(), gqlServer.http.expressHandler());
+app.get('/graphql', gqlServer.http.expressHandler());
+app.post('/graphql', express.json(), gqlServer.http.expressHandler());
 
 app.listen(3000);
 ```

@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   TCreateBossReviewInput,
   TDifficulty,
   TRating,
-} from "../generated/operations";
-import { useGqlMutation, useGqlQuery } from "../graphql";
+} from '../generated/operations';
+import { useGqlMutation, useGqlQuery } from '../graphql';
 
 export function AddReviewForm() {
   const [state, setState] = useState<Partial<TCreateBossReviewInput>>({});
@@ -13,8 +13,8 @@ export function AddReviewForm() {
       ? (state as TCreateBossReviewInput)
       : undefined;
 
-  const GetBosses = useGqlQuery("Bosses", undefined);
-  const CreateBossReview = useGqlMutation("CreateBossReview");
+  const GetBosses = useGqlQuery('Bosses', undefined);
+  const CreateBossReview = useGqlMutation('CreateBossReview');
 
   return (
     <form className="add-review">

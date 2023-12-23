@@ -30,11 +30,11 @@ query Praise {
 Create a `scripts/gql2ts.mjs` script:
 
 ```js
-import { gql2ts } from "graphqlade";
+import { gql2ts } from 'graphqlade';
 
 gql2ts({
   introspection: {
-    url: "http://localhost:3000/graphql",
+    url: 'http://localhost:3000/graphql',
   },
   client: true,
 });
@@ -63,15 +63,15 @@ Add an entry under `scripts` of your `package.json`:
 Create a type-safe `GraphQLClient` instance by using the generated typings and operations:
 
 ```ts
-import { GraphQLClient } from "graphqlade/dist/browser";
-import { typings } from "./generated/operations";
+import { GraphQLClient } from 'graphqlade/dist/browser';
+import { typings } from './generated/operations';
 
 const client = new GraphQLClient({
-  url: "http://localhost:3000/graphql",
+  url: 'http://localhost:3000/graphql',
   typings,
 });
 
-client.postNamed("Praise").then((data) => console.log(data));
+client.postNamed('Praise').then((data) => console.log(data));
 ```
 
 ## 6. Iterate on user interface

@@ -15,19 +15,19 @@ Note that you cannot cancel errors in resolvers using this function.
 ## Example
 
 ```ts
-import { GraphQLServer } from "graphqlade";
-import { GraphQLContext } from "./GraphQLContext";
-import { resolvers } from "./resolvers";
+import { GraphQLServer } from 'graphqlade';
+import { GraphQLContext } from './GraphQLContext';
+import { resolvers } from './resolvers';
 
 const gqlServer = await GraphQLServer.bootstrap<GraphQLContext>({
   // ... other options ...
   resolverErrorHandler(err, source, args, context, info) {
     // report error
-    console.error(err.stack, context.headers["x-request-id"]);
+    console.error(err.stack, context.headers['x-request-id']);
 
     if (!isClientSafeError(err)) {
       // return safe error for clients
-      return new Error("Internal server error");
+      return new Error('Internal server error');
     }
   },
 });
