@@ -10,9 +10,7 @@ import { requireExampleServer, sleep, wsClosed } from '../util';
 describe('The example (ws)', () => {
   let operations: string;
 
-  requireExampleServer();
-
-  const url = 'ws://localhost:4999/graphql';
+  const exampleServer = requireExampleServer();
 
   function createWebSocket(url: string, protocol: string): WebSocketLike {
     return new WebSocket(url, protocol) as unknown as WebSocketLike;
@@ -26,6 +24,8 @@ describe('The example (ws)', () => {
   });
 
   it('should close a socket with invalid an protocol immediately', async () => {
+    const { wsUrl: url } = await exampleServer;
+
     const socket = new WebSocket(url, 'foo-bar-baz');
 
     expect(await wsClosed(socket)).toEqual([
@@ -35,6 +35,8 @@ describe('The example (ws)', () => {
   });
 
   it('should close a socket when not receiving a connection_init message in time', async () => {
+    const { wsUrl: url } = await exampleServer;
+
     const socket = new WebSocket(url, 'graphql-transport-ws');
 
     expect(await wsClosed(socket)).toEqual([
@@ -44,6 +46,8 @@ describe('The example (ws)', () => {
   });
 
   it('should close a socket immediately on receiving more than one connection_init message', async () => {
+    const { wsUrl: url } = await exampleServer;
+
     const socket = new WebSocket(url, 'graphql-transport-ws');
 
     socket.on('open', () => {
@@ -68,6 +72,8 @@ describe('The example (ws)', () => {
   });
 
   it('should close a socket immediately on receiving invalid message types', async () => {
+    const { wsUrl: url } = await exampleServer;
+
     const socket = new WebSocket(url, 'graphql-transport-ws');
 
     socket.on('open', () => {
@@ -81,6 +87,8 @@ describe('The example (ws)', () => {
   });
 
   it('should close a socket immediately if it is not acknowledged', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
@@ -97,6 +105,8 @@ describe('The example (ws)', () => {
   });
 
   it('should reject invalid operations with an error message', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
@@ -123,6 +133,8 @@ describe('The example (ws)', () => {
   });
 
   it('should serve GraphQL subscriptions over web sockets', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
@@ -150,7 +162,7 @@ describe('The example (ws)', () => {
 
     await sleep(300);
 
-    await fetch('http://localhost:4999/graphql', {
+    await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -169,7 +181,7 @@ describe('The example (ws)', () => {
 
     await sleep(300);
 
-    await fetch('http://localhost:4999/graphql', {
+    await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -246,6 +258,8 @@ describe('The example (ws)', () => {
   });
 
   it('should serve GraphQL subscriptions over web sockets (async w/ callbacks)', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
@@ -276,7 +290,7 @@ describe('The example (ws)', () => {
 
     await sleep(300);
 
-    await fetch('http://localhost:4999/graphql', {
+    await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -295,7 +309,7 @@ describe('The example (ws)', () => {
 
     await sleep(300);
 
-    await fetch('http://localhost:4999/graphql', {
+    await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -367,6 +381,8 @@ describe('The example (ws)', () => {
   });
 
   it('should reconnect on non-error closures', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
@@ -391,7 +407,7 @@ describe('The example (ws)', () => {
 
     await sleep(300);
 
-    await fetch('http://localhost:4999/graphql', {
+    await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -414,7 +430,7 @@ describe('The example (ws)', () => {
 
     await sleep(800);
 
-    await fetch('http://localhost:4999/graphql', {
+    await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({

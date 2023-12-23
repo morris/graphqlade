@@ -5,7 +5,7 @@ describe('The example', () => {
   let operations: string;
   let sdl: string;
 
-  requireExampleServer();
+  const exampleServer = requireExampleServer();
 
   beforeAll(async () => {
     const reader = new GraphQLReader();
@@ -16,7 +16,9 @@ describe('The example', () => {
   });
 
   it('should run', async () => {
-    const response = await fetch('http://localhost:4999/graphql', {
+    const { url } = await exampleServer;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -60,7 +62,9 @@ describe('The example', () => {
   });
 
   it('should reject invalid queries', async () => {
-    const response = await fetch('http://localhost:4999/graphql', {
+    const { url } = await exampleServer;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -87,7 +91,9 @@ describe('The example', () => {
   });
 
   it('should respect @skip directives', async () => {
-    const response = await fetch('http://localhost:4999/graphql', {
+    const { url } = await exampleServer;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -122,7 +128,9 @@ describe('The example', () => {
   });
 
   it('should respect @skip directives (negative case)', async () => {
-    const response = await fetch('http://localhost:4999/graphql', {
+    const { url } = await exampleServer;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -175,7 +183,9 @@ describe('The example', () => {
   });
 
   it('should respect @include directives', async () => {
-    const response = await fetch('http://localhost:4999/graphql', {
+    const { url } = await exampleServer;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -235,7 +245,9 @@ describe('The example', () => {
   });
 
   it('should resolve SDL fields', async () => {
-    const response = await fetch('http://localhost:4999/graphql', {
+    const { url } = await exampleServer;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -254,7 +266,9 @@ describe('The example', () => {
   });
 
   it('should reject queries with more than 1000 tokens', async () => {
-    const response = await fetch('http://localhost:4999/graphql', {
+    const { url } = await exampleServer;
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({

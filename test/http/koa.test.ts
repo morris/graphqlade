@@ -2,17 +2,18 @@ import KoaRouter from '@koa/router';
 import { Server } from 'http';
 import Koa from 'koa';
 import KoaBodyParser from 'koa-bodyparser';
+import { AddressInfo } from 'net';
 import { MyContext } from '../../examples/server/src/MyContext';
 import { GraphQLServer } from '../../src';
 import { bootstrapExample } from '../util';
 
 describe('The GraphQLHttpServer exposed via Koa', () => {
-  const url = 'http://localhost:5999/graphql';
   const router = new KoaRouter();
 
   let gqlServer: GraphQLServer<MyContext>;
   let app: Koa;
   let server: Server;
+  let url: string;
 
   beforeAll(async () => {
     gqlServer = await bootstrapExample();
@@ -24,7 +25,12 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
 
     app.use(router.allowedMethods()).use(router.routes());
 
-    server = app.listen(5999);
+    server = app.listen(0);
+
+    await new Promise((resolve) => server.on('listening', resolve));
+
+    const port = (server.address() as AddressInfo).port;
+    url = `http://localhost:${port}/graphql`;
   });
 
   afterAll(() => {
@@ -169,12 +175,15 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
       .use(router.allowedMethods())
       .use(router.routes());
     appWithAdditionalMiddleware.use(postGraphqlHandlerMiddleware);
-    const anotherServer = appWithAdditionalMiddleware.listen(6001);
+    const anotherServer = appWithAdditionalMiddleware.listen(0);
+
+    await new Promise((resolve) => anotherServer.on('listening', resolve));
+
+    const port = (anotherServer.address() as AddressInfo).port;
+    const url = `http://localhost:${port}/graphql`;
 
     try {
-      const response = await fetch(
-        `http://localhost:6001/graphql?query={praise}`,
-      );
+      const response = await fetch(`${url}?query={praise}`);
       expect(response.status).toBe(200);
       expect(postGraphqlHandlerMiddleware).toBeCalledTimes(1);
     } finally {

@@ -1,5 +1,4 @@
 import EventEmitter from 'events';
-import { Server } from 'http';
 import WebSocket from 'ws';
 import { MyContext } from '../examples/server/src/MyContext';
 import { main } from '../examples/server/src/main';
@@ -22,19 +21,23 @@ export function bootstrapExample() {
 }
 
 export function requireExampleServer(env?: NodeJS.ProcessEnv) {
-  let server: Server;
+  const ready = main({ PORT: '0', ...env });
 
-  beforeAll(async () => {
-    ({ server } = await main({ PORT: '4999', ...env }));
-  });
+  beforeAll(() => ready);
 
   afterAll(async () => {
-    if (!server) return;
+    const { server } = await ready;
 
     return new Promise<void>((resolve, reject) =>
       server.close((err) => (err ? reject(err) : resolve())),
     );
   });
+
+  return ready.then((r) => ({
+    ...r,
+    url: `http://localhost:${r.port}/graphql`,
+    wsUrl: `ws://localhost:${r.port}/graphql`,
+  }));
 }
 
 export function wsClosed(socket: WebSocket): Promise<[number, string]> {

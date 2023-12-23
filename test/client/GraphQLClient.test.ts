@@ -49,11 +49,11 @@ const typings = {
 } as unknown as OperationTypings;
 
 describe('The GraphQLClient', () => {
-  requireExampleServer();
-
-  const url = 'http://localhost:4999/graphql';
+  const exampleServer = requireExampleServer();
 
   it('should be able to send GraphQL requests via POST (with typings)', async () => {
+    const { url } = await exampleServer;
+
     const expectedResult = { data: { query2: 1 } };
 
     const client = new GraphQLClient({
@@ -94,6 +94,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should be reset initial headers', async () => {
+    const { url } = await exampleServer;
+
     const expectedResult = { data: { query2: 1 } };
 
     const client = new GraphQLClient({
@@ -133,6 +135,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should be able to send GraphQL requests via POST (untyped)', async () => {
+    const { url } = await exampleServer;
+
     const expectedResult = { data: { query2: 1 } };
 
     const client = new GraphQLClient({
@@ -147,6 +151,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should handle responses with GraphQL errors correctly', async () => {
+    const { url } = await exampleServer;
+
     const expectedResult = {
       data: { query2: null },
       errors: [{ message: 'failure' }],
@@ -173,6 +179,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should handle non-2xx responses correctly', async () => {
+    const { url } = await exampleServer;
+
     const expectedResult = {
       data: { query2: null },
       errors: [{ message: 'failure' }, { message: 'failure2' }],
@@ -205,6 +213,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should be able to filter errors', async () => {
+    const { url } = await exampleServer;
+
     const expectedResult = {
       data: { query2: null },
       errors: [{ message: 'failure' }, { message: 'failure2' }],
@@ -235,6 +245,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should not throw if all errors are filtered', async () => {
+    const { url } = await exampleServer;
+
     const expectedResult = {
       data: { query2: null },
       errors: [{ message: 'failure' }, { message: 'failure2' }],
@@ -259,6 +271,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should handle non-GraphQL JSON responses correctly', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLClient({
       url,
       typings,
@@ -281,6 +295,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should handle non-JSON responses correctly', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLClient({
       url,
       typings,
@@ -308,6 +324,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should handle non-GraphQL, non-2xx responses correctly', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLClient({
       url,
       typings,
@@ -333,6 +351,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should be able to query the example server with node-fetch', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLClient({
       url,
       typings: exampleTypings,
@@ -351,6 +371,8 @@ describe('The GraphQLClient', () => {
   });
 
   it('should handle validation errors from the example server', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLClient({
       url,
       typings: exampleTypings,

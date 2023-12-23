@@ -8,15 +8,15 @@ import { GraphQLWebSocketClient, WebSocketLike } from '../../src';
 import { requireExampleServer, sleep } from '../util';
 
 describe('The GraphQLWebSocketClient', () => {
-  requireExampleServer();
-
-  const url = 'ws://localhost:4999/graphql';
+  const exampleServer = requireExampleServer();
 
   function createWebSocket(url: string, protocol: string) {
     return new WebSocket(url, protocol) as unknown as WebSocketLike;
   }
 
   it('should be able to cancel subscriptions client-side (return)', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
@@ -65,6 +65,8 @@ describe('The GraphQLWebSocketClient', () => {
   });
 
   it('should be able to use typings', async () => {
+    const { url } = await exampleServer;
+
     const client = new GraphQLWebSocketClient({
       url,
       typings,

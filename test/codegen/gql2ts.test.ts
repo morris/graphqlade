@@ -3,7 +3,7 @@ import { gql2ts } from '../../src';
 import { requireExampleServer, TestLogger } from '../util';
 
 describe('The gql2ts function', () => {
-  requireExampleServer();
+  const exampleServer = requireExampleServer();
 
   const scalarTypes = {
     Date: 'string',
@@ -28,12 +28,14 @@ describe('The gql2ts function', () => {
   });
 
   it('should generate client-code for the example client (using node-fetch)', async () => {
+    const { url } = await exampleServer;
+
     const logger = new TestLogger();
 
     await gql2ts({
       root: 'examples/client',
       introspection: {
-        url: 'http://localhost:4999/graphql',
+        url,
         async getHeaders() {
           logger.log('got headers');
 
@@ -65,6 +67,8 @@ describe('The gql2ts function', () => {
   });
 
   it('should write an introspection fallback file if the file option is set', async () => {
+    const { url } = await exampleServer;
+
     const logger = new TestLogger();
     const file = 'test/codegen/introspection.json';
 
@@ -73,7 +77,7 @@ describe('The gql2ts function', () => {
     await gql2ts({
       root: 'examples/client',
       introspection: {
-        url: 'http://localhost:4999/graphql',
+        url,
         file,
       },
       client: true,
@@ -87,7 +91,7 @@ describe('The gql2ts function', () => {
     await gql2ts({
       root: 'examples/client',
       introspection: {
-        url: 'http://localhost:4999/use/fallback/instead',
+        url: url + '/use/fallback/instead',
         file,
       },
       client: true,

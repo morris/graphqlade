@@ -5,11 +5,13 @@ import {
   AsyncPushIterator,
   GraphQLWebSocketClient,
   GraphQLWebSocketServer,
+  listen,
 } from '../../src';
 
 describe('The GraphQLWebSocketServer', () => {
   let schema: GraphQLSchema;
   let server: http.Server;
+  let url: string;
 
   beforeAll(async () => {
     schema = buildSchema(`
@@ -49,7 +51,8 @@ describe('The GraphQLWebSocketServer', () => {
       // ignore
     });
 
-    server.listen(7777);
+    const port = await listen(server);
+    url = `http://localhost:${port}/graphql`;
   });
 
   afterAll(() => {
@@ -74,7 +77,7 @@ describe('The GraphQLWebSocketServer', () => {
     const counters: number[] = [];
 
     const gqlWsClient = new GraphQLWebSocketClient({
-      url: 'ws://localhost:7777/graphql',
+      url,
       connectionInitPayload: {
         authorization: 'it me',
       },

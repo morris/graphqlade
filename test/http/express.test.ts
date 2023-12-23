@@ -1,15 +1,15 @@
 import express, { Express } from 'express';
 import { Server } from 'http';
+import { AddressInfo } from 'net';
 import { MyContext } from '../../examples/server/src/MyContext';
 import { GraphQLServer } from '../../src';
 import { bootstrapExample } from '../util';
 
 describe('The GraphQLHttpServer exposed via Express', () => {
-  const url = 'http://localhost:6004/graphql';
-
   let gqlServer: GraphQLServer<MyContext>;
   let app: Express;
   let server: Server;
+  let url: string;
 
   beforeAll(async () => {
     gqlServer = await bootstrapExample();
@@ -19,7 +19,12 @@ describe('The GraphQLHttpServer exposed via Express', () => {
     app.get('/graphql', gqlServer.http.expressHandler());
     app.post('/graphql', express.json(), gqlServer.http.expressHandler());
 
-    server = app.listen(6004);
+    server = app.listen(0);
+
+    await new Promise((resolve) => server.on('listening', resolve));
+
+    const port = (server.address() as AddressInfo).port;
+    url = `http://localhost:${port}/graphql`;
   });
 
   afterAll(() => {
@@ -159,14 +164,17 @@ describe('The GraphQLHttpServer exposed via Express', () => {
       postGraphqlHandlerMiddleware,
     );
 
-    const anotherServer = anotherApp.listen(6002);
+    const anotherServer = anotherApp.listen(0);
+
+    await new Promise((resolve) => anotherServer.on('listening', resolve));
+
+    const port = (anotherServer.address() as AddressInfo).port;
+    const url = `http://localhost:${port}/graphql`;
 
     try {
-      const response = await fetch(
-        `http://localhost:6002/graphql?query={praise}`,
-      );
+      const response = await fetch(`${url}?query={praise}`);
       expect(response.status).toBe(200);
-      expect(postGraphqlHandlerMiddleware).toBeCalledTimes(1);
+      expect(postGraphqlHandlerMiddleware).toHaveBeenCalledTimes(1);
     } finally {
       anotherServer.close();
     }
