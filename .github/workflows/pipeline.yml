@@ -24,11 +24,20 @@ jobs:
       - run: npm run format-check
       - run: npm run build
       - run: npm run build-examples
+
+      # workaround for https://github.com/jestjs/jest/issues/11438
+      - run: npm run test-coverage -- --maxWorkers=6
+        if: ${{ matrix.node-version == '14.x' }}
+        env:
+          CI: true
+      # end workaround
+
       - run: npm run test-coverage
+        if: ${{ matrix.node-version != '14.x' }} # see above
         env:
           CI: true
       - run: npx codecov
-        if: ${{ matrix.node-version == '14.x' }}
+        if: ${{ matrix.node-version == '18.x' }}
       - run: npm run maybe-publish
         if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == '14.x' }}
         env:
