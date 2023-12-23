@@ -2,9 +2,9 @@
 export function toError(err: any): Error {
   if (
     err &&
-    typeof err === "object" &&
-    typeof err.message === "string" &&
-    typeof err.stack === "string"
+    typeof err === 'object' &&
+    typeof err.message === 'string' &&
+    typeof err.stack === 'string'
   ) {
     return err;
   }

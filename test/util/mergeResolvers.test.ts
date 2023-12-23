@@ -1,16 +1,16 @@
-import { GraphQLDateTime } from "graphql-scalars";
-import { Resolvers } from "../../examples/server/src/generated/schema";
-import { mergeResolvers } from "../../src";
+import { GraphQLDateTime } from 'graphql-scalars';
+import { Resolvers } from '../../examples/server/src/generated/schema';
+import { mergeResolvers } from '../../src';
 
-describe("The mergeResolvers function", () => {
-  it("should merge resolvers", () => {
+describe('The mergeResolvers function', () => {
+  it('should merge resolvers', () => {
     const a: Resolvers<undefined> = {
       Query: {
         boss() {
-          return { id: 11, name: "a", locationId: 21, required: true };
+          return { id: 11, name: 'a', locationId: 21, required: true };
         },
         praise() {
-          return "???";
+          return '???';
         },
       },
       Rating: {
@@ -26,10 +26,10 @@ describe("The mergeResolvers function", () => {
     const b: Resolvers<undefined> = {
       Query: {
         location() {
-          return { id: 21, name: "x" };
+          return { id: 21, name: 'x' };
         },
         praise() {
-          return "sun";
+          return 'sun';
         },
       },
     };

@@ -1,13 +1,13 @@
-import KoaRouter from "@koa/router";
-import { Server } from "http";
-import Koa from "koa";
-import KoaBodyParser from "koa-bodyparser";
-import { MyContext } from "../../examples/server/src/MyContext";
-import { GraphQLServer } from "../../src";
-import { bootstrapExample } from "../util";
+import KoaRouter from '@koa/router';
+import { Server } from 'http';
+import Koa from 'koa';
+import KoaBodyParser from 'koa-bodyparser';
+import { MyContext } from '../../examples/server/src/MyContext';
+import { GraphQLServer } from '../../src';
+import { bootstrapExample } from '../util';
 
-describe("The GraphQLHttpServer exposed via Koa", () => {
-  const url = "http://localhost:5999/graphql";
+describe('The GraphQLHttpServer exposed via Koa', () => {
+  const url = 'http://localhost:5999/graphql';
   const router = new KoaRouter();
 
   let gqlServer: GraphQLServer<MyContext>;
@@ -19,8 +19,8 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
 
     app = new Koa();
 
-    router.get("/graphql", gqlServer.http.koaHandler());
-    router.post("/graphql", KoaBodyParser(), gqlServer.http.koaHandler());
+    router.get('/graphql', gqlServer.http.koaHandler());
+    router.post('/graphql', KoaBodyParser(), gqlServer.http.koaHandler());
 
     app.use(router.allowedMethods()).use(router.routes());
 
@@ -35,56 +35,56 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
     jest.clearAllMocks();
   });
 
-  it("should be able to handle POST GraphQL requests", async () => {
+  it('should be able to handle POST GraphQL requests', async () => {
     const response = await fetch(url, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "content-type": "application/json",
-        authorization: "Bearer of a ring",
+        'content-type': 'application/json',
+        authorization: 'Bearer of a ring',
       },
       body: JSON.stringify({
-        query: "{ praise }",
+        query: '{ praise }',
       }),
     });
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe(
-      "application/json; charset=utf-8"
+    expect(response.headers.get('content-type')).toBe(
+      'application/json; charset=utf-8',
     );
 
     const json = await response.json();
 
     expect(json).toEqual({
       data: {
-        praise: "the sun!",
+        praise: 'the sun!',
       },
     });
   });
 
-  it("should be able to handle GET GraphQL requests", async () => {
+  it('should be able to handle GET GraphQL requests', async () => {
     const response = await fetch(`${url}?query={praise}`);
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe(
-      "application/json; charset=utf-8"
+    expect(response.headers.get('content-type')).toBe(
+      'application/json; charset=utf-8',
     );
 
     const json = await response.json();
 
     expect(json).toEqual({
       data: {
-        praise: "the sun!",
+        praise: 'the sun!',
       },
     });
   });
 
-  it("should reject unsupported methods", async () => {
+  it('should reject unsupported methods', async () => {
     const response = await fetch(url, {
-      method: "PUT",
-      headers: { "content-type": "application/json" },
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: `{ praise }`,
-        operationName: "String",
+        operationName: 'String',
       }),
     });
 
@@ -92,36 +92,36 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
 
     const text = await response.text();
 
-    expect(text).toEqual("Method Not Allowed");
+    expect(text).toEqual('Method Not Allowed');
   });
 
-  it("should reject mutations via GET", async () => {
+  it('should reject mutations via GET', async () => {
     const response = await fetch(`${url}?query=mutation{youDied}`);
 
     expect(response.status).toBe(400);
-    expect(response.headers.get("content-type")).toBe(
-      "application/json; charset=utf-8"
+    expect(response.headers.get('content-type')).toBe(
+      'application/json; charset=utf-8',
     );
 
     const json = await response.json();
 
     expect(json).toEqual({
-      errors: [{ message: "Mutations are not allowed via GET" }],
+      errors: [{ message: 'Mutations are not allowed via GET' }],
     });
   });
 
-  it("should reject invalid queries", async () => {
+  it('should reject invalid queries', async () => {
     const response = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: `{ invalid }`,
       }),
     });
 
     expect(response.status).toBe(400);
-    expect(response.headers.get("content-type")).toBe(
-      "application/json; charset=utf-8"
+    expect(response.headers.get('content-type')).toBe(
+      'application/json; charset=utf-8',
     );
 
     const json = await response.json();
@@ -141,27 +141,27 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
     });
   });
 
-  it("should reject bad requests (e.g. no content-type) with status code 400", async () => {
+  it('should reject bad requests (e.g. no content-type) with status code 400', async () => {
     const response = await fetch(url, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({
         query: `{ invalid }`,
       }),
     });
 
     expect(response.status).toBe(400);
-    expect(response.headers.get("content-type")).toBe(
-      "application/json; charset=utf-8"
+    expect(response.headers.get('content-type')).toBe(
+      'application/json; charset=utf-8',
     );
 
     const json = await response.json();
 
     expect(json).toEqual({
-      errors: [{ message: "Invalid query, expected string" }],
+      errors: [{ message: 'Invalid query, expected string' }],
     });
   });
 
-  it("should respect koa middleware queued in after the graphql handler", async () => {
+  it('should respect koa middleware queued in after the graphql handler', async () => {
     const postGraphqlHandlerMiddleware = jest.fn();
 
     const appWithAdditionalMiddleware: Koa = new Koa();
@@ -173,7 +173,7 @@ describe("The GraphQLHttpServer exposed via Koa", () => {
 
     try {
       const response = await fetch(
-        `http://localhost:6001/graphql?query={praise}`
+        `http://localhost:6001/graphql?query={praise}`,
       );
       expect(response.status).toBe(200);
       expect(postGraphqlHandlerMiddleware).toBeCalledTimes(1);

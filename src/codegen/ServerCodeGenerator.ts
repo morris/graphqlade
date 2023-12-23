@@ -15,10 +15,10 @@ import {
   isObjectType,
   isScalarType,
   isUnionType,
-} from "graphql";
-import { getDirective } from "../util";
-import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
-import { ImportCodeGenerator } from "./ImportCodeGenerator";
+} from 'graphql';
+import { getDirective } from '../util';
+import { CommonCodeGenerator, TsDirective } from './CommonCodeGenerator';
+import { ImportCodeGenerator } from './ImportCodeGenerator';
 
 export interface ServerCodeGeneratorOptions {
   schema: GraphQLSchema;
@@ -46,7 +46,7 @@ export class ServerCodeGenerator {
       if (isObjectType(node) || isInterfaceType(node)) {
         if (!node.astNode) continue;
 
-        const tsDirective = getDirective<TsDirective>(node.astNode, "ts");
+        const tsDirective = getDirective<TsDirective>(node.astNode, 'ts');
 
         if (tsDirective) {
           this.commonCodeGenerator.addTypeMapping({
@@ -58,7 +58,7 @@ export class ServerCodeGenerator {
       } else if (isEnumType(node)) {
         if (!node.astNode) continue;
 
-        const tsDirective = getDirective<TsDirective>(node.astNode, "ts");
+        const tsDirective = getDirective<TsDirective>(node.astNode, 'ts');
 
         if (tsDirective) {
           this.commonCodeGenerator.addTypeMapping({
@@ -71,7 +71,7 @@ export class ServerCodeGenerator {
       } else if (isScalarType(node)) {
         if (!node.astNode) continue;
 
-        const tsDirective = getDirective<TsDirective>(node.astNode, "ts");
+        const tsDirective = getDirective<TsDirective>(node.astNode, 'ts');
 
         if (tsDirective) {
           this.commonCodeGenerator.addTypeMapping({
@@ -83,7 +83,7 @@ export class ServerCodeGenerator {
         } else {
           this.commonCodeGenerator.addTypeMapping({
             gqlType: node.name,
-            tsType: "string",
+            tsType: 'string',
           });
         }
       }
@@ -120,8 +120,8 @@ export class ServerCodeGenerator {
     const importCodeGenerator = new ImportCodeGenerator();
 
     importCodeGenerator.addImport({
-      names: ["GraphQLResolveInfo", "GraphQLEnumType", "GraphQLScalarType"],
-      from: "graphql",
+      names: ['GraphQLResolveInfo', 'GraphQLEnumType', 'GraphQLScalarType'],
+      from: 'graphql',
     });
 
     this.commonCodeGenerator.addTypeMapImports(importCodeGenerator);
@@ -227,7 +227,7 @@ export class ServerCodeGenerator {
 
   generateField(field: GraphQLField<unknown, unknown>) {
     return `${this.commonCodeGenerator.generateFieldDescription(field)}
-      ${field.name}${isNonNullType(field.type) ? "" : "?"}:
+      ${field.name}${isNonNullType(field.type) ? '' : '?'}:
         ${this.commonCodeGenerator.generateOutputRef(field.type, false)};`;
   }
 
@@ -237,7 +237,7 @@ export class ServerCodeGenerator {
         node
           .getTypes()
           .map((it) => this.commonCodeGenerator.generateNamedOutputRef(it)),
-        " | "
+        ' | ',
       )}`;
   }
 
@@ -250,14 +250,14 @@ export class ServerCodeGenerator {
       export interface R${node.name}<TContext> {
         ${this.generateIsTypeOf(node)}
         ${this.join(
-          fields.map((it) => this.generateSubscriptionFieldResolver(it, node))
+          fields.map((it) => this.generateSubscriptionFieldResolver(it, node)),
         )}
       }`;
   }
 
   generateSubscriptionFieldResolver(
     field: GraphQLField<unknown, unknown>,
-    parent: GraphQLObjectType
+    parent: GraphQLObjectType,
   ) {
     const tResult = this.commonCodeGenerator.generateOutputRef(field.type);
 
@@ -317,7 +317,7 @@ export class ServerCodeGenerator {
 
   generateFieldResolver(
     field: GraphQLField<unknown, unknown>,
-    parent: GraphQLInterfaceType | GraphQLObjectType
+    parent: GraphQLInterfaceType | GraphQLObjectType,
   ) {
     const tResult = this.commonCodeGenerator.generateOutputRef(field.type);
 
@@ -334,14 +334,14 @@ export class ServerCodeGenerator {
 
   generateArgs(
     field: GraphQLField<unknown, unknown>,
-    object: GraphQLObjectType | GraphQLInterfaceType
+    object: GraphQLObjectType | GraphQLInterfaceType,
   ) {
     if (field.args.length > 0) {
       return `export interface ${this.generateArgsName(field, object)} {
         ${this.join(
           field.args.map((it) =>
-            this.commonCodeGenerator.generateInputField(it)
-          )
+            this.commonCodeGenerator.generateInputField(it),
+          ),
         )}
       }`;
     }
@@ -349,16 +349,16 @@ export class ServerCodeGenerator {
 
   generateArgsRef(
     field: GraphQLField<unknown, unknown>,
-    object: GraphQLObjectType | GraphQLInterfaceType
+    object: GraphQLObjectType | GraphQLInterfaceType,
   ) {
     return field.args.length > 0
       ? this.generateArgsName(field, object)
-      : "Record<string, never>";
+      : 'Record<string, never>';
   }
 
   generateArgsName(
     field: GraphQLField<unknown, unknown>,
-    object: GraphQLObjectType | GraphQLInterfaceType
+    object: GraphQLObjectType | GraphQLInterfaceType,
   ) {
     return `${object.name}${this.firstToUpper(field.name)}Args`;
   }
@@ -385,7 +385,7 @@ export class ServerCodeGenerator {
           node
             .getValues()
             .map((it) => this.generateEnumValueResolver(it, node)),
-          ",\n"
+          ',\n',
         )}
       }`;
   }
@@ -403,7 +403,7 @@ export class ServerCodeGenerator {
 
   // util
 
-  join(parts: (string | undefined)[], separator = "\n\n", braces?: string) {
+  join(parts: (string | undefined)[], separator = '\n\n', braces?: string) {
     return this.commonCodeGenerator.join(parts, separator, braces);
   }
 

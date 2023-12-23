@@ -1,9 +1,9 @@
-import { toError } from "../util";
+import { toError } from '../util';
 import {
   CodeGenerator,
   CodeGeneratorCliOptions,
   CodeGeneratorOptions,
-} from "./CodeGenerator";
+} from './CodeGenerator';
 
 export interface Gql2TsOptions
   extends CodeGeneratorOptions,

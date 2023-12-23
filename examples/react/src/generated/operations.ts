@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import { ExecutionResult } from "graphql";
+import { ExecutionResult } from 'graphql';
 
 export type Maybe<T> = T | null | undefined;
 
@@ -8,7 +8,7 @@ export function typeRef<T>(value?: T | null): T {
   return {} as T;
 }
 
-export const BossesDocument = "query Bosses{bosses{id name location{id name}}}";
+export const BossesDocument = 'query Bosses{bosses{id name location{id name}}}';
 
 export type XBosses<TExtensions> = ExecutionResult<DBosses, TExtensions>;
 
@@ -29,7 +29,7 @@ export type DBosses = {
 };
 
 export const CompareBossDifficultyDocument =
-  "query CompareBossDifficulty($left:ID!$right:ID!){left:boss(id:$left){...compareBossDifficultyData}right:boss(id:$right){...compareBossDifficultyData}}\n\nfragment compareBossDifficultyData on Boss{id name reviews{difficulty}}";
+  'query CompareBossDifficulty($left:ID!$right:ID!){left:boss(id:$left){...compareBossDifficultyData}right:boss(id:$right){...compareBossDifficultyData}}\n\nfragment compareBossDifficultyData on Boss{id name reviews{difficulty}}';
 
 export interface VCompareBossDifficulty {
   left: string;
@@ -48,7 +48,7 @@ export type DCompareBossDifficulty = {
 };
 
 export const CreateBossReviewDocument =
-  "mutation CreateBossReview($input:CreateBossReviewInput!){createBossReview(input:$input){id}}";
+  'mutation CreateBossReview($input:CreateBossReviewInput!){createBossReview(input:$input){id}}';
 
 export interface VCreateBossReview {
   input: TCreateBossReviewInput;
@@ -66,7 +66,7 @@ export type DCreateBossReview = {
 };
 
 export const CreateLocationReviewDocument =
-  "mutation CreateLocationReview($input:CreateLocationReviewInput!){createLocationReview(input:$input){id}}";
+  'mutation CreateLocationReview($input:CreateLocationReviewInput!){createLocationReview(input:$input){id}}';
 
 export interface VCreateLocationReview {
   input: TCreateLocationReviewInput;
@@ -84,7 +84,7 @@ export type DCreateLocationReview = {
 };
 
 export const DivideDocument =
-  "query Divide($dividend:ESNumber!$divisor:ESNumber!){divide(dividend:$dividend divisor:$divisor)}";
+  'query Divide($dividend:ESNumber!$divisor:ESNumber!){divide(dividend:$dividend divisor:$divisor)}';
 
 export interface VDivide {
   dividend: number | string;
@@ -98,7 +98,7 @@ export type DDivide = {
 };
 
 export const LocationsDocument =
-  "query Locations($skipBosses:Boolean=false$includeReviews:Boolean=false){locations{id name bosses@skip(if:$skipBosses){id name reviews@include(if:$includeReviews){difficulty}}}}";
+  'query Locations($skipBosses:Boolean=false$includeReviews:Boolean=false){locations{id name bosses@skip(if:$skipBosses){id name reviews@include(if:$includeReviews){difficulty}}}}';
 
 export interface VLocations {
   skipBosses?: boolean;
@@ -132,7 +132,7 @@ export type DLocations = {
 };
 
 export const ReviewsDocument =
-  "query Reviews{reviews{...reviewData}}\n\nfragment reviewData on Review{__typename ...on BossReview{boss{id name}difficulty theme ...reviewMetadata}...on LocationReview{location{id name}difficulty design ...reviewMetadata}}\n\nfragment reviewMetadata on Review{id author createdAt}";
+  'query Reviews{reviews{...reviewData}}\n\nfragment reviewData on Review{__typename ...on BossReview{boss{id name}difficulty theme ...reviewMetadata}...on LocationReview{location{id name}difficulty design ...reviewMetadata}}\n\nfragment reviewMetadata on Review{id author createdAt}';
 
 export type XReviews<TExtensions> = ExecutionResult<DReviews, TExtensions>;
 
@@ -140,17 +140,17 @@ export type DReviews = {
   reviews: Maybe<
     Array<
       | ({
-          __typename: "BossReview";
+          __typename: 'BossReview';
         } & FReviewData)
       | ({
-          __typename: "LocationReview";
+          __typename: 'LocationReview';
         } & FReviewData)
     >
   >;
 };
 
 export const NewReviewsDocument =
-  "subscription NewReviews($limit:Int){newReview(limit:$limit){...reviewData}}\n\nfragment reviewData on Review{__typename ...on BossReview{boss{id name}difficulty theme ...reviewMetadata}...on LocationReview{location{id name}difficulty design ...reviewMetadata}}\n\nfragment reviewMetadata on Review{id author createdAt}";
+  'subscription NewReviews($limit:Int){newReview(limit:$limit){...reviewData}}\n\nfragment reviewData on Review{__typename ...on BossReview{boss{id name}difficulty theme ...reviewMetadata}...on LocationReview{location{id name}difficulty design ...reviewMetadata}}\n\nfragment reviewMetadata on Review{id author createdAt}';
 
 export interface VNewReviews {
   limit?: number;
@@ -164,15 +164,15 @@ export type XNewReviews<TExtensions> = ExecutionResult<
 export type DNewReviews = {
   newReview:
     | ({
-        __typename: "BossReview";
+        __typename: 'BossReview';
       } & FReviewData)
     | ({
-        __typename: "LocationReview";
+        __typename: 'LocationReview';
       } & FReviewData);
 };
 
 export const Reviews2Document =
-  "query Reviews2{reviews{...baseReview2 ...bossReview2}}\n\nfragment baseReview2 on Review{__typename author}\n\nfragment bossReview2 on BossReview{__typename boss{id name}}";
+  'query Reviews2{reviews{...baseReview2 ...bossReview2}}\n\nfragment baseReview2 on Review{__typename author}\n\nfragment bossReview2 on BossReview{__typename boss{id name}}';
 
 export type XReviews2<TExtensions> = ExecutionResult<DReviews2, TExtensions>;
 
@@ -180,17 +180,17 @@ export type DReviews2 = {
   reviews: Maybe<
     Array<
       | ({
-          __typename: "BossReview";
+          __typename: 'BossReview';
         } & (FBaseReview2 & FBossReview2))
       | ({
-          __typename: "LocationReview";
+          __typename: 'LocationReview';
         } & FBaseReview2)
     >
   >;
 };
 
 export const Reviews3Document =
-  "query Reviews3{reviews{...on Review{__typename}...on BossReview{__typename boss{id name}}}}";
+  'query Reviews3{reviews{...on Review{__typename}...on BossReview{__typename boss{id name}}}}';
 
 export type XReviews3<TExtensions> = ExecutionResult<DReviews3, TExtensions>;
 
@@ -198,7 +198,7 @@ export type DReviews3 = {
   reviews: Maybe<
     Array<
       | ({
-          __typename: "BossReview";
+          __typename: 'BossReview';
         } & ({} & {
           boss: {
             id: string;
@@ -207,14 +207,14 @@ export type DReviews3 = {
           };
         }))
       | ({
-          __typename: "LocationReview";
+          __typename: 'LocationReview';
         } & {})
     >
   >;
 };
 
 export const Reviews4Document =
-  "query Reviews4{reviews{...baseReview4 ...on BossReview{boss{id name}}}}\n\nfragment baseReview4 on Review{author}";
+  'query Reviews4{reviews{...baseReview4 ...on BossReview{boss{id name}}}}\n\nfragment baseReview4 on Review{author}';
 
 export type XReviews4<TExtensions> = ExecutionResult<DReviews4, TExtensions>;
 
@@ -234,7 +234,7 @@ export type DReviews4 = {
 };
 
 export const Reviews5Document =
-  "query Reviews5{reviews{...baseReview5 ...on BossReview{__typename boss{id name}}}}\n\nfragment baseReview5 on Review{author}";
+  'query Reviews5{reviews{...baseReview5 ...on BossReview{__typename boss{id name}}}}\n\nfragment baseReview5 on Review{author}';
 
 export type XReviews5<TExtensions> = ExecutionResult<DReviews5, TExtensions>;
 
@@ -242,7 +242,7 @@ export type DReviews5 = {
   reviews: Maybe<
     Array<
       | ({
-          __typename: "BossReview";
+          __typename: 'BossReview';
         } & {
           boss: {
             id: string;
@@ -256,7 +256,7 @@ export type DReviews5 = {
 };
 
 export const SearchDocument =
-  "query Search($q:String!$types:[SearchType!]){search(q:$q types:$types){__typename ...on Boss{id name}...on Location{id name}}}";
+  'query Search($q:String!$types:[SearchType!]){search(q:$q types:$types){__typename ...on Boss{id name}...on Location{id name}}}';
 
 export interface VSearch {
   q: string;
@@ -269,14 +269,14 @@ export type DSearch = {
   search: Maybe<
     Array<
       | ({
-          __typename: "Boss";
+          __typename: 'Boss';
         } & {
           id: string;
 
           name: string;
         })
       | ({
-          __typename: "Location";
+          __typename: 'Location';
         } & {
           id: string;
 
@@ -300,7 +300,7 @@ export type FCompareBossDifficultyData = {
 
 export type FReviewData =
   | ({
-      __typename: "BossReview";
+      __typename: 'BossReview';
     } & ({
       boss: {
         id: string;
@@ -313,7 +313,7 @@ export type FReviewData =
       theme: TRating;
     } & FReviewMetadata))
   | ({
-      __typename: "LocationReview";
+      __typename: 'LocationReview';
     } & ({
       location: {
         id: string;
@@ -346,12 +346,12 @@ export type FBaseReview2 =
   | {
       author: Maybe<string>;
 
-      __typename: "BossReview";
+      __typename: 'BossReview';
     }
   | {
       author: Maybe<string>;
 
-      __typename: "LocationReview";
+      __typename: 'LocationReview';
     };
 
 export type FBossReview2 = {
@@ -361,7 +361,7 @@ export type FBossReview2 = {
     name: string;
   };
 
-  __typename: "BossReview";
+  __typename: 'BossReview';
 };
 
 export type FBaseReview4 =
@@ -413,29 +413,29 @@ export interface TCreateLocationReviewInput {
 }
 
 export enum TRating {
-  TERRIBLE = "TERRIBLE",
+  TERRIBLE = 'TERRIBLE',
 
-  MEH = "MEH",
+  MEH = 'MEH',
 
-  ALRIGHT = "ALRIGHT",
+  ALRIGHT = 'ALRIGHT',
 
-  AMAZING = "AMAZING",
+  AMAZING = 'AMAZING',
 
-  STELLAR = "STELLAR",
+  STELLAR = 'STELLAR',
 }
 
 export enum TDifficulty {
-  OKAYISH = "OKAYISH",
+  OKAYISH = 'OKAYISH',
 
-  HARD = "HARD",
+  HARD = 'HARD',
 
-  IMPOSSIBLE = "IMPOSSIBLE",
+  IMPOSSIBLE = 'IMPOSSIBLE',
 }
 
 export enum TSearchType {
-  BOSSES = "BOSSES",
+  BOSSES = 'BOSSES',
 
-  LOCATIONS = "LOCATIONS",
+  LOCATIONS = 'LOCATIONS',
 }
 
 /**
@@ -445,35 +445,35 @@ export enum T__TypeKind {
   /**
    * Indicates this type is a scalar.
    */
-  SCALAR = "SCALAR",
+  SCALAR = 'SCALAR',
   /**
    * Indicates this type is an object. `fields` and `interfaces` are valid fields.
    */
-  OBJECT = "OBJECT",
+  OBJECT = 'OBJECT',
   /**
    * Indicates this type is an interface. `fields`, `interfaces`, and `possibleTypes` are valid fields.
    */
-  INTERFACE = "INTERFACE",
+  INTERFACE = 'INTERFACE',
   /**
    * Indicates this type is a union. `possibleTypes` is a valid field.
    */
-  UNION = "UNION",
+  UNION = 'UNION',
   /**
    * Indicates this type is an enum. `enumValues` is a valid field.
    */
-  ENUM = "ENUM",
+  ENUM = 'ENUM',
   /**
    * Indicates this type is an input object. `inputFields` is a valid field.
    */
-  INPUT_OBJECT = "INPUT_OBJECT",
+  INPUT_OBJECT = 'INPUT_OBJECT',
   /**
    * Indicates this type is a list. `ofType` is a valid field.
    */
-  LIST = "LIST",
+  LIST = 'LIST',
   /**
    * Indicates this type is a non-null. `ofType` is a valid field.
    */
-  NON_NULL = "NON_NULL",
+  NON_NULL = 'NON_NULL',
 }
 
 /**
@@ -483,79 +483,79 @@ export enum T__DirectiveLocation {
   /**
    * Location adjacent to a query operation.
    */
-  QUERY = "QUERY",
+  QUERY = 'QUERY',
   /**
    * Location adjacent to a mutation operation.
    */
-  MUTATION = "MUTATION",
+  MUTATION = 'MUTATION',
   /**
    * Location adjacent to a subscription operation.
    */
-  SUBSCRIPTION = "SUBSCRIPTION",
+  SUBSCRIPTION = 'SUBSCRIPTION',
   /**
    * Location adjacent to a field.
    */
-  FIELD = "FIELD",
+  FIELD = 'FIELD',
   /**
    * Location adjacent to a fragment definition.
    */
-  FRAGMENT_DEFINITION = "FRAGMENT_DEFINITION",
+  FRAGMENT_DEFINITION = 'FRAGMENT_DEFINITION',
   /**
    * Location adjacent to a fragment spread.
    */
-  FRAGMENT_SPREAD = "FRAGMENT_SPREAD",
+  FRAGMENT_SPREAD = 'FRAGMENT_SPREAD',
   /**
    * Location adjacent to an inline fragment.
    */
-  INLINE_FRAGMENT = "INLINE_FRAGMENT",
+  INLINE_FRAGMENT = 'INLINE_FRAGMENT',
   /**
    * Location adjacent to a variable definition.
    */
-  VARIABLE_DEFINITION = "VARIABLE_DEFINITION",
+  VARIABLE_DEFINITION = 'VARIABLE_DEFINITION',
   /**
    * Location adjacent to a schema definition.
    */
-  SCHEMA = "SCHEMA",
+  SCHEMA = 'SCHEMA',
   /**
    * Location adjacent to a scalar definition.
    */
-  SCALAR = "SCALAR",
+  SCALAR = 'SCALAR',
   /**
    * Location adjacent to an object type definition.
    */
-  OBJECT = "OBJECT",
+  OBJECT = 'OBJECT',
   /**
    * Location adjacent to a field definition.
    */
-  FIELD_DEFINITION = "FIELD_DEFINITION",
+  FIELD_DEFINITION = 'FIELD_DEFINITION',
   /**
    * Location adjacent to an argument definition.
    */
-  ARGUMENT_DEFINITION = "ARGUMENT_DEFINITION",
+  ARGUMENT_DEFINITION = 'ARGUMENT_DEFINITION',
   /**
    * Location adjacent to an interface definition.
    */
-  INTERFACE = "INTERFACE",
+  INTERFACE = 'INTERFACE',
   /**
    * Location adjacent to a union definition.
    */
-  UNION = "UNION",
+  UNION = 'UNION',
   /**
    * Location adjacent to an enum definition.
    */
-  ENUM = "ENUM",
+  ENUM = 'ENUM',
   /**
    * Location adjacent to an enum value definition.
    */
-  ENUM_VALUE = "ENUM_VALUE",
+  ENUM_VALUE = 'ENUM_VALUE',
   /**
    * Location adjacent to an input object type definition.
    */
-  INPUT_OBJECT = "INPUT_OBJECT",
+  INPUT_OBJECT = 'INPUT_OBJECT',
   /**
    * Location adjacent to an input object field definition.
    */
-  INPUT_FIELD_DEFINITION = "INPUT_FIELD_DEFINITION",
+  INPUT_FIELD_DEFINITION = 'INPUT_FIELD_DEFINITION',
 }
 
 export const OperationNameToDocument = {
@@ -609,20 +609,20 @@ export interface OperationNameToData {
 export type OperationName = QueryName | MutationName | SubscriptionName;
 
 export type QueryName =
-  | "Bosses"
-  | "CompareBossDifficulty"
-  | "Divide"
-  | "Locations"
-  | "Reviews"
-  | "Reviews2"
-  | "Reviews3"
-  | "Reviews4"
-  | "Reviews5"
-  | "Search";
+  | 'Bosses'
+  | 'CompareBossDifficulty'
+  | 'Divide'
+  | 'Locations'
+  | 'Reviews'
+  | 'Reviews2'
+  | 'Reviews3'
+  | 'Reviews4'
+  | 'Reviews5'
+  | 'Search';
 
-export type MutationName = "CreateBossReview" | "CreateLocationReview";
+export type MutationName = 'CreateBossReview' | 'CreateLocationReview';
 
-export type SubscriptionName = "NewReviews";
+export type SubscriptionName = 'NewReviews';
 
 export interface OperationTypings {
   OperationName: OperationName;

@@ -1,11 +1,11 @@
-import { Resolvers } from "../generated/schema";
-import { MyContext } from "../MyContext";
-import { LocationData } from "../types";
+import { Resolvers } from '../generated/schema';
+import { MyContext } from '../MyContext';
+import { LocationData } from '../types';
 
 export const queryResolvers: Resolvers<MyContext> = {
   Query: {
     praise() {
-      return "the sun!";
+      return 'the sun!';
     },
     bosses(_, __, context) {
       return context.getBosses();
@@ -20,7 +20,7 @@ export const queryResolvers: Resolvers<MyContext> = {
       return context.getLocationById(parseInt(args.id));
     },
     search(_, args, context) {
-      if (args.types) throw new Error("Not implemented");
+      if (args.types) throw new Error('Not implemented');
 
       return context.search(args.q);
     },
@@ -56,7 +56,7 @@ export const queryResolvers: Resolvers<MyContext> = {
 
   SearchResult: {
     __resolveType(data) {
-      return data.id < 10 ? "Boss" : "Location";
+      return data.id < 10 ? 'Boss' : 'Location';
     },
   },
 

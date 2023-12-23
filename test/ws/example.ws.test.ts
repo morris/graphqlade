@@ -1,18 +1,18 @@
-import { ExecutionResult } from "graphql";
-import WebSocket from "ws";
+import { ExecutionResult } from 'graphql';
+import WebSocket from 'ws';
 import {
   GraphQLReader,
   GraphQLWebSocketClient,
   WebSocketLike,
-} from "../../src";
-import { requireExampleServer, sleep, wsClosed } from "../util";
+} from '../../src';
+import { requireExampleServer, sleep, wsClosed } from '../util';
 
-describe("The example (ws)", () => {
+describe('The example (ws)', () => {
   let operations: string;
 
   requireExampleServer();
 
-  const url = "ws://localhost:4999/graphql";
+  const url = 'ws://localhost:4999/graphql';
 
   function createWebSocket(url: string, protocol: string): WebSocketLike {
     return new WebSocket(url, protocol) as unknown as WebSocketLike;
@@ -21,66 +21,66 @@ describe("The example (ws)", () => {
   beforeAll(async () => {
     const reader = new GraphQLReader();
     operations = await reader.readDir(
-      `${__dirname}/../../examples/client/operations`
+      `${__dirname}/../../examples/client/operations`,
     );
   });
 
-  it("should close a socket with invalid an protocol immediately", async () => {
-    const socket = new WebSocket(url, "foo-bar-baz");
+  it('should close a socket with invalid an protocol immediately', async () => {
+    const socket = new WebSocket(url, 'foo-bar-baz');
 
     expect(await wsClosed(socket)).toEqual([
       1002,
-      "Unsupported web socket protocol foo-bar-baz",
+      'Unsupported web socket protocol foo-bar-baz',
     ]);
   });
 
-  it("should close a socket when not receiving a connection_init message in time", async () => {
-    const socket = new WebSocket(url, "graphql-transport-ws");
+  it('should close a socket when not receiving a connection_init message in time', async () => {
+    const socket = new WebSocket(url, 'graphql-transport-ws');
 
     expect(await wsClosed(socket)).toEqual([
       4408,
-      "Connection initialization timeout",
+      'Connection initialization timeout',
     ]);
   });
 
-  it("should close a socket immediately on receiving more than one connection_init message", async () => {
-    const socket = new WebSocket(url, "graphql-transport-ws");
+  it('should close a socket immediately on receiving more than one connection_init message', async () => {
+    const socket = new WebSocket(url, 'graphql-transport-ws');
 
-    socket.on("open", () => {
+    socket.on('open', () => {
       socket.send(
         JSON.stringify({
-          type: "connection_init",
-          payload: { keys: ["MASTER_KEY"] },
-        })
+          type: 'connection_init',
+          payload: { keys: ['MASTER_KEY'] },
+        }),
       );
       socket.send(
         JSON.stringify({
-          type: "connection_init",
-          payload: { keys: ["BRUTE_FORCE"] },
-        })
+          type: 'connection_init',
+          payload: { keys: ['BRUTE_FORCE'] },
+        }),
       );
     });
 
     expect(await wsClosed(socket)).toEqual([
       4429,
-      "Too many initialization requests",
+      'Too many initialization requests',
     ]);
   });
 
-  it("should close a socket immediately on receiving invalid message types", async () => {
-    const socket = new WebSocket(url, "graphql-transport-ws");
+  it('should close a socket immediately on receiving invalid message types', async () => {
+    const socket = new WebSocket(url, 'graphql-transport-ws');
 
-    socket.on("open", () => {
-      socket.send(JSON.stringify({ type: "hello" }));
+    socket.on('open', () => {
+      socket.send(JSON.stringify({ type: 'hello' }));
     });
 
     expect(await wsClosed(socket)).toEqual([
       4400,
-      "Invalid message type: hello",
+      'Invalid message type: hello',
     ]);
   });
 
-  it("should close a socket immediately if it is not acknowledged", async () => {
+  it('should close a socket immediately if it is not acknowledged', async () => {
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
@@ -90,18 +90,18 @@ describe("The example (ws)", () => {
     });
 
     await expect(client.requireConnection()).rejects.toThrowError(
-      "Unauthorized: It appears to be locked"
+      'Unauthorized: It appears to be locked',
     );
 
     client.close();
   });
 
-  it("should reject invalid operations with an error message", async () => {
+  it('should reject invalid operations with an error message', async () => {
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
       connectionInitPayload: {
-        keys: ["MASTER_KEY"],
+        keys: ['MASTER_KEY'],
       },
     });
 
@@ -114,20 +114,20 @@ describe("The example (ws)", () => {
         })) {
           expect(result).toBeDefined();
         }
-      })()
+      })(),
     ).rejects.toThrow(
-      'Subscription error: Cannot query field "hello" on type "Subscription".'
+      'Subscription error: Cannot query field "hello" on type "Subscription".',
     );
 
     client.close();
   });
 
-  it("should serve GraphQL subscriptions over web sockets", async () => {
+  it('should serve GraphQL subscriptions over web sockets', async () => {
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
       connectionInitPayload: {
-        keys: ["MASTER_KEY"],
+        keys: ['MASTER_KEY'],
       },
     });
 
@@ -136,7 +136,7 @@ describe("The example (ws)", () => {
 
     const iterator = client.subscribe<ExecutionResult>({
       query: operations,
-      operationName: "NewReviews",
+      operationName: 'NewReviews',
       variables: {
         limit: 2,
       },
@@ -150,18 +150,18 @@ describe("The example (ws)", () => {
 
     await sleep(300);
 
-    await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+    await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "CreateBossReview",
+        operationName: 'CreateBossReview',
         variables: {
           input: {
-            author: "tester",
-            bossId: "1",
-            difficulty: "IMPOSSIBLE",
-            theme: "ALRIGHT",
+            author: 'tester',
+            bossId: '1',
+            difficulty: 'IMPOSSIBLE',
+            theme: 'ALRIGHT',
           },
         },
       }),
@@ -169,18 +169,18 @@ describe("The example (ws)", () => {
 
     await sleep(300);
 
-    await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+    await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "CreateLocationReview",
+        operationName: 'CreateLocationReview',
         variables: {
           input: {
-            author: "tester",
-            locationId: "13",
-            difficulty: "HARD",
-            design: "STELLAR",
+            author: 'tester',
+            locationId: '13',
+            difficulty: 'HARD',
+            design: 'STELLAR',
           },
         },
       }),
@@ -193,8 +193,8 @@ describe("The example (ws)", () => {
     client.close();
 
     expect(
-      await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket)
-    ).toEqual([1000, "Normal Closure"]);
+      await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket),
+    ).toEqual([1000, 'Normal Closure']);
 
     expect(results.length).toEqual(2);
 
@@ -204,53 +204,53 @@ describe("The example (ws)", () => {
         data: {
           newReview: {
             ...it.data?.newReview,
-            createdAt: "test",
-            id: "test",
+            createdAt: 'test',
+            id: 'test',
           },
         },
-      }))
+      })),
     ).toEqual([
       {
         data: {
           newReview: {
-            __typename: "BossReview",
-            author: "tester",
+            __typename: 'BossReview',
+            author: 'tester',
             boss: {
-              id: "1",
-              name: "Asylum Demon",
+              id: '1',
+              name: 'Asylum Demon',
             },
-            createdAt: "test",
-            difficulty: "IMPOSSIBLE",
-            id: "test",
-            theme: "ALRIGHT",
+            createdAt: 'test',
+            difficulty: 'IMPOSSIBLE',
+            id: 'test',
+            theme: 'ALRIGHT',
           },
         },
       },
       {
         data: {
           newReview: {
-            __typename: "LocationReview",
-            author: "tester",
+            __typename: 'LocationReview',
+            author: 'tester',
             location: {
-              id: "13",
-              name: "Undead Parish",
+              id: '13',
+              name: 'Undead Parish',
             },
-            createdAt: "test",
-            difficulty: "HARD",
-            id: "test",
-            design: "STELLAR",
+            createdAt: 'test',
+            difficulty: 'HARD',
+            id: 'test',
+            design: 'STELLAR',
           },
         },
       },
     ]);
   });
 
-  it("should serve GraphQL subscriptions over web sockets (async w/ callbacks)", async () => {
+  it('should serve GraphQL subscriptions over web sockets (async w/ callbacks)', async () => {
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
       connectionInitPayload: {
-        keys: ["MASTER_KEY"],
+        keys: ['MASTER_KEY'],
       },
     });
 
@@ -262,7 +262,7 @@ describe("The example (ws)", () => {
     const stop = client.subscribeAsync<any>(
       {
         query: operations,
-        operationName: "NewReviews",
+        operationName: 'NewReviews',
       },
       {
         onData(data) {
@@ -271,23 +271,23 @@ describe("The example (ws)", () => {
         onError(err) {
           errors.push(err);
         },
-      }
+      },
     );
 
     await sleep(300);
 
-    await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+    await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "CreateBossReview",
+        operationName: 'CreateBossReview',
         variables: {
           input: {
-            author: "tester",
-            bossId: "1",
-            difficulty: "IMPOSSIBLE",
-            theme: "ALRIGHT",
+            author: 'tester',
+            bossId: '1',
+            difficulty: 'IMPOSSIBLE',
+            theme: 'ALRIGHT',
           },
         },
       }),
@@ -295,18 +295,18 @@ describe("The example (ws)", () => {
 
     await sleep(300);
 
-    await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+    await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "CreateLocationReview",
+        operationName: 'CreateLocationReview',
         variables: {
           input: {
-            author: "tester",
-            locationId: "13",
-            difficulty: "HARD",
-            design: "STELLAR",
+            author: 'tester',
+            locationId: '13',
+            difficulty: 'HARD',
+            design: 'STELLAR',
           },
         },
       }),
@@ -319,8 +319,8 @@ describe("The example (ws)", () => {
     client.close();
 
     expect(
-      await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket)
-    ).toEqual([1000, "Normal Closure"]);
+      await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket),
+    ).toEqual([1000, 'Normal Closure']);
 
     expect(errors).toEqual([]);
     expect(results.length).toEqual(2);
@@ -330,48 +330,48 @@ describe("The example (ws)", () => {
         ...it,
         newReview: {
           ...it.newReview,
-          createdAt: "test",
-          id: "test",
+          createdAt: 'test',
+          id: 'test',
         },
-      }))
+      })),
     ).toEqual([
       {
         newReview: {
-          __typename: "BossReview",
-          author: "tester",
+          __typename: 'BossReview',
+          author: 'tester',
           boss: {
-            id: "1",
-            name: "Asylum Demon",
+            id: '1',
+            name: 'Asylum Demon',
           },
-          createdAt: "test",
-          difficulty: "IMPOSSIBLE",
-          id: "test",
-          theme: "ALRIGHT",
+          createdAt: 'test',
+          difficulty: 'IMPOSSIBLE',
+          id: 'test',
+          theme: 'ALRIGHT',
         },
       },
       {
         newReview: {
-          __typename: "LocationReview",
-          author: "tester",
+          __typename: 'LocationReview',
+          author: 'tester',
           location: {
-            id: "13",
-            name: "Undead Parish",
+            id: '13',
+            name: 'Undead Parish',
           },
-          createdAt: "test",
-          difficulty: "HARD",
-          id: "test",
-          design: "STELLAR",
+          createdAt: 'test',
+          difficulty: 'HARD',
+          id: 'test',
+          design: 'STELLAR',
         },
       },
     ]);
   });
 
-  it("should reconnect on non-error closures", async () => {
+  it('should reconnect on non-error closures', async () => {
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
       connectionInitPayload: {
-        keys: ["MASTER_KEY"],
+        keys: ['MASTER_KEY'],
       },
     });
 
@@ -380,7 +380,7 @@ describe("The example (ws)", () => {
 
     const iterator = client.subscribe<ExecutionResult>({
       query: operations,
-      operationName: "NewReviews",
+      operationName: 'NewReviews',
     });
 
     const complete = (async () => {
@@ -391,18 +391,18 @@ describe("The example (ws)", () => {
 
     await sleep(300);
 
-    await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+    await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "CreateBossReview",
+        operationName: 'CreateBossReview',
         variables: {
           input: {
-            author: "tester",
-            bossId: "1",
-            difficulty: "IMPOSSIBLE",
-            theme: "ALRIGHT",
+            author: 'tester',
+            bossId: '1',
+            difficulty: 'IMPOSSIBLE',
+            theme: 'ALRIGHT',
           },
         },
       }),
@@ -414,18 +414,18 @@ describe("The example (ws)", () => {
 
     await sleep(800);
 
-    await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+    await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "CreateLocationReview",
+        operationName: 'CreateLocationReview',
         variables: {
           input: {
-            author: "tester",
-            locationId: "13",
-            difficulty: "HARD",
-            design: "STELLAR",
+            author: 'tester',
+            locationId: '13',
+            difficulty: 'HARD',
+            design: 'STELLAR',
           },
         },
       }),
@@ -438,8 +438,8 @@ describe("The example (ws)", () => {
     await complete;
 
     expect(
-      await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket)
-    ).toEqual([1000, "Normal Closure"]);
+      await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket),
+    ).toEqual([1000, 'Normal Closure']);
 
     expect(results.length).toEqual(2);
 
@@ -449,41 +449,41 @@ describe("The example (ws)", () => {
         data: {
           newReview: {
             ...it.data?.newReview,
-            createdAt: "test",
-            id: "test",
+            createdAt: 'test',
+            id: 'test',
           },
         },
-      }))
+      })),
     ).toEqual([
       {
         data: {
           newReview: {
-            __typename: "BossReview",
-            author: "tester",
+            __typename: 'BossReview',
+            author: 'tester',
             boss: {
-              id: "1",
-              name: "Asylum Demon",
+              id: '1',
+              name: 'Asylum Demon',
             },
-            createdAt: "test",
-            difficulty: "IMPOSSIBLE",
-            id: "test",
-            theme: "ALRIGHT",
+            createdAt: 'test',
+            difficulty: 'IMPOSSIBLE',
+            id: 'test',
+            theme: 'ALRIGHT',
           },
         },
       },
       {
         data: {
           newReview: {
-            __typename: "LocationReview",
-            author: "tester",
+            __typename: 'LocationReview',
+            author: 'tester',
             location: {
-              id: "13",
-              name: "Undead Parish",
+              id: '13',
+              name: 'Undead Parish',
             },
-            createdAt: "test",
-            difficulty: "HARD",
-            id: "test",
-            design: "STELLAR",
+            createdAt: 'test',
+            difficulty: 'HARD',
+            id: 'test',
+            design: 'STELLAR',
           },
         },
       },

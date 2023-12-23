@@ -1,27 +1,27 @@
-import { ExecutionResult } from "graphql";
-import WebSocket from "ws";
+import { ExecutionResult } from 'graphql';
+import WebSocket from 'ws';
 import {
   DNewReviews,
   typings,
-} from "../../examples/client/src/generated/operations";
-import { GraphQLWebSocketClient, WebSocketLike } from "../../src";
-import { requireExampleServer, sleep } from "../util";
+} from '../../examples/client/src/generated/operations';
+import { GraphQLWebSocketClient, WebSocketLike } from '../../src';
+import { requireExampleServer, sleep } from '../util';
 
-describe("The GraphQLWebSocketClient", () => {
+describe('The GraphQLWebSocketClient', () => {
   requireExampleServer();
 
-  const url = "ws://localhost:4999/graphql";
+  const url = 'ws://localhost:4999/graphql';
 
   function createWebSocket(url: string, protocol: string) {
     return new WebSocket(url, protocol) as unknown as WebSocketLike;
   }
 
-  it("should be able to cancel subscriptions client-side (return)", async () => {
+  it('should be able to cancel subscriptions client-side (return)', async () => {
     const client = new GraphQLWebSocketClient({
       url,
       createWebSocket,
       connectionInitPayload: {
-        keys: ["MASTER_KEY"],
+        keys: ['MASTER_KEY'],
       },
     });
 
@@ -58,23 +58,23 @@ describe("The GraphQLWebSocketClient", () => {
 
     await complete;
 
-    expect(messages).toEqual([{ type: "complete", id: "1" }]);
+    expect(messages).toEqual([{ type: 'complete', id: '1' }]);
     expect(results).toEqual([]);
 
     client.close();
   });
 
-  it("should be able to use typings", async () => {
+  it('should be able to use typings', async () => {
     const client = new GraphQLWebSocketClient({
       url,
       typings,
       createWebSocket,
       connectionInitPayload: {
-        keys: ["MASTER_KEY"],
+        keys: ['MASTER_KEY'],
       },
     });
 
-    const iterator = client.subscribeNamed("NewReviews", { limit: 10 });
+    const iterator = client.subscribeNamed('NewReviews', { limit: 10 });
 
     const results: ExecutionResult<DNewReviews>[] = [];
 

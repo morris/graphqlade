@@ -1,6 +1,6 @@
 export function assert(
   condition: unknown,
-  message?: string
+  message?: string,
 ): asserts condition {
-  if (!condition) throw new TypeError(message ?? "Assertion failed");
+  if (!condition) throw new TypeError(message ?? 'Assertion failed');
 }

@@ -1,5 +1,5 @@
-import { IncomingHttpHeaders } from "http";
-import { ParsedQs } from "./GraphQLHttpServer";
+import { IncomingHttpHeaders } from 'http';
+import { ParsedQs } from './GraphQLHttpServer';
 
 export interface ExpressRequestLike {
   method: string;

@@ -1,16 +1,16 @@
-import { GraphQLError, GraphQLSchema, subscribe, validate } from "graphql";
-import type { IncomingMessage } from "http";
+import { GraphQLError, GraphQLSchema, subscribe, validate } from 'graphql';
+import type { IncomingMessage } from 'http';
 import {
   CreateContextFn,
   GraphQLExecutionArgsParser,
   GraphQLExecutionArgsParserOptions,
   ParsedExecutionArgs,
   RawExecutionArgs,
-} from "../server";
+} from '../server';
 import {
   AcknowledgeFn,
   GraphQLServerWebSocket,
-} from "./GraphQLServerWebSocket";
+} from './GraphQLServerWebSocket';
 
 export interface GraphQLWebSocketServerOptions<TContext> {
   /**
@@ -84,11 +84,11 @@ export class GraphQLWebSocketServer<TContext> {
 
     this.graphqlSockets.add(graphqlSocket);
 
-    graphqlSocket.socket.addEventListener("close", () =>
-      this.graphqlSockets.delete(graphqlSocket)
+    graphqlSocket.socket.addEventListener('close', () =>
+      this.graphqlSockets.delete(graphqlSocket),
     );
-    graphqlSocket.socket.addEventListener("error", () =>
-      this.graphqlSockets.delete(graphqlSocket)
+    graphqlSocket.socket.addEventListener('error', () =>
+      this.graphqlSockets.delete(graphqlSocket),
     );
 
     return graphqlSocket;
@@ -96,7 +96,7 @@ export class GraphQLWebSocketServer<TContext> {
 
   close(code?: number, reason?: string) {
     for (const graphqlSocket of this.graphqlSockets) {
-      graphqlSocket.close(code ?? 1000, reason ?? "Normal Closure");
+      graphqlSocket.close(code ?? 1000, reason ?? 'Normal Closure');
     }
 
     this.graphqlSockets.clear();
@@ -104,12 +104,12 @@ export class GraphQLWebSocketServer<TContext> {
 
   async subscribe(
     args: RawExecutionArgs,
-    connectionInitPayload?: Record<string, unknown> | null
+    connectionInitPayload?: Record<string, unknown> | null,
   ) {
     try {
       return await this.subscribeParsed(
         this.parse(args),
-        connectionInitPayload
+        connectionInitPayload,
       );
     } catch (err) {
       return {
@@ -120,7 +120,7 @@ export class GraphQLWebSocketServer<TContext> {
 
   async subscribeParsed(
     args: ParsedExecutionArgs,
-    connectionInitPayload?: Record<string, unknown> | null
+    connectionInitPayload?: Record<string, unknown> | null,
   ) {
     const errors = this.validate(args);
 
@@ -135,7 +135,7 @@ export class GraphQLWebSocketServer<TContext> {
 
   async subscribeValidated(
     args: ParsedExecutionArgs,
-    connectionInitPayload: Record<string, unknown> | undefined | null
+    connectionInitPayload: Record<string, unknown> | undefined | null,
   ) {
     const contextValue = await this.createContext({
       connectionInitPayload,
@@ -169,7 +169,7 @@ export class GraphQLWebSocketServer<TContext> {
     } else {
       return {
         message:
-          (err as { message?: string })?.message ?? "Internal Server Error",
+          (err as { message?: string })?.message ?? 'Internal Server Error',
       } as GraphQLError;
     }
   }

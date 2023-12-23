@@ -1,7 +1,7 @@
-import { AsyncPushIterator } from "../../../../src";
-import { Resolvers } from "../generated/schema";
-import { MyContext } from "../MyContext";
-import { BossData, LocationData } from "../types";
+import { AsyncPushIterator } from '../../../../src';
+import { Resolvers } from '../generated/schema';
+import { MyContext } from '../MyContext';
+import { BossData, LocationData } from '../types';
 
 export const reviewResolvers: Resolvers<MyContext> = {
   Query: {

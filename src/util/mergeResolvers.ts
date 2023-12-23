@@ -1,13 +1,13 @@
-import { GraphQLScalarType } from "graphql";
+import { GraphQLScalarType } from 'graphql';
 import {
   AnyResolvers,
   CustomResolvers,
   ResolversInput,
   TypeResolver,
-} from "../server";
+} from '../server';
 
 export function mergeResolvers<TContext>(
-  resolversInput: ResolversInput<TContext>
+  resolversInput: ResolversInput<TContext>,
 ): AnyResolvers<TContext> {
   if (!Array.isArray(resolversInput)) return resolversInput;
 
@@ -26,6 +26,6 @@ export function mergeResolvers<TContext>(
 
       return mergedResolvers;
     },
-    {}
+    {},
   );
 }

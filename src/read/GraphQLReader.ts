@@ -1,6 +1,6 @@
-import { promises as fsPromises, Stats } from "fs";
-import { buildSchema, GraphQLError, parse } from "graphql";
-import { join } from "path";
+import { promises as fsPromises, Stats } from 'fs';
+import { buildSchema, GraphQLError, parse } from 'graphql';
+import { join } from 'path';
 
 const { readdir, readFile, stat } = fsPromises;
 
@@ -41,7 +41,7 @@ export class GraphQLReader {
         .filter((it) => this.isGraphQLFile(it.name))
         .map((it) => join(dirname, it.name))
         .sort((a, b) => this.comparePaths(a, b))
-        .map((it) => this.readFile(it))
+        .map((it) => this.readFile(it)),
     );
 
     const fromDirs = await Promise.all(
@@ -49,10 +49,10 @@ export class GraphQLReader {
         .filter((it) => it.isDirectory())
         .map((it) => join(dirname, it.name))
         .sort((a, b) => this.comparePaths(a, b))
-        .map((it) => this.readDir(it))
+        .map((it) => this.readDir(it)),
     );
 
-    return [...fromFiles, ...fromDirs].join("\n\n");
+    return [...fromFiles, ...fromDirs].join('\n\n');
   }
 
   async readFile(filename: string) {
@@ -73,7 +73,7 @@ export class GraphQLReader {
   }
 
   protected async readFileFresh(filename: string) {
-    const document = await readFile(filename, "utf-8");
+    const document = await readFile(filename, 'utf-8');
 
     if (!this.disableParseCheck) this.parseCheck(filename, document);
 
@@ -88,7 +88,7 @@ export class GraphQLReader {
         const firstLocation = err.locations?.[0];
         const location = firstLocation
           ? `:${firstLocation.line}:${firstLocation.column}`
-          : "";
+          : '';
         err.message = `${err.message} at ${filename}${location}`;
       }
 

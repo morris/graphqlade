@@ -1,9 +1,9 @@
-import { Dirent, promises as fsPromises, Stats } from "fs";
-import { join } from "path";
-import type { FileWatcher } from "typescript";
-import { canImportModule } from "./canImportModule";
-import { LoggerLike } from "./LoggerLike";
-import { toError } from "./toError";
+import { Dirent, promises as fsPromises, Stats } from 'fs';
+import { join } from 'path';
+import type { FileWatcher } from 'typescript';
+import { canImportModule } from './canImportModule';
+import { LoggerLike } from './LoggerLike';
+import { toError } from './toError';
 
 const { readdir, stat } = fsPromises;
 
@@ -41,8 +41,8 @@ export async function watchRecursive(options: WatchRecursiveOptions) {
 
         callback(path);
       },
-      false
-    )
+      false,
+    ),
   );
 
   for (const entry of await readdir(dirname, { withFileTypes: true })) {
@@ -73,18 +73,18 @@ export async function watchRecursive(options: WatchRecursiveOptions) {
 }
 
 export async function importWatchFunctions() {
-  if (!canImportModule("typescript")) {
+  if (!canImportModule('typescript')) {
     throw new Error(
-      "Cannot watch files: Could not import package 'typescript'"
+      "Cannot watch files: Could not import package 'typescript'",
     );
   }
 
-  const ts = await import("typescript");
+  const ts = await import('typescript');
   const { watchDirectory, watchFile } = ts.sys;
 
   if (!watchDirectory || !watchFile) {
     throw new Error(
-      "Cannot watch files: ts.sys.watchDirectory/watchFile are undefined"
+      'Cannot watch files: ts.sys.watchDirectory/watchFile are undefined',
     );
   }
 

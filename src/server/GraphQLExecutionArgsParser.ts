@@ -1,5 +1,5 @@
-import { DocumentNode, ExecutionArgs, ParseOptions, parse } from "graphql";
-import { assert, cleanOperations, isRecord, limitDepth } from "../util";
+import { DocumentNode, ExecutionArgs, ParseOptions, parse } from 'graphql';
+import { assert, cleanOperations, isRecord, limitDepth } from '../util';
 
 export interface GraphQLExecutionArgsParserOptions extends ParseOptions {
   cacheSize?: number;
@@ -19,7 +19,7 @@ export interface RawExecutionArgs {
 
 export type ParsedExecutionArgs = Pick<
   ExecutionArgs,
-  "document" | "operationName" | "variableValues"
+  'document' | 'operationName' | 'variableValues'
 >;
 
 /**
@@ -48,7 +48,7 @@ export class GraphQLExecutionArgsParser {
   }
 
   parseQuery(query: unknown): DocumentNode {
-    assert(typeof query === "string", "Invalid query, expected string");
+    assert(typeof query === 'string', 'Invalid query, expected string');
 
     const cached = this.cache.get(query);
 
@@ -82,16 +82,16 @@ export class GraphQLExecutionArgsParser {
 
   parseOperationName(operationName: unknown): string | undefined {
     if (
-      operationName === "" ||
+      operationName === '' ||
       operationName === null ||
-      typeof operationName === "undefined"
+      typeof operationName === 'undefined'
     ) {
       return undefined;
     }
 
     assert(
-      typeof operationName === "string",
-      "Invalid operationName, expected string"
+      typeof operationName === 'string',
+      'Invalid operationName, expected string',
     );
 
     return operationName;
@@ -99,27 +99,27 @@ export class GraphQLExecutionArgsParser {
 
   parseVariables(variables: unknown): Record<string, unknown> | undefined {
     if (
-      variables === "" ||
+      variables === '' ||
       variables === null ||
-      typeof variables === "undefined" ||
-      variables === "null"
+      typeof variables === 'undefined' ||
+      variables === 'null'
     ) {
       return undefined;
     }
 
     let parsed = variables;
 
-    if (typeof parsed === "string") {
+    if (typeof parsed === 'string') {
       try {
         parsed = JSON.parse(parsed);
       } catch (err) {
         throw new TypeError(
-          `Invalid variables, failed to parse JSON: ${(err as Error).message}`
+          `Invalid variables, failed to parse JSON: ${(err as Error).message}`,
         );
       }
     }
 
-    assert(isRecord(parsed), "Invalid variables, expected object");
+    assert(isRecord(parsed), 'Invalid variables, expected object');
 
     return parsed;
   }

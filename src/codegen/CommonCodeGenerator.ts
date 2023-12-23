@@ -14,8 +14,8 @@ import {
   isListType,
   isNonNullType,
   isScalarType,
-} from "graphql";
-import { ImportCodeGenerator } from "./ImportCodeGenerator";
+} from 'graphql';
+import { ImportCodeGenerator } from './ImportCodeGenerator';
 
 export interface CommonCodeGeneratorOptions {
   schema: GraphQLSchema;
@@ -54,18 +54,18 @@ export class CommonCodeGenerator {
       if (isScalarType(type)) {
         this.addTypeMapping({
           gqlType: type.name,
-          tsType: "unknown",
+          tsType: 'unknown',
         });
       }
     }
   }
 
   mapStandardScalars() {
-    this.addTypeMapping({ gqlType: "Int", tsType: "number" });
-    this.addTypeMapping({ gqlType: "Float", tsType: "number" });
-    this.addTypeMapping({ gqlType: "String", tsType: "string" });
-    this.addTypeMapping({ gqlType: "Boolean", tsType: "boolean" });
-    this.addTypeMapping({ gqlType: "ID", tsType: "string" });
+    this.addTypeMapping({ gqlType: 'Int', tsType: 'number' });
+    this.addTypeMapping({ gqlType: 'Float', tsType: 'number' });
+    this.addTypeMapping({ gqlType: 'String', tsType: 'string' });
+    this.addTypeMapping({ gqlType: 'Boolean', tsType: 'boolean' });
+    this.addTypeMapping({ gqlType: 'ID', tsType: 'string' });
   }
 
   addTypeMapping(typeMapping: TypeMapping) {
@@ -93,13 +93,13 @@ export class CommonCodeGenerator {
   // header
 
   generateHeader() {
-    return "/* eslint-disable */";
+    return '/* eslint-disable */';
   }
 
   // helpers
 
   generateHelpers() {
-    return "export type Maybe<T> = T | null | undefined;";
+    return 'export type Maybe<T> = T | null | undefined;';
   }
 
   // directives
@@ -108,7 +108,7 @@ export class CommonCodeGenerator {
     return this.join(
       this.schema
         .getDirectives()
-        .map((node) => this.generateDirectiveInterface(node))
+        .map((node) => this.generateDirectiveInterface(node)),
     );
   }
 
@@ -119,7 +119,7 @@ export class CommonCodeGenerator {
       }`;
     }
 
-    return "";
+    return '';
   }
 
   generateDirectiveInterfaceName(node: GraphQLDirective) {
@@ -131,7 +131,7 @@ export class CommonCodeGenerator {
       ${this.join(
         this.schema
           .getDirectives()
-          .map((it) => this.generateDirectivesMapEntry(it))
+          .map((it) => this.generateDirectivesMapEntry(it)),
       )}
     }`;
   }
@@ -153,15 +153,15 @@ export class CommonCodeGenerator {
       export interface T${node.name} {
         ${this.join(
           Object.values(node.getFields()).map((it) =>
-            this.generateInputField(it)
-          )
+            this.generateInputField(it),
+          ),
         )}
       }`;
   }
 
   generateInputField(node: GraphQLInputField) {
     return `${this.generateFieldDescription(node)}
-      ${node.name}${isNonNullType(node.type) ? "" : "?"}:
+      ${node.name}${isNonNullType(node.type) ? '' : '?'}:
         ${this.generateInputRef(node.type, false)};`;
   }
 
@@ -172,7 +172,7 @@ export class CommonCodeGenerator {
       export enum T${node.name} {
         ${this.join(
           node.getValues().map((it) => this.generateEnumValue(it)),
-          ",\n"
+          ',\n',
         )}
       }`;
   }
@@ -190,7 +190,7 @@ export class CommonCodeGenerator {
     } else if (isListType(node)) {
       return this.generateMaybe(
         `Array<${this.generateOutputRef(node.ofType, true)}>`,
-        optional
+        optional,
       );
     } else {
       return this.generateMaybe(this.generateNamedOutputRef(node), optional);
@@ -211,7 +211,7 @@ export class CommonCodeGenerator {
     } else if (isListType(node)) {
       return this.generateMaybe(
         `Array<${this.generateInputRef(node.ofType)}>`,
-        optional
+        optional,
       );
     } else {
       return this.generateMaybe(this.generateNamedInputRef(node), optional);
@@ -219,7 +219,7 @@ export class CommonCodeGenerator {
   }
 
   generateNamedInputRef(
-    node: GraphQLInputObjectType | GraphQLEnumType | GraphQLScalarType
+    node: GraphQLInputObjectType | GraphQLEnumType | GraphQLScalarType,
   ) {
     const typeMapping = this.typeMap.get(node.name);
 
@@ -235,15 +235,15 @@ export class CommonCodeGenerator {
   // descriptions and comments
 
   generateDescription(node: GraphQLNamedType | GraphQLEnumValue) {
-    return node.description ? this.generateComment(node.description) : "";
+    return node.description ? this.generateComment(node.description) : '';
   }
 
   generateFieldDescription(
-    node: GraphQLField<unknown, unknown> | GraphQLInputField
+    node: GraphQLField<unknown, unknown> | GraphQLInputField,
   ) {
     const t = this.generateTypeForDescription(node.type);
-    const tt = t ? `(${t}) ` : "";
-    const ttt = `${tt}${node.description ?? ""}`;
+    const tt = t ? `(${t}) ` : '';
+    const ttt = `${tt}${node.description ?? ''}`;
 
     return this.generateComment(ttt);
   }
@@ -254,24 +254,24 @@ export class CommonCodeGenerator {
     } else if (isListType(node)) {
       const t = this.generateTypeForDescription(node.ofType);
 
-      return t ? `Array<${t}>` : "";
+      return t ? `Array<${t}>` : '';
     } else {
       if (this.typeMap.has(node.name)) {
         return `${node.name}`;
       } else {
-        return "";
+        return '';
       }
     }
   }
 
   generateComment(text: string) {
     if (text.length === 0) {
-      return "";
+      return '';
     }
 
     const lines = text.split(/\n/g).map((line) => `* ${line}`);
 
-    return `/**\n${lines.join("\n")}\n*/`;
+    return `/**\n${lines.join('\n')}\n*/`;
   }
 
   // helpers
@@ -282,9 +282,9 @@ export class CommonCodeGenerator {
 
   // util
 
-  join(parts: (string | undefined)[], separator = "\n\n", braces?: string) {
+  join(parts: (string | undefined)[], separator = '\n\n', braces?: string) {
     const joined = parts
-      .filter((part) => typeof part === "string" && part.length > 0)
+      .filter((part) => typeof part === 'string' && part.length > 0)
       .join(separator);
 
     if (braces && joined.length > 0) {

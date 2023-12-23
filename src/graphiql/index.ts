@@ -1,1 +1,1 @@
-export * from "./GraphiQL";
+export * from './GraphiQL';

@@ -1,4 +1,4 @@
-import type { ExecutionResult, GraphQLError } from "graphql";
+import type { ExecutionResult, GraphQLError } from 'graphql';
 
 export type GraphQLWebSocketMessage =
   | ConnectionInitMessage
@@ -21,17 +21,17 @@ export type GraphQLWebSocketClientMessage =
   | CompleteMessage;
 
 export interface ConnectionInitMessage {
-  type: "connection_init";
+  type: 'connection_init';
   payload?: Record<string, unknown> | null;
 }
 
 export interface ConnectionAckMessage {
-  type: "connection_ack";
+  type: 'connection_ack';
   payload?: Record<string, unknown> | null;
 }
 
 export interface SubscribeMessage {
-  type: "subscribe";
+  type: 'subscribe';
   id: string;
   payload: {
     query: string;
@@ -41,18 +41,18 @@ export interface SubscribeMessage {
 }
 
 export interface NextMessage {
-  type: "next";
+  type: 'next';
   id: string;
   payload: ExecutionResult<unknown, unknown>;
 }
 
 export interface ErrorMessage {
-  type: "error";
+  type: 'error';
   id: string;
   payload: readonly GraphQLError[];
 }
 
 export interface CompleteMessage {
-  type: "complete";
+  type: 'complete';
   id: string;
 }

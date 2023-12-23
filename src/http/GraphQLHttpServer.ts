@@ -5,22 +5,22 @@ import {
   GraphQLError,
   GraphQLSchema,
   validate,
-} from "graphql";
-import { IncomingHttpHeaders } from "http";
+} from 'graphql';
+import { IncomingHttpHeaders } from 'http';
 import {
   CreateContextFn,
   GraphQLExecutionArgsParser,
   GraphQLExecutionArgsParserOptions,
   ParsedExecutionArgs,
-} from "../server";
-import { assert, isRecord, toError } from "../util";
+} from '../server';
+import { assert, isRecord, toError } from '../util';
 import {
   ExpressNextFunctionLike,
   ExpressRequestLike,
   ExpressResponseLike,
-} from "./express";
-import { KoaContextLike, KoaNextFunctionLike } from "./koa";
-import { MethodNotAllowedError } from "./MethodNotAllowedError";
+} from './express';
+import { KoaContextLike, KoaNextFunctionLike } from './koa';
+import { MethodNotAllowedError } from './MethodNotAllowedError';
 
 export interface GraphQLHttpServerOptions<TContext> {
   /**
@@ -79,14 +79,14 @@ export class GraphQLHttpServer<TContext> {
     return (
       req: ExpressRequestLike,
       res: ExpressResponseLike,
-      next: ExpressNextFunctionLike
+      next: ExpressNextFunctionLike,
     ) => this.handleExpress(req, res, next);
   }
 
   async handleExpress(
     req: ExpressRequestLike,
     res: ExpressResponseLike,
-    next: ExpressNextFunctionLike
+    next: ExpressNextFunctionLike,
   ) {
     try {
       const response = await this.execute({
@@ -131,7 +131,7 @@ export class GraphQLHttpServer<TContext> {
   // execution
 
   async execute(
-    request: GraphQLHttpServerRequest
+    request: GraphQLHttpServerRequest,
   ): Promise<GraphQLHttpServerResponse> {
     try {
       return this.executeParsed(request, this.parse(request));
@@ -144,7 +144,7 @@ export class GraphQLHttpServer<TContext> {
         status = 400;
       }
 
-      if ("status" in err && typeof err.status === "number") {
+      if ('status' in err && typeof err.status === 'number') {
         status = err.status;
       }
 
@@ -160,7 +160,7 @@ export class GraphQLHttpServer<TContext> {
 
   async executeParsed(
     request: GraphQLHttpServerRequest,
-    args: ParsedExecutionArgs
+    args: ParsedExecutionArgs,
   ) {
     const errors = this.validate(request, args);
 
@@ -179,7 +179,7 @@ export class GraphQLHttpServer<TContext> {
 
   async executeValidated(
     request: GraphQLHttpServerRequest,
-    args: ParsedExecutionArgs
+    args: ParsedExecutionArgs,
   ) {
     const contextValue = await this.createContext({ ...request, ...args });
 
@@ -204,11 +204,11 @@ export class GraphQLHttpServer<TContext> {
 
     if (
       operation &&
-      operation.operation === "mutation" &&
-      request.method === "GET"
+      operation.operation === 'mutation' &&
+      request.method === 'GET'
     ) {
       errors.push({
-        message: "Mutations are not allowed via GET",
+        message: 'Mutations are not allowed via GET',
       } as GraphQLError);
     }
 
@@ -219,13 +219,13 @@ export class GraphQLHttpServer<TContext> {
 
   parse(request: GraphQLHttpServerRequest): ParsedExecutionArgs {
     switch (request.method) {
-      case "GET":
+      case 'GET':
         return this.parseGet(request);
-      case "POST":
+      case 'POST':
         return this.parsePost(request);
       default:
         throw new MethodNotAllowedError(
-          `Unsupported method: ${request.method.toUpperCase()}`
+          `Unsupported method: ${request.method.toUpperCase()}`,
         );
     }
   }
@@ -249,7 +249,7 @@ export class GraphQLHttpServer<TContext> {
   }
 
   parseBody(body: unknown) {
-    assert(isRecord(body), "Invalid body, expected object");
+    assert(isRecord(body), 'Invalid body, expected object');
 
     return body;
   }
@@ -262,7 +262,7 @@ export class GraphQLHttpServer<TContext> {
     } else {
       return {
         message:
-          (err as { message?: string })?.message ?? "Internal Server Error",
+          (err as { message?: string })?.message ?? 'Internal Server Error',
       } as GraphQLError;
     }
   }

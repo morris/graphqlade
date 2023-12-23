@@ -1,13 +1,13 @@
 // keep granular imports here for browser build
-import type { ExecutionResult } from "graphql";
-import { AsyncPushIterator } from "../util/AsyncPushIterator";
-import { GraphQLResultError } from "../util/GraphQLResultError";
-import { toError } from "../util/toError";
+import type { ExecutionResult } from 'graphql';
+import { AsyncPushIterator } from '../util/AsyncPushIterator';
+import { GraphQLResultError } from '../util/GraphQLResultError';
+import { toError } from '../util/toError';
 import {
   GraphQLClientWebSocket,
   SubscribePayload,
   WebSocketLike,
-} from "./GraphQLClientWebSocket";
+} from './GraphQLClientWebSocket';
 
 export interface GraphQLWebSocketClientOptions<
   TTypings extends
@@ -85,7 +85,7 @@ export interface GraphQLWebSocketClientTypings {
 
 export type CreateWebSocketFn = (
   url: string,
-  protocol: string
+  protocol: string,
 ) => WebSocketLike;
 
 export class GraphQLWebSocketClient<
@@ -105,16 +105,16 @@ export class GraphQLWebSocketClient<
   protected reconnectDelayMultiplier: number;
   protected reconnectDelay: number;
   protected reconnectDelayPromise?: Promise<void>;
-  protected operations: TTypings["OperationNameToDocument"];
+  protected operations: TTypings['OperationNameToDocument'];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected subscriptions = new Set<AsyncPushIterator<any>>();
 
   constructor(options: GraphQLWebSocketClientOptions<TTypings>) {
     this.url = options.url
-      .replace("https://", "wss://")
-      .replace("http://", "ws://");
-    this.protocol = options.protocol ?? "graphql-transport-ws";
+      .replace('https://', 'wss://')
+      .replace('http://', 'ws://');
+    this.protocol = options.protocol ?? 'graphql-transport-ws';
     this.connectionInitPayload = options.connectionInitPayload;
     this.connectionAckTimeout = options.connectionAckTimeout ?? 3000;
 
@@ -135,15 +135,15 @@ export class GraphQLWebSocketClient<
     this.connectionInitPayload = connectionInitPayload;
   }
 
-  subscribeAsyncNamed<TSubscriptionName extends TTypings["SubscriptionName"]>(
+  subscribeAsyncNamed<TSubscriptionName extends TTypings['SubscriptionName']>(
     operationName: TSubscriptionName,
-    variables: TTypings["OperationNameToVariables"][TSubscriptionName],
+    variables: TTypings['OperationNameToVariables'][TSubscriptionName],
     options: {
       onData: (
-        data: TTypings["OperationNameToData"][TSubscriptionName]
+        data: TTypings['OperationNameToData'][TSubscriptionName],
       ) => unknown;
       onError: (error: Error) => unknown;
-    }
+    },
   ) {
     return this.subscribeAsync(
       {
@@ -151,7 +151,7 @@ export class GraphQLWebSocketClient<
         query: this.operations[operationName],
         variables,
       },
-      options
+      options,
     );
   }
 
@@ -160,7 +160,7 @@ export class GraphQLWebSocketClient<
     options: {
       onData: (data: TData) => unknown;
       onError: (error: Error) => unknown;
-    }
+    },
   ) {
     const iterator = this.subscribe<TData>(payload);
 
@@ -186,11 +186,11 @@ export class GraphQLWebSocketClient<
     };
   }
 
-  subscribeNamed<TSubscriptionName extends TTypings["SubscriptionName"]>(
+  subscribeNamed<TSubscriptionName extends TTypings['SubscriptionName']>(
     operationName: TSubscriptionName,
-    variables: TTypings["OperationNameToVariables"][TSubscriptionName]
+    variables: TTypings['OperationNameToVariables'][TSubscriptionName],
   ) {
-    return this.subscribe<TTypings["OperationNameToData"][TSubscriptionName]>({
+    return this.subscribe<TTypings['OperationNameToData'][TSubscriptionName]>({
       operationName,
       query: this.operations[operationName],
       variables,
@@ -237,7 +237,7 @@ export class GraphQLWebSocketClient<
       subscription.finish();
     }
 
-    this.graphqlSocket?.close(code ?? 1000, reason ?? "Normal Closure");
+    this.graphqlSocket?.close(code ?? 1000, reason ?? 'Normal Closure');
   }
 
   shouldRetry(err: Error & { code?: number }) {
@@ -302,9 +302,9 @@ export class GraphQLWebSocketClient<
       Math.min(
         this.reconnectDelayMultiplier *
           Math.max(this.reconnectDelay, this.minReconnectDelay),
-        this.maxReconnectDelay
+        this.maxReconnectDelay,
       ) +
-        Math.random() * this.minReconnectDelay
+        Math.random() * this.minReconnectDelay,
     );
   }
 }

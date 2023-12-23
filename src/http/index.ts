@@ -1,2 +1,2 @@
-export * from "./GraphQLHttpServer";
-export * from "./MethodNotAllowedError";
+export * from './GraphQLHttpServer';
+export * from './MethodNotAllowedError';

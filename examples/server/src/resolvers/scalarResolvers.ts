@@ -1,24 +1,24 @@
-import { GraphQLScalarType } from "graphql";
-import { GraphQLDate, GraphQLDateTime, GraphQLTime } from "graphql-scalars";
-import { Resolvers } from "../generated/schema";
-import { MyContext } from "../MyContext";
+import { GraphQLScalarType } from 'graphql';
+import { GraphQLDate, GraphQLDateTime, GraphQLTime } from 'graphql-scalars';
+import { Resolvers } from '../generated/schema';
+import { MyContext } from '../MyContext';
 
 export const scalarResolvers: Resolvers<MyContext> = {
   Date: GraphQLDate,
   Time: GraphQLTime,
   DateTime: GraphQLDateTime,
   ESNumber: new GraphQLScalarType<number, number | string>({
-    name: "ESNumber",
+    name: 'ESNumber',
     serialize(value) {
-      if (value === Number.NEGATIVE_INFINITY) return "-Infinity";
-      if (value === Number.POSITIVE_INFINITY) return "Infinity";
-      if (typeof value === "number" && isNaN(value)) return "NaN";
+      if (value === Number.NEGATIVE_INFINITY) return '-Infinity';
+      if (value === Number.POSITIVE_INFINITY) return 'Infinity';
+      if (typeof value === 'number' && isNaN(value)) return 'NaN';
 
-      if (typeof value === "string") {
+      if (typeof value === 'string') {
         return parseFloat(value);
       }
 
-      if (typeof value === "number") {
+      if (typeof value === 'number') {
         return value;
       }
 
@@ -26,18 +26,18 @@ export const scalarResolvers: Resolvers<MyContext> = {
     },
     parseValue(value) {
       switch (value) {
-        case "Infinity":
+        case 'Infinity':
           return Infinity;
-        case "-Infinity":
+        case '-Infinity':
           return -Infinity;
-        case "NaN":
+        case 'NaN':
           return NaN;
         default:
-          if (typeof value === "number") {
+          if (typeof value === 'number') {
             return value;
           }
 
-          if (typeof value === "string") {
+          if (typeof value === 'string') {
             return parseFloat(value);
           }
 

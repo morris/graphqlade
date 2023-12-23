@@ -2,6 +2,7 @@
 
 ## NEXT
 
+- Update formatting
 - Fix compatibility issue with `prettier@3.x` (`format` became async)
 - Update deps
 

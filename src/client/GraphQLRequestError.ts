@@ -1,4 +1,4 @@
-import type { ExecutionResult } from "graphql";
+import type { ExecutionResult } from 'graphql';
 
 export class GraphQLRequestError<
   TData = Record<string, unknown>,
@@ -11,7 +11,7 @@ export class GraphQLRequestError<
     message: string,
     response: Response,
     result?: ExecutionResult<TData>,
-    json?: unknown
+    json?: unknown,
   ) {
     super(message);
 

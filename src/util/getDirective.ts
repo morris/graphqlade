@@ -14,8 +14,8 @@ import {
   ScalarTypeDefinitionNode,
   SchemaDefinitionNode,
   UnionTypeDefinitionNode,
-} from "graphql";
-import { parseDirective } from "./parseDirective";
+} from 'graphql';
+import { parseDirective } from './parseDirective';
 
 export function getDirective<T>(
   node: // ExecutableDirectiveLocation:
@@ -35,7 +35,7 @@ export function getDirective<T>(
     | EnumValueDefinitionNode
     | InputObjectTypeDefinitionNode
     | InputValueDefinitionNode,
-  name: string
+  name: string,
 ): T | undefined {
   const directiveNode = node.directives?.find((it) => it.name.value === name);
 

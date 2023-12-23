@@ -1,10 +1,10 @@
 // keep granular imports here for browser build
-import type { ExecutionResult } from "graphql";
-import { AsyncPushIterator } from "../util/AsyncPushIterator";
-import { DeferredPromise } from "../util/DeferredPromise";
-import { assert } from "../util/assert";
-import { isRecord } from "../util/isRecord";
-import { toError } from "../util/toError";
+import type { ExecutionResult } from 'graphql';
+import { AsyncPushIterator } from '../util/AsyncPushIterator';
+import { DeferredPromise } from '../util/DeferredPromise';
+import { assert } from '../util/assert';
+import { isRecord } from '../util/isRecord';
+import { toError } from '../util/toError';
 import type {
   CompleteMessage,
   ConnectionAckMessage,
@@ -12,7 +12,7 @@ import type {
   GraphQLWebSocketClientMessage,
   NextMessage,
   SubscribeMessage,
-} from "./GraphQLWebSocketMessage";
+} from './GraphQLWebSocketMessage';
 
 export interface GraphQLClientWebSocketOptions {
   socket: WebSocketLike;
@@ -21,10 +21,10 @@ export interface GraphQLClientWebSocketOptions {
 
 export type WebSocketLike = Pick<
   WebSocket,
-  "addEventListener" | "send" | "close" | "readyState" | "OPEN" | "CONNECTING"
+  'addEventListener' | 'send' | 'close' | 'readyState' | 'OPEN' | 'CONNECTING'
 >;
 
-export type SubscribePayload = SubscribeMessage["payload"];
+export type SubscribePayload = SubscribeMessage['payload'];
 
 export class GraphQLClientWebSocket {
   public readonly socket: WebSocketLike;
@@ -46,18 +46,18 @@ export class GraphQLClientWebSocket {
 
   init(connectionInitPayload?: Record<string, unknown>) {
     this.connectionAckWaitTimeoutId = setTimeout(() => {
-      this.close(4408, "Connection acknowledgement timeout");
+      this.close(4408, 'Connection acknowledgement timeout');
     }, this.connectionAckWaitTimeout);
 
     if (this.isOpen()) {
       this.send({
-        type: "connection_init",
+        type: 'connection_init',
         payload: connectionInitPayload,
       });
     } else {
-      this.socket.addEventListener("open", () => {
+      this.socket.addEventListener('open', () => {
         this.send({
-          type: "connection_init",
+          type: 'connection_init',
           payload: connectionInitPayload,
         });
       });
@@ -74,13 +74,13 @@ export class GraphQLClientWebSocket {
       this.subscriptions.set(id, it);
 
       this.send({
-        type: "subscribe",
+        type: 'subscribe',
         id,
         payload,
       });
 
       return () => {
-        this.send({ type: "complete", id });
+        this.send({ type: 'complete', id });
         setTimeout(() => {
           this.subscriptions.delete(id);
         }, 3000);
@@ -96,7 +96,7 @@ export class GraphQLClientWebSocket {
     }
 
     this.connectionAckPayloadPromise.reject(
-      this.makeClosingError(event.code, event.reason)
+      this.makeClosingError(event.code, event.reason),
     );
 
     for (const [, subscription] of this.subscriptions) {
@@ -111,11 +111,11 @@ export class GraphQLClientWebSocket {
     }
 
     this.connectionAckPayloadPromise.reject(
-      this.makeClosingError(-1, "Web socket error")
+      this.makeClosingError(-1, 'Web socket error'),
     );
 
     for (const [, subscription] of this.subscriptions) {
-      subscription.throw(this.makeClosingError(-1, "Web socket error"));
+      subscription.throw(this.makeClosingError(-1, 'Web socket error'));
     }
   }
 
@@ -126,20 +126,20 @@ export class GraphQLClientWebSocket {
       assert(isRecord(message));
 
       switch (message.type) {
-        case "connection_ack":
+        case 'connection_ack':
           this.handleConnectionAckMessage(
-            this.parseConnectionAckMessage(message)
+            this.parseConnectionAckMessage(message),
           );
           break;
-        case "next":
-        case "data": // legacy
+        case 'next':
+        case 'data': // legacy
           this.handleNextMessage(this.parseNextMessage(message));
           break;
-        case "error":
+        case 'error':
           this.handleErrorMessage(this.parseErrorMessage(message));
           break;
-        case "complete":
-        case "stop": // legacy
+        case 'complete':
+        case 'stop': // legacy
           this.handleCompleteMessage(this.parseCompleteMessage(message));
           break;
         default:
@@ -170,8 +170,8 @@ export class GraphQLClientWebSocket {
       new Error(
         `Subscription error: ${message.payload
           .map((it) => it.message)
-          .join(" / ")}`
-      )
+          .join(' / ')}`,
+      ),
     );
   }
 
@@ -182,49 +182,49 @@ export class GraphQLClientWebSocket {
   // message parsers
 
   parseConnectionAckMessage(
-    message: Record<string, unknown>
+    message: Record<string, unknown>,
   ): ConnectionAckMessage {
-    if (typeof message.payload !== "undefined" && message.payload !== null) {
+    if (typeof message.payload !== 'undefined' && message.payload !== null) {
       assert(isRecord(message.payload));
     }
 
     return {
-      type: "connection_ack",
+      type: 'connection_ack',
       payload: message.payload,
     };
   }
 
   parseNextMessage(message: Record<string, unknown>): NextMessage {
-    assert(typeof message.id === "string");
+    assert(typeof message.id === 'string');
     assert(isRecord(message.payload));
 
     return {
-      type: "next",
+      type: 'next',
       id: message.id,
       payload: message.payload,
     };
   }
 
   parseErrorMessage(message: Record<string, unknown>): ErrorMessage {
-    assert(typeof message.id === "string");
+    assert(typeof message.id === 'string');
     assert(Array.isArray(message.payload));
 
     for (const error of message.payload) {
-      assert(typeof error.message === "string");
+      assert(typeof error.message === 'string');
     }
 
     return {
-      type: "error",
+      type: 'error',
       id: message.id,
       payload: message.payload,
     };
   }
 
   parseCompleteMessage(message: Record<string, unknown>): CompleteMessage {
-    assert(typeof message.id === "string");
+    assert(typeof message.id === 'string');
 
     return {
-      type: "complete",
+      type: 'complete',
       id: message.id,
     };
   }
@@ -250,13 +250,13 @@ export class GraphQLClientWebSocket {
   // low-level
 
   protected setup() {
-    this.socket.addEventListener("close", (e) => this.handleCloseEvent(e));
-    this.socket.addEventListener("error", (e) => this.handleErrorEvent(e));
-    this.socket.addEventListener("message", (e) => this.handleMessageEvent(e));
+    this.socket.addEventListener('close', (e) => this.handleCloseEvent(e));
+    this.socket.addEventListener('error', (e) => this.handleErrorEvent(e));
+    this.socket.addEventListener('message', (e) => this.handleMessageEvent(e));
   }
 
   closeByError(err: Error & { code?: number }) {
-    if (typeof err.code === "number") {
+    if (typeof err.code === 'number') {
       this.close(err.code, err.message);
     } else if (err instanceof TypeError) {
       this.close(4400, `Invalid message: ${err.message}`);

@@ -1,11 +1,11 @@
-import { parse, print } from "graphql";
-import { GraphQLExecutionArgsParser } from "../../src";
+import { parse, print } from 'graphql';
+import { GraphQLExecutionArgsParser } from '../../src';
 
-describe("The GraphQLExecutionArgsParser", () => {
-  it("should be able to parse a basic query", async () => {
+describe('The GraphQLExecutionArgsParser', () => {
+  it('should be able to parse a basic query', async () => {
     const gqlExecutionArgsParser = new GraphQLExecutionArgsParser();
 
-    const query = "{ praise }";
+    const query = '{ praise }';
     const args = gqlExecutionArgsParser.parse({ query });
 
     expect(print(args.document)).toEqual(print(parse(query)));
@@ -13,21 +13,21 @@ describe("The GraphQLExecutionArgsParser", () => {
     expect(args.variableValues).toBeUndefined();
   });
 
-  it("should be able to parse a query with variables", async () => {
+  it('should be able to parse a query with variables', async () => {
     const gqlExecutionArgsParser = new GraphQLExecutionArgsParser();
 
-    const query = "query Foo($baz: String!) { foo(bar: $baz) }";
+    const query = 'query Foo($baz: String!) { foo(bar: $baz) }';
     const args = gqlExecutionArgsParser.parse({
       query,
-      variables: { baz: "test" },
+      variables: { baz: 'test' },
     });
 
     expect(print(args.document)).toEqual(print(parse(query)));
     expect(args.operationName).toBeUndefined();
-    expect(args.variableValues).toEqual({ baz: "test" });
+    expect(args.variableValues).toEqual({ baz: 'test' });
   });
 
-  it("should be able to parse a named query with variables", async () => {
+  it('should be able to parse a named query with variables', async () => {
     const gqlExecutionArgsParser = new GraphQLExecutionArgsParser();
 
     const query = `
@@ -36,16 +36,16 @@ describe("The GraphQLExecutionArgsParser", () => {
     `;
     const args = gqlExecutionArgsParser.parse({
       query,
-      variables: { baz: "test" },
-      operationName: "Foo",
+      variables: { baz: 'test' },
+      operationName: 'Foo',
     });
 
     expect(print(args.document)).toEqual(print(parse(query)));
-    expect(args.operationName).toEqual("Foo");
-    expect(args.variableValues).toEqual({ baz: "test" });
+    expect(args.operationName).toEqual('Foo');
+    expect(args.variableValues).toEqual({ baz: 'test' });
   });
 
-  it("should cache parsed documents", async () => {
+  it('should cache parsed documents', async () => {
     const gqlExecutionArgsParser = new GraphQLExecutionArgsParser();
 
     const query = `
@@ -66,15 +66,15 @@ describe("The GraphQLExecutionArgsParser", () => {
     expect(cache.size).toEqual(2);
   });
 
-  it("should release cached documents in an LRU fashion", async () => {
+  it('should release cached documents in an LRU fashion', async () => {
     const gqlExecutionArgsParser = new GraphQLExecutionArgsParser({
       cacheSize: 3,
     });
 
-    const queryA = "{ a }";
-    const queryB = "{ b }";
-    const queryC = "{ c }";
-    const queryD = "{ d }";
+    const queryA = '{ a }';
+    const queryB = '{ b }';
+    const queryC = '{ c }';
+    const queryD = '{ d }';
 
     const cache = gqlExecutionArgsParser.getCache();
     expect(cache.size).toEqual(0);
@@ -100,15 +100,15 @@ describe("The GraphQLExecutionArgsParser", () => {
     expect(cache.get(queryB)).toBeUndefined();
   });
 
-  it("should support setting maxTokens", async () => {
+  it('should support setting maxTokens', async () => {
     const gqlExecutionArgsParser = new GraphQLExecutionArgsParser({
       maxTokens: 3,
     });
 
-    gqlExecutionArgsParser.parse({ query: "{ praise }" });
+    gqlExecutionArgsParser.parse({ query: '{ praise }' });
 
     expect(() =>
-      gqlExecutionArgsParser.parse({ query: "{ dont praise }" })
+      gqlExecutionArgsParser.parse({ query: '{ dont praise }' }),
     ).toThrow();
   });
 });

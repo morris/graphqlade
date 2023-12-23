@@ -1,4 +1,4 @@
-import { DocumentNode, visit } from "graphql";
+import { DocumentNode, visit } from 'graphql';
 
 export function cleanOperations(document: DocumentNode) {
   return visit(document, {

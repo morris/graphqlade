@@ -1,5 +1,5 @@
 export function isAsyncIterator<T>(
-  result: unknown
+  result: unknown,
 ): result is AsyncIterator<T> {
-  return typeof Object(result)[Symbol.asyncIterator] === "function";
+  return typeof Object(result)[Symbol.asyncIterator] === 'function';
 }

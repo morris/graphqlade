@@ -1,1 +1,1 @@
-export * from "./GraphQLIntrospector";
+export * from './GraphQLIntrospector';

@@ -1,1 +1,1 @@
-export * from "./GraphQLReader";
+export * from './GraphQLReader';

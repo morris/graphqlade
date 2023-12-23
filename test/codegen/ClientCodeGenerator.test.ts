@@ -1,18 +1,18 @@
-import { visit } from "graphql";
-import { format } from "prettier";
+import { visit } from 'graphql';
+import { format } from 'prettier';
 import {
   ClientCodeGenerator,
   GraphQLReader,
   NamedOperationDefinitionNode,
   assert,
-} from "../../src";
+} from '../../src';
 
-describe("The ClientCodeGenerator", () => {
+describe('The ClientCodeGenerator', () => {
   const reader = new GraphQLReader();
 
-  it("should uplift __typename from fragment spreads", async () => {
-    const schema = await reader.buildSchemaFromDir("examples/server/schema");
-    const operations = await reader.parseDir("examples/client/operations");
+  it('should uplift __typename from fragment spreads', async () => {
+    const schema = await reader.buildSchemaFromDir('examples/server/schema');
+    const operations = await reader.parseDir('examples/client/operations');
     const generator: ClientCodeGenerator = new ClientCodeGenerator({
       schema,
       operations,
@@ -24,7 +24,7 @@ describe("The ClientCodeGenerator", () => {
       OperationDefinition: (node) => {
         generator.assertNamedOperationDefinition(node);
 
-        if (node.name?.value === "Reviews2") {
+        if (node.name?.value === 'Reviews2') {
           found = node;
         }
       },
@@ -34,8 +34,8 @@ describe("The ClientCodeGenerator", () => {
 
     expect(
       await format(generator.generateOperationDataType(found), {
-        parser: "typescript",
-      })
+        parser: 'typescript',
+      }),
     ).toEqual(`export type DReviews2 = {
   reviews?: Maybe<
     Array<
@@ -51,9 +51,9 @@ describe("The ClientCodeGenerator", () => {
 `);
   });
 
-  it("should uplift __typename from inline fragments", async () => {
-    const schema = await reader.buildSchemaFromDir("examples/server/schema");
-    const operations = await reader.parseDir("examples/client/operations");
+  it('should uplift __typename from inline fragments', async () => {
+    const schema = await reader.buildSchemaFromDir('examples/server/schema');
+    const operations = await reader.parseDir('examples/client/operations');
     const generator: ClientCodeGenerator = new ClientCodeGenerator({
       schema,
       operations,
@@ -65,7 +65,7 @@ describe("The ClientCodeGenerator", () => {
       OperationDefinition: (node) => {
         generator.assertNamedOperationDefinition(node);
 
-        if (node.name?.value === "Reviews3") {
+        if (node.name?.value === 'Reviews3') {
           found = node;
         }
       },
@@ -75,8 +75,8 @@ describe("The ClientCodeGenerator", () => {
 
     expect(
       await format(generator.generateOperationDataType(found), {
-        parser: "typescript",
-      })
+        parser: 'typescript',
+      }),
     ).toEqual(`export type DReviews3 = {
   reviews?: Maybe<
     Array<
@@ -98,9 +98,9 @@ describe("The ClientCodeGenerator", () => {
 `);
   });
 
-  it("should not uplift __typename if it is not requested", async () => {
-    const schema = await reader.buildSchemaFromDir("examples/server/schema");
-    const operations = await reader.parseDir("examples/client/operations");
+  it('should not uplift __typename if it is not requested', async () => {
+    const schema = await reader.buildSchemaFromDir('examples/server/schema');
+    const operations = await reader.parseDir('examples/client/operations');
     const generator: ClientCodeGenerator = new ClientCodeGenerator({
       schema,
       operations,
@@ -112,7 +112,7 @@ describe("The ClientCodeGenerator", () => {
       OperationDefinition: (node) => {
         generator.assertNamedOperationDefinition(node);
 
-        if (node.name?.value === "Reviews4") {
+        if (node.name?.value === 'Reviews4') {
           found = node;
         }
       },
@@ -122,8 +122,8 @@ describe("The ClientCodeGenerator", () => {
 
     expect(
       await format(generator.generateOperationDataType(found), {
-        parser: "typescript",
-      })
+        parser: 'typescript',
+      }),
     ).toEqual(`export type DReviews4 = {
   reviews?: Maybe<
     Array<
@@ -141,9 +141,9 @@ describe("The ClientCodeGenerator", () => {
 `);
   });
 
-  it("should only uplift __typename for possible types where it is requested", async () => {
-    const schema = await reader.buildSchemaFromDir("examples/server/schema");
-    const operations = await reader.parseDir("examples/client/operations");
+  it('should only uplift __typename for possible types where it is requested', async () => {
+    const schema = await reader.buildSchemaFromDir('examples/server/schema');
+    const operations = await reader.parseDir('examples/client/operations');
     const generator: ClientCodeGenerator = new ClientCodeGenerator({
       schema,
       operations,
@@ -155,7 +155,7 @@ describe("The ClientCodeGenerator", () => {
       OperationDefinition: (node) => {
         generator.assertNamedOperationDefinition(node);
 
-        if (node.name?.value === "Reviews5") {
+        if (node.name?.value === 'Reviews5') {
           found = node;
         }
       },
@@ -165,8 +165,8 @@ describe("The ClientCodeGenerator", () => {
 
     expect(
       await format(generator.generateOperationDataType(found), {
-        parser: "typescript",
-      })
+        parser: 'typescript',
+      }),
     ).toEqual(`export type DReviews5 = {
   reviews?: Maybe<
     Array<

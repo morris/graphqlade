@@ -3,22 +3,22 @@ import {
   GraphQLFieldResolver,
   GraphQLSchema,
   isSchema,
-} from "graphql";
-import { IncomingHttpHeaders } from "http";
-import { join } from "path";
-import { GraphQLHttpServer, GraphQLHttpServerOptions } from "../http";
-import { GraphQLReader } from "../read";
-import { GraphQLWebSocketServer, GraphQLWebSocketServerOptions } from "../ws";
+} from 'graphql';
+import { IncomingHttpHeaders } from 'http';
+import { join } from 'path';
+import { GraphQLHttpServer, GraphQLHttpServerOptions } from '../http';
+import { GraphQLReader } from '../read';
+import { GraphQLWebSocketServer, GraphQLWebSocketServerOptions } from '../ws';
 import {
   GraphQLExecutionArgsParser,
   GraphQLExecutionArgsParserOptions,
   ParsedExecutionArgs,
-} from "./GraphQLExecutionArgsParser";
+} from './GraphQLExecutionArgsParser';
 import {
   GraphQLSchemaManager,
   ResolverErrorHandler,
   ResolversInput,
-} from "./GraphQLSchemaManager";
+} from './GraphQLSchemaManager';
 
 export type GraphQLServerOptions<TContext> =
   GraphQLHttpServerOptions<TContext> &
@@ -33,7 +33,7 @@ export type GraphQLServerOptions<TContext> =
     };
 
 export interface GraphQLServerBootstrapOptions<TContext>
-  extends Omit<GraphQLServerOptions<TContext>, "schema"> {
+  extends Omit<GraphQLServerOptions<TContext>, 'schema'> {
   /**
    * Path to root directory for code generation.
    * It's recommended to use a root relative to __dirname.
@@ -82,7 +82,7 @@ export interface CreateContextFnOptions extends ParsedExecutionArgs {
 }
 
 export type CreateContextFn<TContext> = (
-  options: CreateContextFnOptions
+  options: CreateContextFnOptions,
 ) => TContext | Promise<TContext>;
 
 export class GraphQLServer<TContext> extends GraphQLSchemaManager<TContext> {
@@ -98,11 +98,11 @@ export class GraphQLServer<TContext> extends GraphQLSchemaManager<TContext> {
   }
 
   static async bootstrap<TContext>(
-    options: GraphQLServerBootstrapOptions<TContext>
+    options: GraphQLServerBootstrapOptions<TContext>,
   ) {
     const reader =
       options.reader ?? new GraphQLReader({ disableCaching: true });
-    const root = options.root ?? "";
+    const root = options.root ?? '';
 
     let sdl: string | undefined;
     let schema: GraphQLSchema;
@@ -110,7 +110,7 @@ export class GraphQLServer<TContext> extends GraphQLSchemaManager<TContext> {
     if (isSchema(options.schema)) {
       schema = options.schema;
     } else {
-      sdl = await reader.readDir(join(root, options.schema ?? "schema"));
+      sdl = await reader.readDir(join(root, options.schema ?? 'schema'));
       schema = buildSchema(sdl);
     }
 

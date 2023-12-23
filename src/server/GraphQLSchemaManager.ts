@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash } from 'crypto';
 import {
   assertScalarType,
   defaultFieldResolver,
@@ -18,8 +18,8 @@ import {
   isObjectType,
   isScalarType,
   isUnionType,
-} from "graphql";
-import { assert, defined, isRecord, mergeResolvers, toError } from "../util";
+} from 'graphql';
+import { assert, defined, isRecord, mergeResolvers, toError } from '../util';
 
 export type ResolversInput<TContext> =
   | AnyResolvers<TContext>
@@ -73,7 +73,7 @@ export type ResolverErrorHandler<TContext> = (
   data: unknown,
   args: unknown,
   context: TContext,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
 ) => Error | undefined | void;
 
 export class GraphQLSchemaManager<TContext> {
@@ -86,10 +86,10 @@ export class GraphQLSchemaManager<TContext> {
   // default resolvers
 
   setDefaultFieldResolver(
-    defaultFieldResolver: GraphQLFieldResolver<unknown, TContext>
+    defaultFieldResolver: GraphQLFieldResolver<unknown, TContext>,
   ) {
     for (const type of Object.values(this.schema.getTypeMap())) {
-      if (type.name.startsWith("__")) continue;
+      if (type.name.startsWith('__')) continue;
 
       this.setDefaultFieldResolverToType(type, defaultFieldResolver);
     }
@@ -99,11 +99,11 @@ export class GraphQLSchemaManager<TContext> {
 
   protected setDefaultFieldResolverToType(
     type: GraphQLNamedType,
-    defaultFieldResolver: GraphQLFieldResolver<unknown, TContext>
+    defaultFieldResolver: GraphQLFieldResolver<unknown, TContext>,
   ) {
     if (isObjectType(type) || isInterfaceType(type)) {
       for (const field of Object.values(type.getFields())) {
-        if (field.name.startsWith("__")) continue;
+        if (field.name.startsWith('__')) continue;
 
         if (!field.resolve) field.resolve = defaultFieldResolver;
       }
@@ -111,7 +111,7 @@ export class GraphQLSchemaManager<TContext> {
   }
 
   protected setSdlResolvers(sdl: string) {
-    const sdlVersion = createHash("sha1").update(sdl).digest("hex");
+    const sdlVersion = createHash('sha1').update(sdl).digest('hex');
 
     this.setResolvers({
       Query: {
@@ -137,16 +137,16 @@ export class GraphQLSchemaManager<TContext> {
 
   setResolversWithoutInheritance(resolvers: ResolversInput<TContext>) {
     const mergedResolvers = mergeResolvers(
-      resolvers
+      resolvers,
     ) as CustomResolvers<TContext>;
 
     for (const typeName of Object.keys(mergedResolvers)) {
       this.setResolversToType(
         defined(
           this.schema.getType(typeName),
-          `Cannot set resolver for undefined type ${typeName}`
+          `Cannot set resolver for undefined type ${typeName}`,
         ),
-        mergedResolvers[typeName]
+        mergedResolvers[typeName],
       );
     }
 
@@ -155,22 +155,22 @@ export class GraphQLSchemaManager<TContext> {
 
   protected setResolversToType(
     type: GraphQLNamedType,
-    resolver: TypeResolver<unknown, TContext>
+    resolver: TypeResolver<unknown, TContext>,
   ) {
     if (isObjectType(type)) {
       this.setResolversToObjectType(
         type,
-        resolver as ObjectResolver<unknown, TContext>
+        resolver as ObjectResolver<unknown, TContext>,
       );
     } else if (isInterfaceType(type)) {
       this.setResolversToInterfaceType(
         type,
-        resolver as InterfaceResolver<unknown, TContext>
+        resolver as InterfaceResolver<unknown, TContext>,
       );
     } else if (isUnionType(type)) {
       this.setResolversToUnionType(
         type,
-        resolver as UnionResolver<unknown, TContext>
+        resolver as UnionResolver<unknown, TContext>,
       );
     } else if (isEnumType(type)) {
       if (!isEnumType(resolver)) assert(isRecord(resolver));
@@ -185,7 +185,7 @@ export class GraphQLSchemaManager<TContext> {
 
   protected setResolversToObjectType(
     type: GraphQLObjectType<unknown, TContext>,
-    resolver: ObjectResolver<unknown, TContext>
+    resolver: ObjectResolver<unknown, TContext>,
   ) {
     if (resolver.__isTypeOf) {
       type.isTypeOf = resolver.__isTypeOf;
@@ -196,7 +196,7 @@ export class GraphQLSchemaManager<TContext> {
 
   protected setResolversToInterfaceType(
     type: GraphQLInterfaceType,
-    resolver: InterfaceResolver<unknown, TContext>
+    resolver: InterfaceResolver<unknown, TContext>,
   ) {
     if (resolver.__resolveType) {
       type.resolveType = resolver.__resolveType;
@@ -209,19 +209,19 @@ export class GraphQLSchemaManager<TContext> {
     type: GraphQLObjectType<unknown, TContext> | GraphQLInterfaceType,
     resolver:
       | ObjectResolver<unknown, TContext>
-      | InterfaceResolver<unknown, TContext>
+      | InterfaceResolver<unknown, TContext>,
   ) {
     for (const fieldName of Object.keys(resolver)) {
-      if (fieldName.startsWith("__")) continue;
+      if (fieldName.startsWith('__')) continue;
 
       const fields = type.getFields();
       const field = defined(
         fields[fieldName],
-        `Cannot set field resolver for undefined field ${type.name}.${fieldName}`
+        `Cannot set field resolver for undefined field ${type.name}.${fieldName}`,
       );
 
       const resolveOrSubscribe =
-        type === this.schema.getSubscriptionType() ? "subscribe" : "resolve";
+        type === this.schema.getSubscriptionType() ? 'subscribe' : 'resolve';
 
       field[resolveOrSubscribe] = resolver[fieldName] as GraphQLFieldResolver<
         unknown,
@@ -232,14 +232,14 @@ export class GraphQLSchemaManager<TContext> {
 
   protected setResolversToUnionType(
     type: GraphQLUnionType,
-    resolver: UnionResolver<unknown, TContext>
+    resolver: UnionResolver<unknown, TContext>,
   ) {
     type.resolveType = resolver.__resolveType ?? type.resolveType;
   }
 
   protected setResolversToEnumType(
     type: GraphQLEnumType,
-    resolver: GraphQLEnumType | Record<string, unknown>
+    resolver: GraphQLEnumType | Record<string, unknown>,
   ) {
     let newEnumType: GraphQLEnumType;
 
@@ -262,7 +262,7 @@ export class GraphQLSchemaManager<TContext> {
 
   protected setResolversToScalarType(
     type: GraphQLScalarType,
-    resolver: GraphQLScalarType
+    resolver: GraphQLScalarType,
   ) {
     type.parseLiteral = resolver.parseLiteral ?? type.parseLiteral;
     type.parseValue = resolver.parseValue ?? type.parseLiteral;
@@ -273,16 +273,16 @@ export class GraphQLSchemaManager<TContext> {
 
   setInheritedResolvers(resolvers: ResolversInput<TContext>) {
     const mergedResolvers = mergeResolvers(
-      resolvers
+      resolvers,
     ) as CustomResolvers<TContext>;
 
     for (const typeName of Object.keys(mergedResolvers)) {
       this.setInheritedResolversToType(
         defined(
           this.schema.getType(typeName),
-          `Cannot set resolver for undefined type ${typeName}`
+          `Cannot set resolver for undefined type ${typeName}`,
         ),
-        mergedResolvers
+        mergedResolvers,
       );
     }
 
@@ -291,7 +291,7 @@ export class GraphQLSchemaManager<TContext> {
 
   protected setInheritedResolversToType(
     type: GraphQLNamedType,
-    resolvers: AnyResolvers<TContext>
+    resolvers: AnyResolvers<TContext>,
   ) {
     if (!isObjectType(type) && !isInterfaceType(type)) return;
 
@@ -308,7 +308,7 @@ export class GraphQLSchemaManager<TContext> {
 
   setResolverErrorHandler(handler: ResolverErrorHandler<TContext>) {
     for (const type of Object.values(this.schema.getTypeMap())) {
-      if (type.name.startsWith("__")) continue;
+      if (type.name.startsWith('__')) continue;
 
       this.setResolverErrorHandlerOnType(type, handler);
     }
@@ -318,7 +318,7 @@ export class GraphQLSchemaManager<TContext> {
 
   protected setResolverErrorHandlerOnType(
     type: GraphQLNamedType,
-    handler: ResolverErrorHandler<TContext>
+    handler: ResolverErrorHandler<TContext>,
   ) {
     if (isObjectType(type) || isInterfaceType(type)) {
       for (const field of Object.values(type.getFields())) {
@@ -332,7 +332,7 @@ export class GraphQLSchemaManager<TContext> {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const result: any = originalResolve(data, args, context, info);
 
-            if (typeof result?.catch === "function") {
+            if (typeof result?.catch === 'function') {
               return result.catch((err: unknown) => {
                 const newErr = handler(toError(err), data, args, context, info);
 

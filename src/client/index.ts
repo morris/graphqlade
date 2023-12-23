@@ -1,2 +1,2 @@
-export * from "./GraphQLClient";
-export * from "./GraphQLRequestError";
+export * from './GraphQLClient';
+export * from './GraphQLRequestError';

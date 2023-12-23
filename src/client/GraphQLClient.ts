@@ -1,7 +1,7 @@
 // keep granular imports here for browser build
-import type { ExecutionResult, GraphQLError } from "graphql";
-import { toError } from "../util/toError";
-import { GraphQLRequestError } from "./GraphQLRequestError";
+import type { ExecutionResult, GraphQLError } from 'graphql';
+import { toError } from '../util/toError';
+import { GraphQLRequestError } from './GraphQLRequestError';
 
 export interface GraphQLClientOptions<TTypings extends GraphQLClientTypings> {
   url: string;
@@ -28,7 +28,7 @@ export interface GraphQLRequestOptions extends GraphQLRequestInit {
 
 export type GraphQLRequestInit = Omit<
   RequestInit,
-  "headers" | "body" | "method"
+  'headers' | 'body' | 'method'
 > & {
   headers?: Record<string, string>;
   errorFilter?: (err: GraphQLError) => boolean;
@@ -40,7 +40,7 @@ export class GraphQLClient<
   protected url: string;
   protected fetch: typeof fetch;
   protected init: GraphQLRequestInit;
-  protected operations: TTypings["OperationNameToDocument"];
+  protected operations: TTypings['OperationNameToDocument'];
 
   constructor(options: GraphQLClientOptions<TTypings>) {
     this.url = options.url;
@@ -54,13 +54,13 @@ export class GraphQLClient<
   }
 
   async postNamed<
-    TOperationName extends TTypings["QueryName"] | TTypings["MutationName"],
+    TOperationName extends TTypings['QueryName'] | TTypings['MutationName'],
   >(
     operationName: TOperationName,
-    variables: TTypings["OperationNameToVariables"][TOperationName],
-    init?: GraphQLRequestInit
+    variables: TTypings['OperationNameToVariables'][TOperationName],
+    init?: GraphQLRequestInit,
   ) {
-    return this.post<TTypings["OperationNameToData"][TOperationName]>({
+    return this.post<TTypings['OperationNameToData'][TOperationName]>({
       ...init,
       query: this.operations[operationName],
       operationName,
@@ -79,10 +79,10 @@ export class GraphQLClient<
     const response = await fetch(this.url, {
       ...this.init,
       ...init,
-      method: "POST",
+      method: 'POST',
       headers: {
-        accept: "application/json",
-        "content-type": "application/json",
+        accept: 'application/json',
+        'content-type': 'application/json',
         ...this.init?.headers,
         ...headers,
       },
@@ -94,7 +94,7 @@ export class GraphQLClient<
 
   async parseResponse<TData>(response: Response, init?: GraphQLRequestInit) {
     const suffix = response.ok
-      ? ""
+      ? ''
       : ` (${response.status} ${response.statusText})`;
 
     let result: ExecutionResult<TData>;
@@ -104,7 +104,7 @@ export class GraphQLClient<
     } catch (err) {
       throw new GraphQLRequestError(
         `Not a GraphQL response: ${toError(err).message}${suffix}`,
-        response
+        response,
       );
     }
 
@@ -113,7 +113,7 @@ export class GraphQLClient<
         `Not a GraphQL response${suffix}`,
         response,
         undefined,
-        result
+        result,
       );
     }
 
@@ -128,9 +128,9 @@ export class GraphQLClient<
         throw new GraphQLRequestError(
           `GraphQL error(s): ${errors
             .map((err) => err.message)
-            .join("; ")}${suffix}`,
+            .join('; ')}${suffix}`,
           response,
-          result
+          result,
         );
       }
     }
@@ -140,7 +140,7 @@ export class GraphQLClient<
 
   isResult(json: unknown) {
     return (
-      json && typeof json === "object" && ("data" in json || "errors" in json)
+      json && typeof json === 'object' && ('data' in json || 'errors' in json)
     );
   }
 }

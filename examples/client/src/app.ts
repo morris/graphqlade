@@ -1,4 +1,4 @@
-import { GraphQLClient, GraphQLWebSocketClient } from "graphqlade/dist/browser";
+import { GraphQLClient, GraphQLWebSocketClient } from 'graphqlade/dist/browser';
 import {
   DBosses,
   DLocations,
@@ -8,7 +8,7 @@ import {
   TRating,
   typeRef,
   typings,
-} from "./generated/operations";
+} from './generated/operations';
 
 export interface AppState {
   bossData?: Maybe<DBosses>;
@@ -64,31 +64,31 @@ export function App(el: Element) {
   `;
 
   const client = new GraphQLClient({
-    url: "http://localhost:4000/graphql",
+    url: 'http://localhost:4000/graphql',
     typings,
   });
 
   const socketClient = new GraphQLWebSocketClient({
-    url: "ws://localhost:4000/graphql",
+    url: 'ws://localhost:4000/graphql',
     typings,
     connectionInitPayload: {
-      keys: ["MASTER_KEY"],
+      keys: ['MASTER_KEY'],
     },
   });
 
   client
-    .postNamed("Bosses", undefined)
+    .postNamed('Bosses', undefined)
     .then((x) => update({ bossData: x.data }));
   client
-    .postNamed("Locations", {})
+    .postNamed('Locations', {})
     .then((x) => update({ locationData: x.data }));
   client
-    .postNamed("Reviews", undefined)
+    .postNamed('Reviews', undefined)
     .then((x) => update({ reviewData: x.data }));
 
-  client.postNamed("Reviews2", undefined).then((x) => {
+  client.postNamed('Reviews2', undefined).then((x) => {
     for (const review of x.data?.reviews ?? []) {
-      if (review.__typename === "BossReview") {
+      if (review.__typename === 'BossReview') {
         // eslint-disable-next-line no-console
         console.log(review.boss);
         break;
@@ -96,9 +96,9 @@ export function App(el: Element) {
     }
   });
 
-  client.postNamed("Reviews3", undefined).then((x) => {
+  client.postNamed('Reviews3', undefined).then((x) => {
     for (const review of x.data?.reviews ?? []) {
-      if (review.__typename === "BossReview") {
+      if (review.__typename === 'BossReview') {
         // eslint-disable-next-line no-console
         console.log(review.boss);
         break;
@@ -109,8 +109,8 @@ export function App(el: Element) {
   setTimeout(async () => {
     try {
       for await (const review of socketClient.subscribeNamed(
-        "NewReviews",
-        {}
+        'NewReviews',
+        {},
       )) {
         if (review.data?.newReview) {
           state.reviewData?.reviews?.push(review.data?.newReview);
@@ -124,17 +124,17 @@ export function App(el: Element) {
   }, 100);
 
   el
-    .querySelector<HTMLFormElement>(".add-review")
-    ?.addEventListener("submit", (e) => {
+    .querySelector<HTMLFormElement>('.add-review')
+    ?.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      client.postNamed("CreateBossReview", {
+      client.postNamed('CreateBossReview', {
         input: {
-          bossId: el.querySelector<HTMLSelectElement>("[name=bossId]")
+          bossId: el.querySelector<HTMLSelectElement>('[name=bossId]')
             ?.value as string,
-          difficulty: el.querySelector<HTMLSelectElement>("[name=difficulty]")
+          difficulty: el.querySelector<HTMLSelectElement>('[name=difficulty]')
             ?.value as TDifficulty,
-          theme: el.querySelector<HTMLSelectElement>("[name=theme]")
+          theme: el.querySelector<HTMLSelectElement>('[name=theme]')
             ?.value as TRating,
         },
       });
@@ -143,25 +143,25 @@ export function App(el: Element) {
   function update(next: Partial<AppState>) {
     Object.assign(state, next);
 
-    el.querySelectorAll<HTMLElement>("[name=bossId]").forEach((el) => {
+    el.querySelectorAll<HTMLElement>('[name=bossId]').forEach((el) => {
       el.innerHTML =
-        state.bossData?.bosses?.map(renderBossOption).join("") ?? "";
+        state.bossData?.bosses?.map(renderBossOption).join('') ?? '';
     });
 
-    el.querySelectorAll<HTMLElement>(".bosses").forEach((el) => {
+    el.querySelectorAll<HTMLElement>('.bosses').forEach((el) => {
       el.innerHTML =
-        state.bossData?.bosses?.map(renderBoss).join("") ?? "Loading...";
+        state.bossData?.bosses?.map(renderBoss).join('') ?? 'Loading...';
     });
 
-    el.querySelectorAll<HTMLElement>(".locations").forEach((el) => {
+    el.querySelectorAll<HTMLElement>('.locations').forEach((el) => {
       el.innerHTML =
-        state.locationData?.locations?.map(renderLocation).join("") ??
-        "Loading...";
+        state.locationData?.locations?.map(renderLocation).join('') ??
+        'Loading...';
     });
 
-    el.querySelectorAll<HTMLElement>(".reviews").forEach((el) => {
+    el.querySelectorAll<HTMLElement>('.reviews').forEach((el) => {
       el.innerHTML =
-        state.reviewData?.reviews?.map(renderReview).join("") ?? "Loading...";
+        state.reviewData?.reviews?.map(renderReview).join('') ?? 'Loading...';
     });
   }
 
@@ -185,10 +185,10 @@ export function App(el: Element) {
   }
 
   function renderReview(data: typeof Review) {
-    const author = data.author ?? "<em>anonymous</em>";
+    const author = data.author ?? '<em>anonymous</em>';
 
     switch (data.__typename) {
-      case "BossReview":
+      case 'BossReview':
         return `<div>
           <h3>Boss Review on ${data.boss.name} by ${author}</h3>
           <h6>${data.createdAt}</h6>
@@ -199,7 +199,7 @@ export function App(el: Element) {
             <dd>${data.theme}</dd>
           </dl>
         </div>`;
-      case "LocationReview":
+      case 'LocationReview':
         return `<div>
           <h3>Location Review on ${data.location.name} by ${author}</h3>
           <h6>${data.createdAt}</h6>

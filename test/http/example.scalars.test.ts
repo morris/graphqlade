@@ -1,17 +1,17 @@
-import { MyContext } from "../../examples/server/src/MyContext";
-import { GraphQLServer } from "../../src";
-import { bootstrapExample } from "../util";
+import { MyContext } from '../../examples/server/src/MyContext';
+import { GraphQLServer } from '../../src';
+import { bootstrapExample } from '../util';
 
-describe("The example server", () => {
+describe('The example server', () => {
   let gqlServer: GraphQLServer<MyContext>;
 
   beforeAll(async () => {
     gqlServer = await bootstrapExample();
   });
 
-  it("should support custom scalar parsing and serialization", async () => {
+  it('should support custom scalar parsing and serialization', async () => {
     const response = await gqlServer.http.execute({
-      method: "POST",
+      method: 'POST',
       headers: {},
       body: {
         query: `{
@@ -33,17 +33,17 @@ describe("The example server", () => {
           zero: { input: 0, result: true },
           one: { input: 1, result: true },
           minusOne: { input: -1, result: true },
-          infinity: { input: "Infinity", result: false },
-          negativeInfinity: { input: "-Infinity", result: false },
-          nan: { input: "NaN", result: false },
+          infinity: { input: 'Infinity', result: false },
+          negativeInfinity: { input: '-Infinity', result: false },
+          nan: { input: 'NaN', result: false },
         },
       },
     });
   });
 
-  it("should support custom scalar parsing and serialization (2)", async () => {
+  it('should support custom scalar parsing and serialization (2)', async () => {
     const response = await gqlServer.http.execute({
-      method: "POST",
+      method: 'POST',
       headers: {},
       body: {
         query: `{
@@ -58,8 +58,8 @@ describe("The example server", () => {
       headers: {},
       body: {
         data: {
-          infinity: "Infinity",
-          negativeInfinity: "-Infinity",
+          infinity: 'Infinity',
+          negativeInfinity: '-Infinity',
         },
       },
     });

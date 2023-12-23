@@ -1,11 +1,11 @@
-import EventEmitter from "events";
-import { Server } from "http";
-import WebSocket from "ws";
-import { MyContext } from "../examples/server/src/MyContext";
-import { main } from "../examples/server/src/main";
-import { resolvers } from "../examples/server/src/resolvers";
-import { GraphQLServer, assert } from "../src";
-import { LoggerLike } from "../src/util/LoggerLike";
+import EventEmitter from 'events';
+import { Server } from 'http';
+import WebSocket from 'ws';
+import { MyContext } from '../examples/server/src/MyContext';
+import { main } from '../examples/server/src/main';
+import { resolvers } from '../examples/server/src/resolvers';
+import { GraphQLServer, assert } from '../src';
+import { LoggerLike } from '../src/util/LoggerLike';
 
 export function bootstrapExample() {
   return GraphQLServer.bootstrap<MyContext>({
@@ -25,21 +25,21 @@ export function requireExampleServer(env?: NodeJS.ProcessEnv) {
   let server: Server;
 
   beforeAll(async () => {
-    ({ server } = await main({ PORT: "4999", ...env }));
+    ({ server } = await main({ PORT: '4999', ...env }));
   });
 
   afterAll(async () => {
     if (!server) return;
 
     return new Promise<void>((resolve, reject) =>
-      server.close((err) => (err ? reject(err) : resolve()))
+      server.close((err) => (err ? reject(err) : resolve())),
     );
   });
 }
 
 export function wsClosed(socket: WebSocket): Promise<[number, string]> {
   return new Promise((resolve) => {
-    socket.on("close", (code, reason) => {
+    socket.on('close', (code, reason) => {
       resolve([code, reason.toString()]);
     });
   });
@@ -73,7 +73,7 @@ export function mockFetchJson(json: unknown, rest?: Partial<Response>) {
 
 export function mockFetch(response: Partial<Response>) {
   return async () => {
-    return { ok: true, status: 200, statusText: "OK", ...response } as Response;
+    return { ok: true, status: 200, statusText: 'OK', ...response } as Response;
   };
 }
 
@@ -81,7 +81,7 @@ export function mockJsonResponse(json: unknown, rest?: Partial<Response>) {
   return {
     ok: true,
     status: 200,
-    statusText: "OK",
+    statusText: 'OK',
     ...rest,
     async json() {
       return json;

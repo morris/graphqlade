@@ -4,8 +4,8 @@ import {
   GraphQLResolveInfo,
   GraphQLEnumType,
   GraphQLScalarType,
-} from "graphql";
-import { BossData, LocationData, ReviewData } from "../types";
+} from 'graphql';
+import { BossData, LocationData, ReviewData } from '../types';
 
 export type AsyncResult<T> = T | Promise<T>;
 export type Maybe<T> = T | null | undefined;
@@ -87,7 +87,7 @@ export interface RMutation<TContext> {
   __isTypeOf?: (
     source: TMutation,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (Boolean)
@@ -96,7 +96,7 @@ export interface RMutation<TContext> {
     source: TMutation,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<boolean>>;
 
   /**
@@ -106,7 +106,7 @@ export interface RMutation<TContext> {
     source: TMutation,
     args: MutationCreateBossReviewArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<ReviewData>>;
 
   /**
@@ -116,7 +116,7 @@ export interface RMutation<TContext> {
     source: TMutation,
     args: MutationCreateLocationReviewArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<ReviewData>>;
 }
 
@@ -124,7 +124,7 @@ export interface RQuery<TContext> {
   __isTypeOf?: (
     source: TQuery,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (String)
@@ -133,7 +133,7 @@ export interface RQuery<TContext> {
     source: TQuery,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -143,7 +143,7 @@ export interface RQuery<TContext> {
     source: TQuery,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<BossData>>>;
 
   /**
@@ -153,7 +153,7 @@ export interface RQuery<TContext> {
     source: TQuery,
     args: QueryBossArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<BossData>>;
 
   /**
@@ -163,7 +163,7 @@ export interface RQuery<TContext> {
     source: TQuery,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<LocationData>>>;
 
   /**
@@ -173,7 +173,7 @@ export interface RQuery<TContext> {
     source: TQuery,
     args: QueryLocationArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<LocationData>>;
 
   /**
@@ -183,21 +183,21 @@ export interface RQuery<TContext> {
     source: TQuery,
     args: QueryReviewsArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<ReviewData>>>;
 
   search?: (
     source: TQuery,
     args: QuerySearchArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<TSearchResult>>>;
 
   isFinite?: (
     source: TQuery,
     args: QueryIsFiniteArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<TIsFiniteResult>>;
 
   /**
@@ -207,7 +207,7 @@ export interface RQuery<TContext> {
     source: TQuery,
     args: QueryDivideArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<number>>;
 
   /**
@@ -217,7 +217,7 @@ export interface RQuery<TContext> {
     source: TQuery,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -227,7 +227,7 @@ export interface RQuery<TContext> {
     source: TQuery,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 }
 
@@ -235,7 +235,7 @@ export interface RBoss<TContext> {
   __isTypeOf?: (
     source: BossData,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (ID)
@@ -244,7 +244,7 @@ export interface RBoss<TContext> {
     source: BossData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -254,7 +254,7 @@ export interface RBoss<TContext> {
     source: BossData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -264,7 +264,7 @@ export interface RBoss<TContext> {
     source: BossData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<boolean>;
 
   /**
@@ -274,7 +274,7 @@ export interface RBoss<TContext> {
     source: BossData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<LocationData>;
 
   /**
@@ -284,7 +284,7 @@ export interface RBoss<TContext> {
     source: BossData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<ReviewData>>>;
 }
 
@@ -292,7 +292,7 @@ export interface RLocation<TContext> {
   __isTypeOf?: (
     source: LocationData,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (ID)
@@ -301,7 +301,7 @@ export interface RLocation<TContext> {
     source: LocationData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -311,7 +311,7 @@ export interface RLocation<TContext> {
     source: LocationData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -321,7 +321,7 @@ export interface RLocation<TContext> {
     source: LocationData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<BossData>>>;
 
   /**
@@ -331,7 +331,7 @@ export interface RLocation<TContext> {
     source: LocationData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<ReviewData>>>;
 }
 
@@ -339,7 +339,7 @@ export interface RReview<TContext> {
   __resolveType?: (
     source: ReviewData,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => string;
   /**
    * (UUID)
@@ -348,7 +348,7 @@ export interface RReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -358,7 +358,7 @@ export interface RReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   /**
@@ -368,7 +368,7 @@ export interface RReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string | number | Date>;
 }
 
@@ -376,7 +376,7 @@ export interface RBossReview<TContext> {
   __isTypeOf?: (
     source: ReviewData,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (UUID)
@@ -385,7 +385,7 @@ export interface RBossReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -395,7 +395,7 @@ export interface RBossReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   /**
@@ -405,7 +405,7 @@ export interface RBossReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string | number | Date>;
 
   /**
@@ -415,7 +415,7 @@ export interface RBossReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<BossData>;
 
   /**
@@ -425,7 +425,7 @@ export interface RBossReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -435,7 +435,7 @@ export interface RBossReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<number>;
 }
 
@@ -443,7 +443,7 @@ export interface RLocationReview<TContext> {
   __isTypeOf?: (
     source: ReviewData,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (UUID)
@@ -452,7 +452,7 @@ export interface RLocationReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -462,7 +462,7 @@ export interface RLocationReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   /**
@@ -472,7 +472,7 @@ export interface RLocationReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string | number | Date>;
 
   /**
@@ -482,7 +482,7 @@ export interface RLocationReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<LocationData>;
 
   /**
@@ -492,7 +492,7 @@ export interface RLocationReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -502,7 +502,7 @@ export interface RLocationReview<TContext> {
     source: ReviewData,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<number>;
 }
 
@@ -510,7 +510,7 @@ export interface RSearchResult<TContext> {
   __resolveType?: (
     source: TSearchResult,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => string;
 }
 
@@ -518,7 +518,7 @@ export interface RIsFiniteResult<TContext> {
   __isTypeOf?: (
     source: TIsFiniteResult,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (ESNumber)
@@ -527,7 +527,7 @@ export interface RIsFiniteResult<TContext> {
     source: TIsFiniteResult,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<number>;
 
   /**
@@ -537,7 +537,7 @@ export interface RIsFiniteResult<TContext> {
     source: TIsFiniteResult,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<boolean>;
 }
 
@@ -545,7 +545,7 @@ export interface RSubscription<TContext> {
   __isTypeOf?: (
     source: TSubscription,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (Review)
@@ -554,7 +554,7 @@ export interface RSubscription<TContext> {
     source: TSubscription,
     args: SubscriptionNewReviewArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<AsyncIterableIterator<{ newReview: ReviewData }>>;
 }
 
@@ -565,7 +565,7 @@ export interface R__Schema<TContext> {
   __isTypeOf?: (
     source: T__Schema,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (String)
@@ -574,7 +574,7 @@ export interface R__Schema<TContext> {
     source: T__Schema,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   /**
@@ -584,7 +584,7 @@ export interface R__Schema<TContext> {
     source: T__Schema,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Array<T__Type>>;
 
   /**
@@ -594,7 +594,7 @@ export interface R__Schema<TContext> {
     source: T__Schema,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<T__Type>;
 
   /**
@@ -604,7 +604,7 @@ export interface R__Schema<TContext> {
     source: T__Schema,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<T__Type>>;
 
   /**
@@ -614,7 +614,7 @@ export interface R__Schema<TContext> {
     source: T__Schema,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<T__Type>>;
 
   /**
@@ -624,7 +624,7 @@ export interface R__Schema<TContext> {
     source: T__Schema,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Array<T__Directive>>;
 }
 
@@ -637,14 +637,14 @@ export interface R__Type<TContext> {
   __isTypeOf?: (
     source: T__Type,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
 
   kind?: (
     source: T__Type,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<T__TypeKind>;
 
   /**
@@ -654,7 +654,7 @@ export interface R__Type<TContext> {
     source: T__Type,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   /**
@@ -664,7 +664,7 @@ export interface R__Type<TContext> {
     source: T__Type,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   /**
@@ -674,49 +674,49 @@ export interface R__Type<TContext> {
     source: T__Type,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   fields?: (
     source: T__Type,
     args: __TypeFieldsArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<T__Field>>>;
 
   interfaces?: (
     source: T__Type,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<T__Type>>>;
 
   possibleTypes?: (
     source: T__Type,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<T__Type>>>;
 
   enumValues?: (
     source: T__Type,
     args: __TypeEnumValuesArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<T__EnumValue>>>;
 
   inputFields?: (
     source: T__Type,
     args: __TypeInputFieldsArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<Array<T__InputValue>>>;
 
   ofType?: (
     source: T__Type,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<T__Type>>;
 }
 
@@ -727,7 +727,7 @@ export interface R__Field<TContext> {
   __isTypeOf?: (
     source: T__Field,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (String)
@@ -736,7 +736,7 @@ export interface R__Field<TContext> {
     source: T__Field,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -746,21 +746,21 @@ export interface R__Field<TContext> {
     source: T__Field,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   args?: (
     source: T__Field,
     args: __FieldArgsArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Array<T__InputValue>>;
 
   type?: (
     source: T__Field,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<T__Type>;
 
   /**
@@ -770,7 +770,7 @@ export interface R__Field<TContext> {
     source: T__Field,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<boolean>;
 
   /**
@@ -780,7 +780,7 @@ export interface R__Field<TContext> {
     source: T__Field,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 }
 
@@ -791,7 +791,7 @@ export interface R__InputValue<TContext> {
   __isTypeOf?: (
     source: T__InputValue,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (String)
@@ -800,7 +800,7 @@ export interface R__InputValue<TContext> {
     source: T__InputValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -810,14 +810,14 @@ export interface R__InputValue<TContext> {
     source: T__InputValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   type?: (
     source: T__InputValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<T__Type>;
 
   /**
@@ -827,7 +827,7 @@ export interface R__InputValue<TContext> {
     source: T__InputValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   /**
@@ -837,7 +837,7 @@ export interface R__InputValue<TContext> {
     source: T__InputValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<boolean>;
 
   /**
@@ -847,7 +847,7 @@ export interface R__InputValue<TContext> {
     source: T__InputValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 }
 
@@ -858,7 +858,7 @@ export interface R__EnumValue<TContext> {
   __isTypeOf?: (
     source: T__EnumValue,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (String)
@@ -867,7 +867,7 @@ export interface R__EnumValue<TContext> {
     source: T__EnumValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -877,7 +877,7 @@ export interface R__EnumValue<TContext> {
     source: T__EnumValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   /**
@@ -887,7 +887,7 @@ export interface R__EnumValue<TContext> {
     source: T__EnumValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<boolean>;
 
   /**
@@ -897,7 +897,7 @@ export interface R__EnumValue<TContext> {
     source: T__EnumValue,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 }
 
@@ -910,7 +910,7 @@ export interface R__Directive<TContext> {
   __isTypeOf?: (
     source: T__Directive,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => boolean;
   /**
    * (String)
@@ -919,7 +919,7 @@ export interface R__Directive<TContext> {
     source: T__Directive,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<string>;
 
   /**
@@ -929,7 +929,7 @@ export interface R__Directive<TContext> {
     source: T__Directive,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<string>>;
 
   /**
@@ -939,21 +939,21 @@ export interface R__Directive<TContext> {
     source: T__Directive,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<boolean>;
 
   locations?: (
     source: T__Directive,
     args: Record<string, never>,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Array<T__DirectiveLocation>>;
 
   args?: (
     source: T__Directive,
     args: __DirectiveArgsArgs,
     context: TContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => AsyncResult<Array<T__InputValue>>;
 }
 
@@ -1654,29 +1654,29 @@ export interface TCreateLocationReviewInput {
 }
 
 export enum TRating {
-  TERRIBLE = "TERRIBLE",
+  TERRIBLE = 'TERRIBLE',
 
-  MEH = "MEH",
+  MEH = 'MEH',
 
-  ALRIGHT = "ALRIGHT",
+  ALRIGHT = 'ALRIGHT',
 
-  AMAZING = "AMAZING",
+  AMAZING = 'AMAZING',
 
-  STELLAR = "STELLAR",
+  STELLAR = 'STELLAR',
 }
 
 export enum TDifficulty {
-  OKAYISH = "OKAYISH",
+  OKAYISH = 'OKAYISH',
 
-  HARD = "HARD",
+  HARD = 'HARD',
 
-  IMPOSSIBLE = "IMPOSSIBLE",
+  IMPOSSIBLE = 'IMPOSSIBLE',
 }
 
 export enum TSearchType {
-  BOSSES = "BOSSES",
+  BOSSES = 'BOSSES',
 
-  LOCATIONS = "LOCATIONS",
+  LOCATIONS = 'LOCATIONS',
 }
 
 /**
@@ -1686,35 +1686,35 @@ export enum T__TypeKind {
   /**
    * Indicates this type is a scalar.
    */
-  SCALAR = "SCALAR",
+  SCALAR = 'SCALAR',
   /**
    * Indicates this type is an object. `fields` and `interfaces` are valid fields.
    */
-  OBJECT = "OBJECT",
+  OBJECT = 'OBJECT',
   /**
    * Indicates this type is an interface. `fields`, `interfaces`, and `possibleTypes` are valid fields.
    */
-  INTERFACE = "INTERFACE",
+  INTERFACE = 'INTERFACE',
   /**
    * Indicates this type is a union. `possibleTypes` is a valid field.
    */
-  UNION = "UNION",
+  UNION = 'UNION',
   /**
    * Indicates this type is an enum. `enumValues` is a valid field.
    */
-  ENUM = "ENUM",
+  ENUM = 'ENUM',
   /**
    * Indicates this type is an input object. `inputFields` is a valid field.
    */
-  INPUT_OBJECT = "INPUT_OBJECT",
+  INPUT_OBJECT = 'INPUT_OBJECT',
   /**
    * Indicates this type is a list. `ofType` is a valid field.
    */
-  LIST = "LIST",
+  LIST = 'LIST',
   /**
    * Indicates this type is a non-null. `ofType` is a valid field.
    */
-  NON_NULL = "NON_NULL",
+  NON_NULL = 'NON_NULL',
 }
 
 /**
@@ -1724,79 +1724,79 @@ export enum T__DirectiveLocation {
   /**
    * Location adjacent to a query operation.
    */
-  QUERY = "QUERY",
+  QUERY = 'QUERY',
   /**
    * Location adjacent to a mutation operation.
    */
-  MUTATION = "MUTATION",
+  MUTATION = 'MUTATION',
   /**
    * Location adjacent to a subscription operation.
    */
-  SUBSCRIPTION = "SUBSCRIPTION",
+  SUBSCRIPTION = 'SUBSCRIPTION',
   /**
    * Location adjacent to a field.
    */
-  FIELD = "FIELD",
+  FIELD = 'FIELD',
   /**
    * Location adjacent to a fragment definition.
    */
-  FRAGMENT_DEFINITION = "FRAGMENT_DEFINITION",
+  FRAGMENT_DEFINITION = 'FRAGMENT_DEFINITION',
   /**
    * Location adjacent to a fragment spread.
    */
-  FRAGMENT_SPREAD = "FRAGMENT_SPREAD",
+  FRAGMENT_SPREAD = 'FRAGMENT_SPREAD',
   /**
    * Location adjacent to an inline fragment.
    */
-  INLINE_FRAGMENT = "INLINE_FRAGMENT",
+  INLINE_FRAGMENT = 'INLINE_FRAGMENT',
   /**
    * Location adjacent to a variable definition.
    */
-  VARIABLE_DEFINITION = "VARIABLE_DEFINITION",
+  VARIABLE_DEFINITION = 'VARIABLE_DEFINITION',
   /**
    * Location adjacent to a schema definition.
    */
-  SCHEMA = "SCHEMA",
+  SCHEMA = 'SCHEMA',
   /**
    * Location adjacent to a scalar definition.
    */
-  SCALAR = "SCALAR",
+  SCALAR = 'SCALAR',
   /**
    * Location adjacent to an object type definition.
    */
-  OBJECT = "OBJECT",
+  OBJECT = 'OBJECT',
   /**
    * Location adjacent to a field definition.
    */
-  FIELD_DEFINITION = "FIELD_DEFINITION",
+  FIELD_DEFINITION = 'FIELD_DEFINITION',
   /**
    * Location adjacent to an argument definition.
    */
-  ARGUMENT_DEFINITION = "ARGUMENT_DEFINITION",
+  ARGUMENT_DEFINITION = 'ARGUMENT_DEFINITION',
   /**
    * Location adjacent to an interface definition.
    */
-  INTERFACE = "INTERFACE",
+  INTERFACE = 'INTERFACE',
   /**
    * Location adjacent to a union definition.
    */
-  UNION = "UNION",
+  UNION = 'UNION',
   /**
    * Location adjacent to an enum definition.
    */
-  ENUM = "ENUM",
+  ENUM = 'ENUM',
   /**
    * Location adjacent to an enum value definition.
    */
-  ENUM_VALUE = "ENUM_VALUE",
+  ENUM_VALUE = 'ENUM_VALUE',
   /**
    * Location adjacent to an input object type definition.
    */
-  INPUT_OBJECT = "INPUT_OBJECT",
+  INPUT_OBJECT = 'INPUT_OBJECT',
   /**
    * Location adjacent to an input object field definition.
    */
-  INPUT_FIELD_DEFINITION = "INPUT_FIELD_DEFINITION",
+  INPUT_FIELD_DEFINITION = 'INPUT_FIELD_DEFINITION',
 }
 
 export interface KeyDirective {

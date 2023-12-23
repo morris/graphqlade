@@ -24,10 +24,10 @@ export class ImportCodeGenerator {
     return Array.from(this.imports)
       .map(
         ([from, names]) =>
-          `import { ${Array.from(names).join(", ")} } from ${JSON.stringify(
-            from
-          )}`
+          `import { ${Array.from(names).join(', ')} } from ${JSON.stringify(
+            from,
+          )}`,
       )
-      .join("\n");
+      .join('\n');
   }
 }

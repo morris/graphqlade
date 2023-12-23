@@ -1,21 +1,21 @@
-import { GraphQLError } from "graphql";
-import { MyContext } from "../../examples/server/src/MyContext";
-import { GraphQLServer } from "../../src";
-import { bootstrapExample } from "../util";
+import { GraphQLError } from 'graphql';
+import { MyContext } from '../../examples/server/src/MyContext';
+import { GraphQLServer } from '../../src';
+import { bootstrapExample } from '../util';
 
-describe("The GraphQLHttpServer", () => {
+describe('The GraphQLHttpServer', () => {
   let gqlServer: GraphQLServer<MyContext>;
 
   beforeAll(async () => {
     gqlServer = await bootstrapExample();
   });
 
-  it("should be able to handle POST GraphQL requests", async () => {
+  it('should be able to handle POST GraphQL requests', async () => {
     const response = await gqlServer.http.execute({
-      method: "POST",
+      method: 'POST',
       headers: {},
       body: {
-        query: "{ praise }",
+        query: '{ praise }',
       },
     });
 
@@ -24,15 +24,15 @@ describe("The GraphQLHttpServer", () => {
       headers: {},
       body: {
         data: {
-          praise: "the sun!",
+          praise: 'the sun!',
         },
       },
     });
   });
 
-  it("should be able to handle GET GraphQL requests", async () => {
+  it('should be able to handle GET GraphQL requests', async () => {
     const response = await gqlServer.http.execute({
-      method: "GET",
+      method: 'GET',
       headers: {},
       query: {
         query: `{ praise }`,
@@ -41,7 +41,7 @@ describe("The GraphQLHttpServer", () => {
 
     // test query caching
     await gqlServer.http.execute({
-      method: "GET",
+      method: 'GET',
       headers: {},
       query: {
         query: `{ praise }`,
@@ -53,19 +53,19 @@ describe("The GraphQLHttpServer", () => {
       headers: {},
       body: {
         data: {
-          praise: "the sun!",
+          praise: 'the sun!',
         },
       },
     });
   });
 
-  it("should reject unsupported methods", async () => {
+  it('should reject unsupported methods', async () => {
     const response = await gqlServer.http.execute({
-      method: "PUT",
+      method: 'PUT',
       headers: {},
       body: {
         query: `{ praise }`,
-        operationName: "String",
+        operationName: 'String',
       },
     });
 
@@ -75,20 +75,20 @@ describe("The GraphQLHttpServer", () => {
       body: {
         errors: [
           {
-            message: "Unsupported method: PUT",
+            message: 'Unsupported method: PUT',
           },
         ],
       },
     });
   });
 
-  it("should reject mutations via GET", async () => {
+  it('should reject mutations via GET', async () => {
     const response = await gqlServer.http.execute({
-      method: "GET",
+      method: 'GET',
       headers: {},
       query: {
-        query: "mutation Test { youDied }",
-        operationName: "Test",
+        query: 'mutation Test { youDied }',
+        operationName: 'Test',
       },
     });
 
@@ -98,16 +98,16 @@ describe("The GraphQLHttpServer", () => {
       body: {
         errors: [
           {
-            message: "Mutations are not allowed via GET",
+            message: 'Mutations are not allowed via GET',
           },
         ],
       },
     });
   });
 
-  it("should reject invalid queries", async () => {
+  it('should reject invalid queries', async () => {
     const response = await gqlServer.http.execute({
-      method: "POST",
+      method: 'POST',
       headers: {},
       body: {
         query: `{ invalid }`,

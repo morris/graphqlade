@@ -31,10 +31,10 @@ import {
   TypeNode,
   VariableDefinitionNode,
   visit,
-} from "graphql";
-import { assert, defined, getDirective } from "../util";
-import { CommonCodeGenerator, TsDirective } from "./CommonCodeGenerator";
-import { ImportCodeGenerator } from "./ImportCodeGenerator";
+} from 'graphql';
+import { assert, defined, getDirective } from '../util';
+import { CommonCodeGenerator, TsDirective } from './CommonCodeGenerator';
+import { ImportCodeGenerator } from './ImportCodeGenerator';
 
 export interface ClientCodeGeneratorOptions {
   schema: GraphQLSchema;
@@ -79,7 +79,7 @@ export class ClientCodeGenerator {
     // TODO remove this in 2.0 in favor of options.scalarTypes
     visit(this.operations, {
       ScalarTypeDefinition: (node) => {
-        const tsDirective = getDirective<TsDirective>(node, "ts");
+        const tsDirective = getDirective<TsDirective>(node, 'ts');
 
         if (tsDirective) {
           this.commonCodeGenerator.addTypeMapping({
@@ -91,7 +91,7 @@ export class ClientCodeGenerator {
         } else {
           this.commonCodeGenerator.addTypeMapping({
             gqlType: node.name.value,
-            tsType: "string",
+            tsType: 'string',
           });
         }
       },
@@ -100,8 +100,8 @@ export class ClientCodeGenerator {
     for (const [gqlType, tsType] of Object.entries(this.scalarTypes)) {
       this.commonCodeGenerator.addTypeMapping({
         gqlType,
-        tsType: typeof tsType === "string" ? tsType : tsType.type,
-        from: typeof tsType === "string" ? undefined : tsType.from,
+        tsType: typeof tsType === 'string' ? tsType : tsType.type,
+        from: typeof tsType === 'string' ? undefined : tsType.from,
       });
     }
   }
@@ -151,8 +151,8 @@ export class ClientCodeGenerator {
     const importCodeGenerator = new ImportCodeGenerator();
 
     importCodeGenerator.addImport({
-      names: ["ExecutionResult"],
-      from: "graphql",
+      names: ['ExecutionResult'],
+      from: 'graphql',
     });
 
     this.commonCodeGenerator.addTypeMapImports(importCodeGenerator);
@@ -197,15 +197,15 @@ export class ClientCodeGenerator {
       OperationDefinition: (node) => {
         this.assertNamedOperationDefinition(node);
 
-        if (node.operation === "query") {
+        if (node.operation === 'query') {
           parts.push(JSON.stringify(node.name.value));
         }
       },
     });
 
-    if (parts.length === 0) parts.push("never");
+    if (parts.length === 0) parts.push('never');
 
-    return `export type QueryName = ${this.join(parts, " | ")}`;
+    return `export type QueryName = ${this.join(parts, ' | ')}`;
   }
 
   generateMutationNames() {
@@ -215,15 +215,15 @@ export class ClientCodeGenerator {
       OperationDefinition: (node) => {
         this.assertNamedOperationDefinition(node);
 
-        if (node.operation === "mutation") {
+        if (node.operation === 'mutation') {
           parts.push(JSON.stringify(node.name.value));
         }
       },
     });
 
-    if (parts.length === 0) parts.push("never");
+    if (parts.length === 0) parts.push('never');
 
-    return `export type MutationName = ${this.join(parts, " | ")}`;
+    return `export type MutationName = ${this.join(parts, ' | ')}`;
   }
 
   generateSubscriptionNames() {
@@ -233,15 +233,15 @@ export class ClientCodeGenerator {
       OperationDefinition: (node) => {
         this.assertNamedOperationDefinition(node);
 
-        if (node.operation === "subscription") {
+        if (node.operation === 'subscription') {
           parts.push(JSON.stringify(node.name.value));
         }
       },
     });
 
-    if (parts.length === 0) parts.push("never");
+    if (parts.length === 0) parts.push('never');
 
-    return `export type SubscriptionName = ${this.join(parts, " | ")}`;
+    return `export type SubscriptionName = ${this.join(parts, ' | ')}`;
   }
 
   generateOperationNameToDocument() {
@@ -256,7 +256,7 @@ export class ClientCodeGenerator {
     });
 
     return `export const OperationNameToDocument = {
-      ${this.join(parts, "\n")}
+      ${this.join(parts, '\n')}
     }`;
   }
 
@@ -272,13 +272,13 @@ export class ClientCodeGenerator {
     });
 
     return `export interface OperationNameToVariables {
-      ${this.join(parts, "\n")}
+      ${this.join(parts, '\n')}
     }`;
   }
 
   generateVariablesRef(node: NamedOperationDefinitionNode) {
     if (!node.variableDefinitions || node.variableDefinitions.length === 0) {
-      return "undefined";
+      return 'undefined';
     }
 
     return `V${node.name.value}`;
@@ -296,7 +296,7 @@ export class ClientCodeGenerator {
     });
 
     return `export interface OperationNameToData {
-      ${this.join(parts, "\n")}
+      ${this.join(parts, '\n')}
     }`;
   }
 
@@ -325,7 +325,7 @@ export class ClientCodeGenerator {
         this.join([
           stripIgnoredCharacters(print(node)),
           this.generateOperationFragments(node),
-        ])
+        ]),
       )}`;
   }
 
@@ -348,8 +348,8 @@ export class ClientCodeGenerator {
 
     return this.join(
       Array.from(names).map((name) =>
-        stripIgnoredCharacters(print(this.requireFragment(name).node))
-      )
+        stripIgnoredCharacters(print(this.requireFragment(name).node)),
+      ),
     );
   }
 
@@ -365,10 +365,10 @@ export class ClientCodeGenerator {
 
   generateVariableDef(node: VariableDefinitionNode) {
     return `${node.variable.name.value}${
-      node.type.kind === "NonNullType" ? "" : "?"
+      node.type.kind === 'NonNullType' ? '' : '?'
     }: ${this.commonCodeGenerator.generateInputRef(
       this.requireInputTypeFromNode(node.type),
-      false
+      false,
     )}`;
   }
 
@@ -385,7 +385,7 @@ export class ClientCodeGenerator {
     return `export type D${node.name.value} =
       ${this.generateSelectionSet(
         node.selectionSet,
-        this.requireOperationType(node)
+        this.requireOperationType(node),
       )}
     `;
   }
@@ -394,7 +394,7 @@ export class ClientCodeGenerator {
 
   generateSelectionSet(
     node: SelectionSetNode,
-    parentType: GraphQLCompositeType
+    parentType: GraphQLCompositeType,
   ) {
     const possibleTypes = isObjectType(parentType)
       ? [parentType]
@@ -402,43 +402,43 @@ export class ClientCodeGenerator {
 
     return this.join(
       possibleTypes.map((possibleType) =>
-        this.generateSelectionSetForObject(node, possibleType)
+        this.generateSelectionSetForObject(node, possibleType),
       ),
-      " | "
+      ' | ',
     );
   }
 
   generateSelectionSetForObject(
     node: SelectionSetNode,
     parentType: GraphQLObjectType,
-    withTypeNameField = true
+    withTypeNameField = true,
   ): string {
     return this.join(
       [
         this.generateFields(
           node,
           parentType,
-          withTypeNameField && this.hasTypeNameField(node, parentType)
+          withTypeNameField && this.hasTypeNameField(node, parentType),
         ),
         this.generateInlineFragments(node, parentType),
         this.generateFragmentSpreads(node, parentType),
       ],
-      " & ",
-      "()"
+      ' & ',
+      '()',
     );
   }
 
   hasTypeNameField(node: SelectionSetNode, parentType: GraphQLObjectType) {
     for (const selection of node.selections) {
-      if (selection.kind === "Field" && selection.name.value === "__typename") {
+      if (selection.kind === 'Field' && selection.name.value === '__typename') {
         return true;
       } else if (
-        selection.kind === "InlineFragment" &&
+        selection.kind === 'InlineFragment' &&
         this.checkTypeCondition(selection, parentType) &&
         this.hasTypeNameField(selection.selectionSet, parentType)
       ) {
         return true;
-      } else if (selection.kind === "FragmentSpread") {
+      } else if (selection.kind === 'FragmentSpread') {
         const fragment = this.requireFragment(selection.name.value);
 
         if (
@@ -458,15 +458,17 @@ export class ClientCodeGenerator {
   generateFields(
     node: SelectionSetNode,
     parentType: GraphQLObjectType,
-    withTypeNameField: boolean
+    withTypeNameField: boolean,
   ) {
     return `{
       ${this.join(
         node.selections
-          .filter((it): it is FieldNode => it.kind === "Field")
-          .filter((it) => it.name.value !== "__typename")
+          .filter((it): it is FieldNode => it.kind === 'Field')
+          .filter((it) => it.name.value !== '__typename')
           .map((it) => this.generateField(it, parentType))
-          .concat(withTypeNameField ? [`__typename: "${parentType.name}"`] : [])
+          .concat(
+            withTypeNameField ? [`__typename: "${parentType.name}"`] : [],
+          ),
       )}
     }`;
   }
@@ -476,28 +478,28 @@ export class ClientCodeGenerator {
     const field = this.requireField(parentType, node.name.value);
     const nonNull = isNonNullType(field.type);
 
-    return `${key}${nonNull ? "" : "?"}: ${this.generateFieldType(
+    return `${key}${nonNull ? '' : '?'}: ${this.generateFieldType(
       node,
-      field.type
+      field.type,
     )}`;
   }
 
   generateFieldType(
     node: FieldNode,
     type: GraphQLOutputType,
-    optional = true
+    optional = true,
   ): string {
     if (isNonNullType(type)) {
       return this.generateFieldType(node, type.ofType, false);
     } else if (isListType(type)) {
       return this.generateMaybe(
         `Array<${this.generateFieldType(node, type.ofType)}>`,
-        optional
+        optional,
       );
     } else {
       return this.generateMaybe(
         this.generateFieldNamedType(node, type),
-        optional
+        optional,
       );
     }
   }
@@ -518,28 +520,28 @@ export class ClientCodeGenerator {
 
   generateInlineFragments(
     node: SelectionSetNode,
-    parentType: GraphQLObjectType
+    parentType: GraphQLObjectType,
   ) {
     return this.join(
       node.selections.map((it) =>
-        it.kind === "InlineFragment"
+        it.kind === 'InlineFragment'
           ? this.generateInlineFragment(it, parentType)
-          : undefined
+          : undefined,
       ),
-      " & ",
-      "()"
+      ' & ',
+      '()',
     );
   }
 
   generateInlineFragment(
     node: InlineFragmentNode,
-    parentType: GraphQLObjectType
+    parentType: GraphQLObjectType,
   ) {
     if (this.checkTypeCondition(node, parentType)) {
       return this.generateSelectionSetForObject(
         node.selectionSet,
         parentType,
-        false
+        false,
       );
     }
   }
@@ -548,22 +550,22 @@ export class ClientCodeGenerator {
 
   generateFragmentSpreads(
     node: SelectionSetNode,
-    parentType: GraphQLObjectType
+    parentType: GraphQLObjectType,
   ) {
     return this.join(
       node.selections.map((it) =>
-        it.kind === "FragmentSpread"
+        it.kind === 'FragmentSpread'
           ? this.generateFragmentSpread(it, parentType)
-          : undefined
+          : undefined,
       ),
-      " & ",
-      "()"
+      ' & ',
+      '()',
     );
   }
 
   generateFragmentSpread(
     node: FragmentSpreadNode,
-    parentType: GraphQLObjectType
+    parentType: GraphQLObjectType,
   ) {
     const fragment = this.requireFragment(node.name.value);
 
@@ -588,7 +590,7 @@ export class ClientCodeGenerator {
 
   generateFragmentType(node: FragmentDefinitionNode) {
     const type = assertCompositeType(
-      this.requireTypeFromNode(node.typeCondition)
+      this.requireTypeFromNode(node.typeCondition),
     );
 
     return `export type ${this.generateFragmentTypeName(node.name.value)} =
@@ -628,11 +630,11 @@ export class ClientCodeGenerator {
 
   checkTypeCondition(
     node: InlineFragmentNode | FragmentDefinitionNode,
-    parentType: GraphQLObjectType
+    parentType: GraphQLObjectType,
   ) {
     const name = defined(
       node.typeCondition,
-      "Missing type condition in fragment spread" // should never happen
+      'Missing type condition in fragment spread', // should never happen
     ).name.value;
 
     return (
@@ -649,11 +651,11 @@ export class ClientCodeGenerator {
 
   getOperationType(node: OperationDefinitionNode) {
     switch (node.operation) {
-      case "query":
+      case 'query':
         return this.schema.getQueryType();
-      case "mutation":
+      case 'mutation':
         return this.schema.getMutationType();
-      case "subscription":
+      case 'subscription':
         return this.schema.getSubscriptionType();
     }
   }
@@ -680,7 +682,7 @@ export class ClientCodeGenerator {
   requireField(type: GraphQLObjectType | GraphQLInterfaceType, name: string) {
     return defined(
       type.getFields()[name],
-      `Undefined field ${name} on ${type.name}`
+      `Undefined field ${name} on ${type.name}`,
     );
   }
 
@@ -689,12 +691,12 @@ export class ClientCodeGenerator {
   }
 
   assertNamedOperationDefinition(
-    node: OperationDefinitionNode
+    node: OperationDefinitionNode,
   ): asserts node is NamedOperationDefinitionNode {
-    assert(node.name, "Cannot generate client code for unnamed operations");
+    assert(node.name, 'Cannot generate client code for unnamed operations');
   }
 
-  join(parts: (string | undefined)[], separator = "\n\n", braces?: string) {
+  join(parts: (string | undefined)[], separator = '\n\n', braces?: string) {
     return this.commonCodeGenerator.join(parts, separator, braces);
   }
 

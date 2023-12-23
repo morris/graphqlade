@@ -1,13 +1,13 @@
-import { GraphQLSchema, buildSchema } from "graphql";
-import * as http from "http";
-import * as ws from "ws";
+import { GraphQLSchema, buildSchema } from 'graphql';
+import * as http from 'http';
+import * as ws from 'ws';
 import {
   AsyncPushIterator,
   GraphQLWebSocketClient,
   GraphQLWebSocketServer,
-} from "../../src";
+} from '../../src';
 
-describe("The GraphQLWebSocketServer", () => {
+describe('The GraphQLWebSocketServer', () => {
   let schema: GraphQLSchema;
   let server: http.Server;
 
@@ -26,11 +26,11 @@ describe("The GraphQLWebSocketServer", () => {
 
     fields.counter.subscribe = (_, args, context) => {
       if (!context.authorization) {
-        throw new Error("Missing authorization");
+        throw new Error('Missing authorization');
       }
 
-      if (context.authorization !== "it me") {
-        throw new Error("Unauthorized");
+      if (context.authorization !== 'it me') {
+        throw new Error('Unauthorized');
       }
 
       return new AsyncPushIterator((iterator) => {
@@ -38,7 +38,7 @@ describe("The GraphQLWebSocketServer", () => {
 
         const interval = setInterval(
           () => iterator.push({ counter: ++counter }),
-          500
+          500,
         );
 
         return () => clearInterval(interval);
@@ -56,7 +56,7 @@ describe("The GraphQLWebSocketServer", () => {
     server.close();
   });
 
-  it("should work", async () => {
+  it('should work', async () => {
     const gqlWsServer = new GraphQLWebSocketServer({
       schema,
       createContext({ connectionInitPayload }) {
@@ -66,17 +66,17 @@ describe("The GraphQLWebSocketServer", () => {
 
     const wsServer = new ws.Server({
       server,
-      path: "/graphql",
+      path: '/graphql',
     });
 
-    wsServer.on("connection", gqlWsServer.connectionHandler());
+    wsServer.on('connection', gqlWsServer.connectionHandler());
 
     const counters: number[] = [];
 
     const gqlWsClient = new GraphQLWebSocketClient({
-      url: "ws://localhost:7777/graphql",
+      url: 'ws://localhost:7777/graphql',
       connectionInitPayload: {
-        authorization: "it me",
+        authorization: 'it me',
       },
       createWebSocket(url, protocol) {
         return new ws.WebSocket(url, protocol) as unknown as WebSocket;
@@ -87,7 +87,7 @@ describe("The GraphQLWebSocketServer", () => {
       for await (const result of gqlWsClient.subscribe<{ counter: number }>({
         query: `subscription { counter }`,
       })) {
-        if (!result.data) throw new Error("No data");
+        if (!result.data) throw new Error('No data');
 
         counters.push(result.data.counter);
 

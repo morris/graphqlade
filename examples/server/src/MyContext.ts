@@ -1,6 +1,6 @@
-import { EventEmitter } from "events";
-import { bosses, locations, reviews } from "./data";
-import { BossData, LocationData, ReviewData } from "./types";
+import { EventEmitter } from 'events';
+import { bosses, locations, reviews } from './data';
+import { BossData, LocationData, ReviewData } from './types';
 
 export class MyContext {
   pubsub: EventEmitter;
@@ -37,7 +37,7 @@ export class MyContext {
     return reviews.filter((it) => it.subjectId === id);
   }
 
-  saveReview(review: Omit<ReviewData, "id" | "time">) {
+  saveReview(review: Omit<ReviewData, 'id' | 'time'>) {
     const reviewWithId = { ...review, id: this.uuid(), time: new Date() };
     reviews.push(reviewWithId);
 
@@ -54,26 +54,26 @@ export class MyContext {
   }
 
   publishReview(review: ReviewData) {
-    this.pubsub.emit("review", review);
+    this.pubsub.emit('review', review);
   }
 
   subscribeReviews(listener: (review: ReviewData) => void) {
-    this.pubsub.on("review", listener);
+    this.pubsub.on('review', listener);
 
     return () => {
-      this.pubsub.removeListener("review", listener);
+      this.pubsub.removeListener('review', listener);
     };
   }
 
   uuid() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
       /[xy]/g,
       function (c) {
         const r = (Math.random() * 16) | 0;
-        const v = c == "x" ? r : (r & 0x3) | 0x8;
+        const v = c == 'x' ? r : (r & 0x3) | 0x8;
 
         return v.toString(16);
-      }
+      },
     );
   }
 }

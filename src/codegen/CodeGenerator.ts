@@ -1,17 +1,17 @@
-import * as fs from "fs";
-import { buildClientSchema, validate } from "graphql";
-import * as path from "path";
-import { GraphQLIntrospector, IntrospectionRequestFn } from "../introspect";
-import { GraphQLReader } from "../read";
+import * as fs from 'fs';
+import { buildClientSchema, validate } from 'graphql';
+import * as path from 'path';
+import { GraphQLIntrospector, IntrospectionRequestFn } from '../introspect';
+import { GraphQLReader } from '../read';
 import {
   LoggerLike,
   cleanOperations,
   toError,
   watchRecursive,
   writeTypeScript,
-} from "../util";
-import { ClientCodeGenerator } from "./ClientCodeGenerator";
-import { ServerCodeGenerator } from "./ServerCodeGenerator";
+} from '../util';
+import { ClientCodeGenerator } from './ClientCodeGenerator';
+import { ServerCodeGenerator } from './ServerCodeGenerator';
 
 export interface CodeGeneratorOptions {
   /**
@@ -124,12 +124,12 @@ export class CodeGenerator {
   protected introspector?: GraphQLIntrospector;
 
   constructor(options?: CodeGeneratorOptions) {
-    this.root = options?.root ?? "";
-    this.schema = options?.schema ?? "schema";
-    this.operations = options?.operations ?? "operations";
+    this.root = options?.root ?? '';
+    this.schema = options?.schema ?? 'schema';
+    this.operations = options?.operations ?? 'operations';
     this.scalarTypes = options?.scalarTypes;
     this.introspection = options?.introspection;
-    this.out = options?.out ?? "src/generated";
+    this.out = options?.out ?? 'src/generated';
 
     this.reader = options?.reader ?? new GraphQLReader();
     this.introspector =
@@ -147,8 +147,8 @@ export class CodeGenerator {
 
     for (let i = 0; i < argv.length; ++i) {
       switch (argv[i]) {
-        case "--watch":
-        case "-w":
+        case '--watch':
+        case '-w':
           return this.run({ ...options, watch: true });
       }
     }
@@ -165,7 +165,7 @@ export class CodeGenerator {
       await this.write(options);
 
       if (options.watch) {
-        logger.log("Initial generation done. Watching for changes...");
+        logger.log('Initial generation done. Watching for changes...');
       } else {
         return;
       }
@@ -173,13 +173,13 @@ export class CodeGenerator {
       if (!options.watch) throw err;
 
       logger.error(toError(err));
-      logger.log("Initial generation failed. Watching for changes...");
+      logger.log('Initial generation failed. Watching for changes...');
     }
 
     await this.watch(options);
   }
 
-  async watch(options: Omit<CodeGeneratorCliOptions, "watch">) {
+  async watch(options: Omit<CodeGeneratorCliOptions, 'watch'>) {
     const logger = options?.logger ?? console;
     const schema = path.join(this.root, this.schema);
     const operations = path.join(this.root, this.operations);
@@ -196,13 +196,13 @@ export class CodeGenerator {
           logger.log(
             `Change detected (${path.relative(
               schema,
-              filename
-            )}), regenerating...`
+              filename,
+            )}), regenerating...`,
           );
 
           await this.write(options);
 
-          logger.log("Done. Watching for changes...");
+          logger.log('Done. Watching for changes...');
         } catch (err) {
           logger.error(toError(err));
         }
@@ -228,36 +228,36 @@ export class CodeGenerator {
     }
   }
 
-  async write(options: Omit<CodeGeneratorCliOptions, "watch">) {
+  async write(options: Omit<CodeGeneratorCliOptions, 'watch'>) {
     if (options.server) await this.writeServer();
     if (options.client) await this.writeClient();
   }
 
   async writeTsDirectiveDefinition(
-    options: Omit<CodeGeneratorCliOptions, "watch">
+    options: Omit<CodeGeneratorCliOptions, 'watch'>,
   ) {
     if (options.server) {
       await fs.promises.writeFile(
-        path.join(this.root, this.schema, "_ts.gql"),
-        this.getTsDirectiveDefinition()
+        path.join(this.root, this.schema, '_ts.gql'),
+        this.getTsDirectiveDefinition(),
       );
     }
 
     if (options.client) {
       await fs.promises.writeFile(
-        path.join(this.root, this.operations, "_ts.gql"),
-        this.getTsDirectiveDefinition()
+        path.join(this.root, this.operations, '_ts.gql'),
+        this.getTsDirectiveDefinition(),
       );
     }
   }
 
   async writeStitchingDirectiveDefinition(
-    options: Omit<CodeGeneratorCliOptions, "watch">
+    options: Omit<CodeGeneratorCliOptions, 'watch'>,
   ) {
     if (options.server && options.stitching) {
       await fs.promises.writeFile(
-        path.join(this.root, this.schema, "_stitching.gql"),
-        this.getStitchingDirectiveDefinition()
+        path.join(this.root, this.schema, '_stitching.gql'),
+        this.getStitchingDirectiveDefinition(),
       );
     }
   }
@@ -266,15 +266,15 @@ export class CodeGenerator {
 
   async writeServer() {
     await writeTypeScript(
-      path.join(this.root, this.out, "schema.ts"),
-      await this.generateServer()
+      path.join(this.root, this.out, 'schema.ts'),
+      await this.generateServer(),
     );
   }
 
   async writeClient() {
     await writeTypeScript(
-      path.join(this.root, this.out, "operations.ts"),
-      await this.generateClient()
+      path.join(this.root, this.out, 'operations.ts'),
+      await this.generateClient(),
     );
   }
 
@@ -327,7 +327,7 @@ extend type Query {
 
     if (errors.length > 0) {
       throw new Error(
-        `Validation failed: ${errors.map((it) => it.message).join(" ")}`
+        `Validation failed: ${errors.map((it) => it.message).join(' ')}`,
       );
     }
 
@@ -360,13 +360,13 @@ extend type Query {
         this.introspection.url,
         this.introspection.getHeaders
           ? await this.introspection.getHeaders()
-          : undefined
+          : undefined,
       );
 
       if (this.introspection.file) {
         await fs.promises.writeFile(
           this.introspection.file,
-          JSON.stringify(introspection)
+          JSON.stringify(introspection),
         );
       }
 
@@ -374,7 +374,7 @@ extend type Query {
     } catch (err) {
       if (this.introspection.file) {
         const introspection = JSON.parse(
-          await fs.promises.readFile(this.introspection.file, "utf-8")
+          await fs.promises.readFile(this.introspection.file, 'utf-8'),
         );
 
         return buildClientSchema(introspection);

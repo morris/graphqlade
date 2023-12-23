@@ -1,7 +1,7 @@
-import { GraphQLReader } from "../src";
-import { requireExampleServer } from "./util";
+import { GraphQLReader } from '../src';
+import { requireExampleServer } from './util';
 
-describe("The example", () => {
+describe('The example', () => {
   let operations: string;
   let sdl: string;
 
@@ -10,18 +10,18 @@ describe("The example", () => {
   beforeAll(async () => {
     const reader = new GraphQLReader();
     operations = await reader.readDir(
-      `${__dirname}/../examples/client/operations`
+      `${__dirname}/../examples/client/operations`,
     );
     sdl = await reader.readDir(`${__dirname}/../examples/server/schema`);
   });
 
-  it("should run", async () => {
-    const response = await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+  it('should run', async () => {
+    const response = await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "Bosses",
+        operationName: 'Bosses',
       }),
     });
 
@@ -31,38 +31,38 @@ describe("The example", () => {
       data: {
         bosses: [
           {
-            id: "1",
+            id: '1',
             location: {
-              id: "11",
-              name: "Northern Undead Asylum",
+              id: '11',
+              name: 'Northern Undead Asylum',
             },
-            name: "Asylum Demon",
+            name: 'Asylum Demon',
           },
           {
-            id: "2",
+            id: '2',
             location: {
-              id: "12",
-              name: "Undead Burg",
+              id: '12',
+              name: 'Undead Burg',
             },
-            name: "Taurus Demon",
+            name: 'Taurus Demon',
           },
           {
-            id: "3",
+            id: '3',
             location: {
-              id: "13",
-              name: "Undead Parish",
+              id: '13',
+              name: 'Undead Parish',
             },
-            name: "Bell Gargoyles",
+            name: 'Bell Gargoyles',
           },
         ],
       },
     });
   });
 
-  it("should reject invalid queries", async () => {
-    const response = await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+  it('should reject invalid queries', async () => {
+    const response = await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: `{ invalid }`,
       }),
@@ -86,13 +86,13 @@ describe("The example", () => {
     });
   });
 
-  it("should respect @skip directives", async () => {
-    const response = await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+  it('should respect @skip directives', async () => {
+    const response = await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "Locations",
+        operationName: 'Locations',
         variables: {
           skipBosses: true,
         },
@@ -105,29 +105,29 @@ describe("The example", () => {
       data: {
         locations: [
           {
-            id: "11",
-            name: "Northern Undead Asylum",
+            id: '11',
+            name: 'Northern Undead Asylum',
           },
           {
-            id: "12",
-            name: "Undead Burg",
+            id: '12',
+            name: 'Undead Burg',
           },
           {
-            id: "13",
-            name: "Undead Parish",
+            id: '13',
+            name: 'Undead Parish',
           },
         ],
       },
     });
   });
 
-  it("should respect @skip directives (negative case)", async () => {
-    const response = await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+  it('should respect @skip directives (negative case)', async () => {
+    const response = await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "Locations",
+        operationName: 'Locations',
         variables: {
           skipBosses: false,
         },
@@ -140,32 +140,32 @@ describe("The example", () => {
       data: {
         locations: [
           {
-            id: "11",
-            name: "Northern Undead Asylum",
+            id: '11',
+            name: 'Northern Undead Asylum',
             bosses: [
               {
-                id: "1",
-                name: "Asylum Demon",
+                id: '1',
+                name: 'Asylum Demon',
               },
             ],
           },
           {
-            id: "12",
-            name: "Undead Burg",
+            id: '12',
+            name: 'Undead Burg',
             bosses: [
               {
-                id: "2",
-                name: "Taurus Demon",
+                id: '2',
+                name: 'Taurus Demon',
               },
             ],
           },
           {
-            id: "13",
-            name: "Undead Parish",
+            id: '13',
+            name: 'Undead Parish',
             bosses: [
               {
-                id: "3",
-                name: "Bell Gargoyles",
+                id: '3',
+                name: 'Bell Gargoyles',
               },
             ],
           },
@@ -174,13 +174,13 @@ describe("The example", () => {
     });
   });
 
-  it("should respect @include directives", async () => {
-    const response = await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+  it('should respect @include directives', async () => {
+    const response = await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         query: operations,
-        operationName: "Locations",
+        operationName: 'Locations',
         variables: {
           includeReviews: true,
         },
@@ -193,38 +193,38 @@ describe("The example", () => {
       data: {
         locations: [
           {
-            id: "11",
-            name: "Northern Undead Asylum",
+            id: '11',
+            name: 'Northern Undead Asylum',
             bosses: [
               {
-                id: "1",
-                name: "Asylum Demon",
+                id: '1',
+                name: 'Asylum Demon',
                 reviews: [
                   {
-                    difficulty: "OKAYISH",
+                    difficulty: 'OKAYISH',
                   },
                 ],
               },
             ],
           },
           {
-            id: "12",
-            name: "Undead Burg",
+            id: '12',
+            name: 'Undead Burg',
             bosses: [
               {
-                id: "2",
-                name: "Taurus Demon",
+                id: '2',
+                name: 'Taurus Demon',
                 reviews: [],
               },
             ],
           },
           {
-            id: "13",
-            name: "Undead Parish",
+            id: '13',
+            name: 'Undead Parish',
             bosses: [
               {
-                id: "3",
-                name: "Bell Gargoyles",
+                id: '3',
+                name: 'Bell Gargoyles',
                 reviews: [],
               },
             ],
@@ -234,12 +234,12 @@ describe("The example", () => {
     });
   });
 
-  it("should resolve SDL fields", async () => {
-    const response = await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+  it('should resolve SDL fields', async () => {
+    const response = await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        query: "{ _sdl _sdlVersion }",
+        query: '{ _sdl _sdlVersion }',
       }),
     });
 
@@ -248,17 +248,17 @@ describe("The example", () => {
     expect(json).toEqual({
       data: {
         _sdl: sdl,
-        _sdlVersion: "79b0cab0ba9ca035d10e57c2d739eace9be2a044",
+        _sdlVersion: '79b0cab0ba9ca035d10e57c2d739eace9be2a044',
       },
     });
   });
 
-  it("should reject queries with more than 1000 tokens", async () => {
-    const response = await fetch("http://localhost:4999/graphql", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
+  it('should reject queries with more than 1000 tokens', async () => {
+    const response = await fetch('http://localhost:4999/graphql', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        query: `{ ${" x".repeat(1000)} }`,
+        query: `{ ${' x'.repeat(1000)} }`,
       }),
     });
 
@@ -274,7 +274,7 @@ describe("The example", () => {
             },
           ],
           message:
-            "Syntax Error: Document contains more that 1000 tokens. Parsing aborted.",
+            'Syntax Error: Document contains more that 1000 tokens. Parsing aborted.',
         },
       ],
     });

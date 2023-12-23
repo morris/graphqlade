@@ -1,8 +1,8 @@
-import { execute, GraphQLResolveInfo, parse } from "graphql";
-import { CustomResolvers, getProjection, GraphQLServer } from "../../src";
+import { execute, GraphQLResolveInfo, parse } from 'graphql';
+import { CustomResolvers, getProjection, GraphQLServer } from '../../src';
 
-describe("The getProjection function", () => {
-  it("should calculate a projection from GraphQLResolveInfo", async () => {
+describe('The getProjection function', () => {
+  it('should calculate a projection from GraphQLResolveInfo', async () => {
     const gqlServer = await GraphQLServer.bootstrap<undefined>({
       root: `${__dirname}/../../examples/server`,
       createContext() {
@@ -18,11 +18,11 @@ describe("The getProjection function", () => {
           _: unknown,
           __: unknown,
           ___: unknown,
-          info: GraphQLResolveInfo
+          info: GraphQLResolveInfo,
         ) {
           projections.push(getProjection(info));
 
-          return [{ id: "fake" }];
+          return [{ id: 'fake' }];
         },
       },
       BossReview: {
@@ -31,10 +31,10 @@ describe("The getProjection function", () => {
         },
         boss(_: unknown, __: unknown, ___: unknown, info: GraphQLResolveInfo) {
           projections.push(
-            getProjection(info, { name: { otherName: true, stuff: true } })
+            getProjection(info, { name: { otherName: true, stuff: true } }),
           );
 
-          return { name: "big bo$$" };
+          return { name: 'big bo$$' };
         },
       },
     } as CustomResolvers<undefined>);

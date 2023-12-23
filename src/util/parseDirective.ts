@@ -1,4 +1,4 @@
-import { DirectiveNode, valueFromASTUntyped } from "graphql";
+import { DirectiveNode, valueFromASTUntyped } from 'graphql';
 
 export function parseDirective<T>(node: DirectiveNode): T {
   const directive: Record<string, unknown> = {};

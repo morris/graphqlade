@@ -1,9 +1,9 @@
-import { DocumentNode, visit } from "graphql";
+import { DocumentNode, visit } from 'graphql';
 
 export function limitDepth(document: DocumentNode, maxDepth: number) {
   function traverse(currentDepth: number, fragmentSpreads: string[]) {
     if (fragmentSpreads.some((f, i) => i !== fragmentSpreads.indexOf(f))) {
-      throw new TypeError("Invalid query, contains circular fragment spreads");
+      throw new TypeError('Invalid query, contains circular fragment spreads');
     }
 
     visit(document, {
@@ -27,7 +27,7 @@ export function limitDepth(document: DocumentNode, maxDepth: number) {
           ++currentDepth;
 
           if (currentDepth > maxDepth) {
-            throw new TypeError("Invalid query, exceeds max depth");
+            throw new TypeError('Invalid query, exceeds max depth');
           }
         },
         leave() {
