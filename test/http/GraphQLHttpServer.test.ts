@@ -27,6 +27,7 @@ describe('The GraphQLHttpServer', () => {
           praise: 'the sun!',
         },
       },
+      context: expect.any(MyContext),
     });
   });
 
@@ -56,6 +57,7 @@ describe('The GraphQLHttpServer', () => {
           praise: 'the sun!',
         },
       },
+      context: expect.any(MyContext),
     });
   });
 

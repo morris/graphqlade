@@ -4,7 +4,6 @@ import {
   getOperationAST,
   GraphQLError,
   GraphQLSchema,
-  validate,
 } from 'graphql';
 import { IncomingHttpHeaders } from 'http';
 import {
@@ -20,7 +19,6 @@ import {
   ExpressResponseLike,
 } from './express';
 import { KoaContextLike, KoaNextFunctionLike } from './koa';
-import { MethodNotAllowedError } from './MethodNotAllowedError';
 
 export interface GraphQLHttpServerOptions<TContext> {
   /**
@@ -55,10 +53,11 @@ export interface ParsedQs {
   [key: string]: string | string[] | ParsedQs | ParsedQs[] | undefined;
 }
 
-export interface GraphQLHttpServerResponse {
+export interface GraphQLHttpServerResponse<TContext> {
   status: number;
   headers: Record<string, string>;
   body: ExecutionResult;
+  context?: TContext;
 }
 
 export class GraphQLHttpServer<TContext> {
@@ -128,78 +127,74 @@ export class GraphQLHttpServer<TContext> {
     }
   }
 
-  // execution
+  //
 
   async execute(
     request: GraphQLHttpServerRequest,
-  ): Promise<GraphQLHttpServerResponse> {
-    try {
-      return this.executeParsed(request, this.parse(request));
-    } catch (err_) {
-      const err = toError(err_);
-
-      let status = 500;
-
-      if (err instanceof TypeError && err.message.match(/^Invalid/)) {
-        status = 400;
-      }
-
-      if ('status' in err && typeof err.status === 'number') {
-        status = err.status;
-      }
-
+  ): Promise<GraphQLHttpServerResponse<TContext>> {
+    if (request.method !== 'GET' && request.method !== 'POST') {
       return {
-        status,
+        status: 405,
         headers: {},
         body: {
-          errors: [this.serializeError(err_)],
+          errors: [
+            this.serializeError({
+              message: `Unsupported method: ${request.method.toUpperCase()}`,
+            }),
+          ],
         },
       };
     }
-  }
 
-  async executeParsed(
-    request: GraphQLHttpServerRequest,
-    args: ParsedExecutionArgs,
-  ) {
-    const errors = this.validate(request, args);
+    let args: ParsedExecutionArgs;
 
-    if (errors.length > 0) {
+    try {
+      args = this.parse(request);
+    } catch (err) {
       return {
         status: 400,
         headers: {},
-        body: {
-          errors,
-        },
+        body: { errors: [this.serializeError(err)] },
       };
     }
 
-    return this.executeValidated(request, args);
+    try {
+      const errors = this.validate(request, args);
+
+      if (errors.length > 0) {
+        return {
+          status: 400,
+          headers: {},
+          body: { errors },
+        };
+      }
+
+      const context = await this.createContext({ ...request, ...args });
+
+      const body = await execute({
+        schema: this.schema,
+        contextValue: context,
+        ...args,
+      });
+
+      return {
+        status: 200,
+        headers: {},
+        body,
+        context,
+      };
+    } catch (err) {
+      // This should actually never happen;
+      // any errors should be on resolver level at this point
+      return {
+        status: 500,
+        headers: {},
+        body: { errors: [this.serializeError(err)] },
+      };
+    }
   }
-
-  async executeValidated(
-    request: GraphQLHttpServerRequest,
-    args: ParsedExecutionArgs,
-  ) {
-    const contextValue = await this.createContext({ ...request, ...args });
-
-    const body = await execute({
-      schema: this.schema,
-      contextValue,
-      ...args,
-    });
-
-    return {
-      status: 200,
-      headers: {},
-      body,
-    };
-  }
-
-  // validation
 
   validate(request: GraphQLHttpServerRequest, args: ParsedExecutionArgs) {
-    const errors = validate(this.schema, args.document) as GraphQLError[];
     const operation = getOperationAST(args.document, args.operationName);
 
     if (
@@ -207,15 +202,11 @@ export class GraphQLHttpServer<TContext> {
       operation.operation === 'mutation' &&
       request.method === 'GET'
     ) {
-      errors.push({
-        message: 'Mutations are not allowed via GET',
-      } as GraphQLError);
+      return [{ message: 'Mutations are not allowed via GET' } as GraphQLError];
     }
 
-    return errors;
+    return this.parser.validate(this.schema, args);
   }
-
-  // parsing
 
   parse(request: GraphQLHttpServerRequest): ParsedExecutionArgs {
     switch (request.method) {
@@ -224,7 +215,8 @@ export class GraphQLHttpServer<TContext> {
       case 'POST':
         return this.parsePost(request);
       default:
-        throw new MethodNotAllowedError(
+        // Should never happen
+        throw new TypeError(
           `Unsupported method: ${request.method.toUpperCase()}`,
         );
     }

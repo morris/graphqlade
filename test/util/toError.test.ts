@@ -1,6 +1,5 @@
 import { AssertionError } from 'assert';
 import { toError } from '../../src';
-import { MethodNotAllowedError } from '../../src/http/MethodNotAllowedError';
 
 describe('toError', () => {
   it('should return Error instances as-is', () => {
@@ -8,7 +7,6 @@ describe('toError', () => {
       new Error('a'),
       new TypeError('b'),
       new AssertionError({ message: 'c' }),
-      new MethodNotAllowedError('d'),
     ];
 
     expect(input.map(toError)).toStrictEqual(input);

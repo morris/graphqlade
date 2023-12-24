@@ -2,6 +2,7 @@
 
 ## NEXT
 
+- Improve caching of parse and validation results for performance
 - Update formatting
 - Fix compatibility issue with `prettier@3.x` (`format` became async)
 - Update deps

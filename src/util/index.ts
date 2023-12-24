@@ -1,6 +1,7 @@
 export * from './AsyncPushIterator';
 export * from './DeferredPromise';
 export * from './GraphQLResultError';
+export * from './LRUCache';
 export * from './LoggerLike';
 export * from './assert';
 export * from './cleanOperations';

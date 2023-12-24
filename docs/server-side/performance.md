@@ -11,7 +11,7 @@ or transport level (e.g. compression, streamed body parsing).
 
 ## Parser cache
 
-The GraphQLade execution argument parser uses an LRU (least recently used) cache
+GraphQLade caches parse and validation results in an LRU (least recently used) cache
 with a cache size of 50 by default.
 The cache size can be configured via `parserOptions.cacheSize`.
 

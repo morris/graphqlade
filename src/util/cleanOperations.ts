@@ -1,12 +1,12 @@
-import { DocumentNode, visit } from 'graphql';
+import { DocumentNode, Kind } from 'graphql';
 
-export function cleanOperations(document: DocumentNode) {
-  return visit(document, {
-    ScalarTypeDefinition() {
-      return null;
-    },
-    DirectiveDefinition() {
-      return null;
-    },
-  });
+export function cleanOperations(document: DocumentNode): DocumentNode {
+  return {
+    ...document,
+    definitions: document.definitions.filter(
+      (definition) =>
+        definition.kind !== Kind.SCALAR_TYPE_DEFINITION &&
+        definition.kind !== Kind.DIRECTIVE_DEFINITION,
+    ),
+  };
 }

@@ -1,4 +1,4 @@
-import { GraphQLError, GraphQLSchema, subscribe, validate } from 'graphql';
+import { GraphQLError, GraphQLSchema, subscribe } from 'graphql';
 import type { IncomingMessage } from 'http';
 import {
   CreateContextFn,
@@ -152,7 +152,7 @@ export class GraphQLWebSocketServer<TContext> {
   // validation
 
   validate(args: ParsedExecutionArgs) {
-    return validate(this.schema, args.document) as GraphQLError[];
+    return this.parser.validate(this.schema, args);
   }
 
   // parse

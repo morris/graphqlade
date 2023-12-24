@@ -1,14 +1,18 @@
-import { DocumentNode, ExecutionArgs, ParseOptions, parse } from 'graphql';
+import {
+  DocumentNode,
+  ExecutionArgs,
+  GraphQLError,
+  GraphQLSchema,
+  ParseOptions,
+  parse,
+  validate,
+} from 'graphql';
 import { assert, cleanOperations, isRecord, limitDepth } from '../util';
+import { LRUCache } from '../util/LRUCache';
 
 export interface GraphQLExecutionArgsParserOptions extends ParseOptions {
   cacheSize?: number;
   maxDepth?: number;
-}
-
-interface CacheEntry {
-  document: DocumentNode;
-  index: number;
 }
 
 export interface RawExecutionArgs {
@@ -20,23 +24,23 @@ export interface RawExecutionArgs {
 export type ParsedExecutionArgs = Pick<
   ExecutionArgs,
   'document' | 'operationName' | 'variableValues'
->;
+> & { originalQuery: string };
 
 /**
- * query/operationName/variables parser with LRU caching for operations
+ * query/operationName/variables parser and validator with LRU caching
  */
 export class GraphQLExecutionArgsParser {
-  protected cache = new Map<string, CacheEntry>();
-  protected cacheSize: number;
-  protected cacheIndex = 0;
   protected parseOptions: ParseOptions;
   protected maxDepth?: number;
+  protected parseQueryCache: LRUCache<string, DocumentNode>;
+  protected validateCache: LRUCache<string, GraphQLError[]>;
 
   constructor(options?: GraphQLExecutionArgsParserOptions) {
     const { cacheSize, maxDepth, ...parseOptions } = options ?? {};
-    this.cacheSize = cacheSize ?? 50;
     this.parseOptions = parseOptions;
     this.maxDepth = maxDepth;
+    this.parseQueryCache = new LRUCache(cacheSize ?? 50);
+    this.validateCache = new LRUCache(cacheSize ?? 50);
   }
 
   parse(args: RawExecutionArgs): ParsedExecutionArgs {
@@ -44,19 +48,15 @@ export class GraphQLExecutionArgsParser {
       document: this.parseQuery(args.query),
       operationName: this.parseOperationName(args.operationName),
       variableValues: this.parseVariables(args.variables),
+      originalQuery: args.query as string, // asserted in parseQuery
     };
   }
 
   parseQuery(query: unknown): DocumentNode {
     assert(typeof query === 'string', 'Invalid query, expected string');
 
-    const cached = this.cache.get(query);
-
-    if (cached) {
-      cached.index = this.cacheIndex++;
-
-      return cached.document;
-    }
+    const cached = this.parseQueryCache.get(query);
+    if (cached) return cached;
 
     const document = cleanOperations(parse(query, this.parseOptions));
 
@@ -64,18 +64,7 @@ export class GraphQLExecutionArgsParser {
       limitDepth(document, this.maxDepth);
     }
 
-    this.cache.set(query, {
-      document,
-      index: this.cacheIndex++,
-    });
-
-    if (this.cache.size > this.cacheSize) {
-      const minIndex = this.cacheIndex - this.cacheSize;
-
-      for (const [key, entry] of this.cache) {
-        if (entry.index < minIndex) this.cache.delete(key);
-      }
-    }
+    this.parseQueryCache.set(query, document);
 
     return document;
   }
@@ -124,7 +113,14 @@ export class GraphQLExecutionArgsParser {
     return parsed;
   }
 
-  getCache() {
-    return this.cache;
+  validate(schema: GraphQLSchema, args: ParsedExecutionArgs) {
+    const cached = this.validateCache.get(args.originalQuery);
+    if (cached) return cached;
+
+    const errors = validate(schema, args.document) as GraphQLError[];
+
+    this.validateCache.set(args.originalQuery, errors);
+
+    return errors;
   }
 }

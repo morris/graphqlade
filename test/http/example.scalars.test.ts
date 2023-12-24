@@ -38,6 +38,7 @@ describe('The example server', () => {
           nan: { input: 'NaN', result: false },
         },
       },
+      context: expect.any(MyContext),
     });
   });
 
@@ -62,6 +63,7 @@ describe('The example server', () => {
           negativeInfinity: '-Infinity',
         },
       },
+      context: expect.any(MyContext),
     });
   });
 });
