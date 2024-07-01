@@ -1,12 +1,13 @@
 # Changelog
 
-## NEXT
+## 1.9.0
 
 - Improve caching of parse and validation results for performance
 - Update formatting
 - Fix compatibility issue with `prettier@3.x` (`format` became async)
 - Add [audit](https://github.com/graphql/graphql-http) for [GraphQL over HTTP spec](https://graphql.github.io/graphql-over-http/)
 - Fix incorrect Node.js 12 support (was never supported, at least 14 was always required)
+- Add basic benchmarks
 - Update deps
 
 ## 1.8.1

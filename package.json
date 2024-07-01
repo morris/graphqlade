@@ -1,6 +1,6 @@
 {
   "name": "graphqlade",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "A complete TypeScript library for GraphQL development on server- and client-side",
   "keywords": [
     "graphql",
