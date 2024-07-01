@@ -718,6 +718,16 @@ export interface R__Type<TContext> {
     context: TContext,
     info: GraphQLResolveInfo,
   ) => AsyncResult<Maybe<T__Type>>;
+
+  /**
+   * (Boolean)
+   */
+  isOneOf?: (
+    source: T__Type,
+    args: Record<string, never>,
+    context: TContext,
+    info: GraphQLResolveInfo,
+  ) => AsyncResult<Maybe<boolean>>;
 }
 
 /**
@@ -1391,6 +1401,11 @@ export interface T__Type {
   inputFields?: Array<T__InputValue>;
 
   ofType?: T__Type;
+
+  /**
+   * (Boolean)
+   */
+  isOneOf?: boolean;
 }
 
 /**
