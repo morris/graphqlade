@@ -1,0 +1,17 @@
+{
+  "name": "graphqlade-benchmark",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "benchmark": "bash benchmark.sh",
+    "benchmark1": "bash benchmark1.sh"
+  },
+  "dependencies": {
+    "@graphql-tools/schema": "^10",
+    "autocannon": "^7",
+    "express": "^4",
+    "graphql": "^16",
+    "graphql-yoga": "^5",
+    "graphqlade": "^1"
+  }
+}
