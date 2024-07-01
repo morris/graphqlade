@@ -32,7 +32,7 @@ jobs:
         if: ${{ matrix.node-version != '14.x' }} # see above
         env:
           CI: true
-      - run: npx codecov
+      - run: npx codecov || echo "Codecov failed, ignoring"
         if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == '18.x' }}
   publish:
     if: github.ref == 'refs/heads/main'
