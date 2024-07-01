@@ -21,7 +21,7 @@ export function bootstrapExample() {
   });
 }
 
-export function requireExampleServer(env?: NodeJS.ProcessEnv) {
+export async function requireExampleServer(env?: NodeJS.ProcessEnv) {
   const ready = main({ PORT: '0', ...env });
 
   beforeAll(() => ready);
@@ -32,11 +32,13 @@ export function requireExampleServer(env?: NodeJS.ProcessEnv) {
     return serverClosed(server);
   });
 
-  return ready.then((r) => ({
+  const r = await ready;
+
+  return {
     ...r,
     url: `http://localhost:${r.port}/graphql`,
     wsUrl: `ws://localhost:${r.port}/graphql`,
-  }));
+  };
 }
 
 export function serverClosed(server: Server) {
