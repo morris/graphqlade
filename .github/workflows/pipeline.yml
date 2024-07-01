@@ -22,7 +22,7 @@ jobs:
       - run: npm run build-examples
 
       # workaround for https://github.com/jestjs/jest/issues/11438
-      - run: npm run test-coverage -- --maxWorkers=6
+      - run: npm run test-coverage -- --maxWorkers=7
         if: ${{ matrix.node-version == '14.x' }}
         env:
           CI: true
