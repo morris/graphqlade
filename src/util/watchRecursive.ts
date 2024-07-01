@@ -1,7 +1,6 @@
 import { Dirent, promises as fsPromises, Stats } from 'fs';
 import { join } from 'path';
 import type { FileWatcher } from 'typescript';
-import { canImportModule } from './canImportModule';
 import { LoggerLike } from './LoggerLike';
 import { toError } from './toError';
 
@@ -72,14 +71,15 @@ export async function watchRecursive(options: WatchRecursiveOptions) {
   }
 }
 
-export async function importWatchFunctions() {
-  if (!(await canImportModule('typescript'))) {
+async function importWatchFunctions() {
+  const ts = await import('typescript').catch(() => undefined);
+
+  if (!ts) {
     throw new Error(
       "Cannot watch files: Could not import package 'typescript'",
     );
   }
 
-  const ts = await import('typescript');
   const { watchDirectory, watchFile } = ts.sys;
 
   if (!watchDirectory || !watchFile) {
