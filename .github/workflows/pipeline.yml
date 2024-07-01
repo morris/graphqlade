@@ -1,23 +1,19 @@
 name: Pipeline
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [14.x, 16.x, 18.x, 20.x]
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: https://registry.npmjs.org
       - run: npm install
       - run: npm run lint
         if: ${{ matrix.node-version != '14.x' }}
@@ -37,8 +33,19 @@ jobs:
         env:
           CI: true
       - run: npx codecov
-        if: ${{ matrix.node-version == '18.x' }}
-      - run: npm run maybe-publish
-        if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == '14.x' }}
+        if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == '18.x' }}
+  publish:
+    if: github.ref == 'refs/heads/main'
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 14.x
+          registry-url: https://registry.npmjs.org
+      - run: npm install
+      - run: npm run build
+      - run: npm publish || echo "Already published"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
