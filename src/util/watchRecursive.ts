@@ -73,7 +73,7 @@ export async function watchRecursive(options: WatchRecursiveOptions) {
 }
 
 export async function importWatchFunctions() {
-  if (!canImportModule('typescript')) {
+  if (!(await canImportModule('typescript'))) {
     throw new Error(
       "Cannot watch files: Could not import package 'typescript'",
     );
