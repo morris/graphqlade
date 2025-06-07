@@ -2,7 +2,7 @@
 
 ## NEXT
 
-- Upgrade ESLint
+- Upgrade dependencies
 
 ## 1.9.0
 
