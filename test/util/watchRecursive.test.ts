@@ -7,6 +7,7 @@ describe('The watchRecursive function', () => {
   beforeAll(() => {
     try {
       rmdirSync(join(__dirname, 'watchRecursive'), { recursive: true });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       // ignore
     }

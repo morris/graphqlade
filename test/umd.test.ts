@@ -2,7 +2,7 @@ import fs from 'fs';
 
 describe('The UMD build', () => {
   it('should work with require()', () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const graphqlade = require('../dist/graphqlade.umd.js');
 
     expect(typeof graphqlade.GraphQLClientWebSocket).toEqual('function');
@@ -21,7 +21,6 @@ describe('The UMD build', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const self: any = {};
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const exports = undefined;
 
     eval(

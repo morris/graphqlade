@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x, 20.x]
+        node-version: [14, 16, 18, 20, 22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,24 +16,24 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm install
       - run: npm run lint
-        if: ${{ matrix.node-version != '14.x' }}
+        if: ${{ matrix.node-version == 24 }}
       - run: npm run format-check
       - run: npm run build
       - run: npm run build-examples
 
       # workaround for https://github.com/jestjs/jest/issues/11438
       - run: npm run test-coverage -- --maxWorkers=7
-        if: ${{ matrix.node-version == '14.x' }}
+        if: ${{ matrix.node-version == 14 }}
         env:
           CI: true
       # end workaround
 
       - run: npm run test-coverage
-        if: ${{ matrix.node-version != '14.x' }} # see above
+        if: ${{ matrix.node-version != 14 }} # see above
         env:
           CI: true
       - run: npx codecov || echo "Codecov failed, ignoring"
-        if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == '18.x' }}
+        if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == 18 }}
   publish:
     if: github.ref == 'refs/heads/main'
     needs: check
@@ -42,7 +42,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 14.x
+          node-version: 14
           registry-url: https://registry.npmjs.org
       - run: npm install
       - run: npm run build

@@ -1,3 +1,4 @@
+/* globals process console Buffer */
 /* eslint-disable no-console */
 
 // TODO support source maps

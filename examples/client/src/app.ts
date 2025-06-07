@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { GraphQLClient, GraphQLWebSocketClient } from 'graphqlade/dist/browser';
 import {
   DBosses,

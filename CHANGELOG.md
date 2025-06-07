@@ -1,5 +1,9 @@
 # Changelog
 
+## NEXT
+
+- Upgrade ESLint
+
 ## 1.9.0
 
 - Improve caching of parse and validation results for performance

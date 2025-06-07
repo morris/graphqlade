@@ -102,7 +102,6 @@ export class GraphQLServerWebSocket {
 
   // event handlers
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleCloseEvent(event: CloseEvent) {
     if (this.connectionInitWaitTimeoutId) {
       clearTimeout(this.connectionInitWaitTimeoutId);
@@ -121,7 +120,6 @@ export class GraphQLServerWebSocket {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleErrorEvent(event: ErrorEvent) {
     if (this.connectionInitWaitTimeoutId) {
       clearTimeout(this.connectionInitWaitTimeoutId);

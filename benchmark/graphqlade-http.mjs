@@ -1,3 +1,4 @@
+/* global console URL */
 import { createServer } from 'http';
 import { GraphQLServer } from '../dist/index.js';
 import { resolvers } from './resolvers.mjs';
