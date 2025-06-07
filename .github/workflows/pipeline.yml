@@ -14,14 +14,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://registry.npmjs.org
-      - run: npm install
+      - run: npm ci
       - run: npm run lint
         if: ${{ matrix.node-version == 24 }}
       - run: npm run format-check
+        if: ${{ matrix.node-version == 24 }}
       - run: npm run build
       - run: npm run build-examples
 
       # workaround for https://github.com/jestjs/jest/issues/11438
+      - run: npm ls ts-jest
       - run: npm run test-coverage -- --maxWorkers=7
         if: ${{ matrix.node-version == 14 }}
         env:
