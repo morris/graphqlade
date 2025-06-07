@@ -3,6 +3,21 @@ name: Pipeline
 on: push
 
 jobs:
+  check14:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org
+      - run: npm install
+      - run: npm ls ts-jest
+      - run: npm run build
+      - run: npm run build-examples
+      - run: npm run test-coverage -- --maxWorkers=7
+        env:
+          CI: true
   check:
     runs-on: ubuntu-latest
     strategy:
@@ -38,7 +53,7 @@ jobs:
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org
-      - run: npm ci
+      - run: npm install
       - run: npm run build
       - run: npm publish || echo "Already published"
         env:
