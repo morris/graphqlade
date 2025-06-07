@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14, 16, 18, 20, 22, 24]
+        node-version: [16, 18, 20, 22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,21 +21,13 @@ jobs:
         if: ${{ matrix.node-version == 24 }}
       - run: npm run build
       - run: npm run build-examples
-
-      # workaround for https://github.com/jestjs/jest/issues/11438
-      - run: npm ls ts-jest
-      - run: npm run test-coverage -- --maxWorkers=7
-        if: ${{ matrix.node-version == 14 }}
-        env:
-          CI: true
-      # end workaround
-
       - run: npm run test-coverage
-        if: ${{ matrix.node-version != 14 }} # see above
         env:
           CI: true
-      - run: npx codecov || echo "Codecov failed, ignoring"
-        if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == 18 }}
+      - uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+        if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == 24 }}
   publish:
     if: github.ref == 'refs/heads/main'
     needs: check
@@ -46,7 +38,7 @@ jobs:
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org
-      - run: npm install
+      - run: npm ci
       - run: npm run build
       - run: npm publish || echo "Already published"
         env:
