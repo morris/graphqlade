@@ -1,13 +1,10 @@
-import {
-  execute,
-  executeSync,
-  GraphQLEnumType,
-  GraphQLError,
-  parse,
-} from 'graphql';
+import { execute, executeSync, GraphQLEnumType, parse } from 'graphql';
 import { GraphQLDateTime } from 'graphql-scalars';
-import path from 'path';
+import * as assert from 'node:assert';
+import * as path from 'node:path';
+import { describe, it } from 'node:test';
 import { GraphQLReader, GraphQLServer } from '../../src';
+import { formatForAssertion } from '../util';
 
 describe('The GraphQLServer', () => {
   it('should be able to bootstrap an executable schema', async () => {
@@ -26,14 +23,14 @@ describe('The GraphQLServer', () => {
       },
     });
 
-    const result = execute({
+    const result = await execute({
       schema: gqlServer.schema,
       document: parse(`
         { praise }
       `),
     });
 
-    expect(result).toEqual({
+    assert.deepStrictEqual(formatForAssertion(result), {
       data: {
         praise: 'the sun!',
       },
@@ -79,17 +76,17 @@ describe('The GraphQLServer', () => {
 
     const enumType = gqlServer.schema.getType('Rating') as GraphQLEnumType;
 
-    expect(enumType.parseValue('TERRIBLE')).toEqual(1);
-    expect(enumType.serialize(1)).toEqual('TERRIBLE');
+    assert.deepStrictEqual(enumType.parseValue('TERRIBLE'), 1);
+    assert.deepStrictEqual(enumType.serialize(1), 'TERRIBLE');
 
-    const result = execute({
+    const result = await execute({
       schema: gqlServer.schema,
       document: parse(`
         { reviews { createdAt ... on BossReview { theme } } }
       `),
     });
 
-    expect(result).toEqual({
+    assert.deepStrictEqual(formatForAssertion(result), {
       data: {
         reviews: [
           {
@@ -110,19 +107,17 @@ describe('The GraphQLServer', () => {
       },
     });
 
-    const result = execute({
+    const result = await execute({
       schema: gqlServer.schema,
       document: parse(`
         { _sdl _sdlVersion }
       `),
     });
 
-    expect(result).toEqual({
+    assert.deepStrictEqual(formatForAssertion(result), {
       data: null,
       errors: [
-        new GraphQLError(
-          'Cannot return null for non-nullable field Query._sdl.',
-        ),
+        { message: 'Cannot return null for non-nullable field Query._sdl.' },
       ],
     });
   });
@@ -137,7 +132,7 @@ describe('The GraphQLServer', () => {
       stitching: true,
     });
 
-    const result = execute({
+    const result = await execute({
       schema: gqlServer.schema,
       document: parse(`
         { _sdl _sdlVersion }
@@ -147,7 +142,7 @@ describe('The GraphQLServer', () => {
     const reader = new GraphQLReader();
     const sdl = await reader.readDir(path.join(root, 'schema'));
 
-    expect(result).toEqual({
+    assert.deepStrictEqual(formatForAssertion(result), {
       data: {
         _sdl: sdl,
         _sdlVersion: '79b0cab0ba9ca035d10e57c2d739eace9be2a044',
@@ -195,12 +190,12 @@ describe('The GraphQLServer', () => {
       `),
     });
 
-    expect(resultSync).toEqual({
+    assert.deepStrictEqual(formatForAssertion(resultSync), {
       data: {
         praise: 'the sun!',
         boss: null,
       },
-      errors: [new GraphQLError('sync thrown error')],
+      errors: [{ message: 'sync thrown error' }],
     });
 
     const resultAsync = await execute({
@@ -210,7 +205,7 @@ describe('The GraphQLServer', () => {
       `),
     });
 
-    expect(resultAsync).toEqual({
+    assert.deepStrictEqual(formatForAssertion(resultAsync), {
       data: {
         praise: 'the sun!',
         boss: null,
@@ -218,13 +213,13 @@ describe('The GraphQLServer', () => {
         locations: null,
       },
       errors: [
-        new GraphQLError('sync thrown error'),
-        new GraphQLError('async thrown error'),
-        new GraphQLError('rejection'),
+        { message: 'sync thrown error' },
+        { message: 'async thrown error' },
+        { message: 'rejection' },
       ],
     });
 
-    expect(errors).toEqual([
+    assert.deepStrictEqual(errors, [
       new Error('sync thrown error'),
       new Error('sync thrown error'),
       new Error('async thrown error'),

@@ -2,7 +2,9 @@ import KoaRouter from '@koa/router';
 import { Server } from 'http';
 import Koa from 'koa';
 import KoaBodyParser from 'koa-bodyparser';
-import { AddressInfo } from 'net';
+import * as assert from 'node:assert';
+import { AddressInfo } from 'node:net';
+import { after, before, describe, it } from 'node:test';
 import { MyContext } from '../../examples/server/src/MyContext';
 import { GraphQLServer } from '../../src';
 import { bootstrapExample, serverClosed } from '../util';
@@ -15,7 +17,7 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
   let server: Server;
   let url: string;
 
-  beforeAll(async () => {
+  before(async () => {
     gqlServer = await bootstrapExample();
 
     app = new Koa();
@@ -33,12 +35,8 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
     url = `http://localhost:${port}/graphql`;
   });
 
-  afterAll(() => {
+  after(() => {
     if (server) server.close();
-  });
-
-  beforeEach(() => {
-    jest.clearAllMocks();
   });
 
   it('should be able to handle POST GraphQL requests', async () => {
@@ -53,14 +51,15 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
       }),
     });
 
-    expect(response.status).toBe(200);
-    expect(response.headers.get('content-type')).toBe(
+    assert.deepStrictEqual(response.status, 200);
+    assert.deepStrictEqual(
+      response.headers.get('content-type'),
       'application/json; charset=utf-8',
     );
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       data: {
         praise: 'the sun!',
       },
@@ -70,14 +69,15 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
   it('should be able to handle GET GraphQL requests', async () => {
     const response = await fetch(`${url}?query={praise}`);
 
-    expect(response.status).toBe(200);
-    expect(response.headers.get('content-type')).toBe(
+    assert.deepStrictEqual(response.status, 200);
+    assert.deepStrictEqual(
+      response.headers.get('content-type'),
       'application/json; charset=utf-8',
     );
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       data: {
         praise: 'the sun!',
       },
@@ -94,24 +94,25 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
       }),
     });
 
-    expect(response.status).toBe(405);
+    assert.deepStrictEqual(response.status, 405);
 
     const text = await response.text();
 
-    expect(text).toEqual('Method Not Allowed');
+    assert.deepStrictEqual(text, 'Method Not Allowed');
   });
 
   it('should reject mutations via GET', async () => {
     const response = await fetch(`${url}?query=mutation{youDied}`);
 
-    expect(response.status).toBe(400);
-    expect(response.headers.get('content-type')).toBe(
+    assert.deepStrictEqual(response.status, 400);
+    assert.deepStrictEqual(
+      response.headers.get('content-type'),
       'application/json; charset=utf-8',
     );
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       errors: [{ message: 'Mutations are not allowed via GET' }],
     });
   });
@@ -125,14 +126,15 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
       }),
     });
 
-    expect(response.status).toBe(400);
-    expect(response.headers.get('content-type')).toBe(
+    assert.deepStrictEqual(response.status, 400);
+    assert.deepStrictEqual(
+      response.headers.get('content-type'),
       'application/json; charset=utf-8',
     );
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       errors: [
         {
           locations: [
@@ -155,20 +157,23 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
       }),
     });
 
-    expect(response.status).toBe(400);
-    expect(response.headers.get('content-type')).toBe(
+    assert.deepStrictEqual(response.status, 400);
+    assert.deepStrictEqual(
+      response.headers.get('content-type'),
       'application/json; charset=utf-8',
     );
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       errors: [{ message: 'Invalid query, expected string' }],
     });
   });
 
   it('should respect koa middleware queued in after the graphql handler', async () => {
-    const postGraphqlHandlerMiddleware = jest.fn();
+    let postHandlerCalls = 0;
+
+    const postGraphqlHandlerMiddleware = () => ++postHandlerCalls;
 
     const appWithAdditionalMiddleware: Koa = new Koa();
     appWithAdditionalMiddleware
@@ -184,8 +189,8 @@ describe('The GraphQLHttpServer exposed via Koa', () => {
 
     try {
       const response = await fetch(`${url}?query={praise}`);
-      expect(response.status).toBe(200);
-      expect(postGraphqlHandlerMiddleware).toHaveBeenCalledTimes(1);
+      assert.deepStrictEqual(response.status, 200);
+      assert.deepStrictEqual(postHandlerCalls, 1);
     } finally {
       await serverClosed(anotherServer);
     }

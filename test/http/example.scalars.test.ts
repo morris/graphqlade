@@ -1,11 +1,13 @@
+import assert from 'node:assert';
+import { before, describe, it } from 'node:test';
 import { MyContext } from '../../examples/server/src/MyContext';
 import { GraphQLServer } from '../../src';
-import { bootstrapExample } from '../util';
+import { bootstrapExample, formatForAssertion } from '../util';
 
 describe('The example server', () => {
   let gqlServer: GraphQLServer<MyContext>;
 
-  beforeAll(async () => {
+  before(async () => {
     gqlServer = await bootstrapExample();
   });
 
@@ -25,7 +27,9 @@ describe('The example server', () => {
       },
     });
 
-    expect(response).toEqual({
+    delete response.context;
+
+    assert.deepStrictEqual(formatForAssertion(response), {
       status: 200,
       headers: {},
       body: {
@@ -38,7 +42,6 @@ describe('The example server', () => {
           nan: { input: 'NaN', result: false },
         },
       },
-      context: expect.any(MyContext),
     });
   });
 
@@ -54,7 +57,9 @@ describe('The example server', () => {
       },
     });
 
-    expect(response).toEqual({
+    delete response.context;
+
+    assert.deepStrictEqual(formatForAssertion(response), {
       status: 200,
       headers: {},
       body: {
@@ -63,7 +68,6 @@ describe('The example server', () => {
           negativeInfinity: '-Infinity',
         },
       },
-      context: expect.any(MyContext),
     });
   });
 });

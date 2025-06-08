@@ -1,3 +1,5 @@
+import * as assert from 'node:assert';
+import { before, describe, it } from 'node:test';
 import { GraphQLReader } from '../src';
 import { requireExampleServer } from './util';
 
@@ -7,7 +9,7 @@ describe('The example', () => {
 
   const exampleServer = requireExampleServer();
 
-  beforeAll(async () => {
+  before(async () => {
     const reader = new GraphQLReader();
     operations = await reader.readDir(
       `${__dirname}/../examples/client/operations`,
@@ -29,7 +31,7 @@ describe('The example', () => {
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       data: {
         bosses: [
           {
@@ -72,10 +74,11 @@ describe('The example', () => {
       }),
     });
 
-    expect(response.status).toEqual(400);
+    assert.strictEqual(response.status, 400);
 
     const json = await response.json();
-    expect(json).toEqual({
+
+    assert.deepStrictEqual(json, {
       errors: [
         {
           locations: [
@@ -107,7 +110,7 @@ describe('The example', () => {
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       data: {
         locations: [
           {
@@ -144,7 +147,7 @@ describe('The example', () => {
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       data: {
         locations: [
           {
@@ -199,7 +202,7 @@ describe('The example', () => {
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       data: {
         locations: [
           {
@@ -257,7 +260,7 @@ describe('The example', () => {
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       data: {
         _sdl: sdl,
         _sdlVersion: '79b0cab0ba9ca035d10e57c2d739eace9be2a044',
@@ -278,7 +281,7 @@ describe('The example', () => {
 
     const json = await response.json();
 
-    expect(json).toEqual({
+    assert.deepStrictEqual(json, {
       errors: [
         {
           locations: [

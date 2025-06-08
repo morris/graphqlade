@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
 import { Server } from 'http';
+import { after, before } from 'node:test';
 import WebSocket from 'ws';
 import { MyContext } from '../examples/server/src/MyContext';
 import { main } from '../examples/server/src/main';
@@ -24,9 +25,9 @@ export function bootstrapExample() {
 export async function requireExampleServer(env?: NodeJS.ProcessEnv) {
   const ready = main({ PORT: '0', ...env });
 
-  beforeAll(() => ready);
+  before(() => ready);
 
-  afterAll(async () => {
+  after(async () => {
     const { server } = await ready;
 
     return serverClosed(server);
@@ -97,4 +98,24 @@ export function mockJsonResponse(json: unknown, rest?: Partial<Response>) {
       return json;
     },
   } as Response;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function formatForAssertion(result: any): any {
+  if (Array.isArray(result)) {
+    return result.map(formatForAssertion);
+  } else if (result instanceof Error) {
+    return { message: result.message };
+  } else if (result instanceof Date) {
+    return result;
+  } else if (typeof result === 'object' && result) {
+    return Object.fromEntries(
+      Object.entries(result).map(([key, value]) => [
+        key,
+        formatForAssertion(value),
+      ]),
+    );
+  }
+
+  return result;
 }

@@ -1,4 +1,6 @@
 import { AuditFail, auditServer } from 'graphql-http';
+import * as assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { requireExampleServer } from '../util';
 
 describe('The GraphQL over HTTP audit', () => {
@@ -19,13 +21,14 @@ describe('The GraphQL over HTTP audit', () => {
 
     const results = await auditServer({ url });
 
-    expect(
+    assert.deepStrictEqual(
       results
         .filter((it): it is AuditFail => it.status === 'error')
         .map((it) => [it.id, it.name, it.reason]),
-    ).toEqual([]);
+      [],
+    );
 
-    expect(
+    assert.deepStrictEqual(
       results
         .filter((it): it is AuditFail => it.status === 'warn')
         .filter((it) => !ACCEPTED_WARNINGS.includes(it.id))
@@ -36,6 +39,7 @@ describe('The GraphQL over HTTP audit', () => {
             headers: Object.fromEntries(it.response.headers.entries()),
           },
         })),
-    ).toEqual([]);
+      [],
+    );
   });
 });

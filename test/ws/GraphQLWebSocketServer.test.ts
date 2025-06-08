@@ -1,5 +1,7 @@
 import { GraphQLSchema, buildSchema } from 'graphql';
-import * as http from 'http';
+import * as assert from 'node:assert';
+import * as http from 'node:http';
+import { after, before, describe, it } from 'node:test';
 import * as ws from 'ws';
 import {
   AsyncPushIterator,
@@ -14,7 +16,7 @@ describe('The GraphQLWebSocketServer', () => {
   let server: http.Server;
   let url: string;
 
-  beforeAll(async () => {
+  before(async () => {
     schema = buildSchema(`
       type Query {
         hello: String
@@ -56,7 +58,7 @@ describe('The GraphQLWebSocketServer', () => {
     url = `http://localhost:${port}/graphql`;
   });
 
-  afterAll(async () => {
+  after(async () => {
     await serverClosed(server);
   });
 
@@ -102,6 +104,6 @@ describe('The GraphQLWebSocketServer', () => {
       gqlWsClient.close();
     }
 
-    expect(counters).toEqual([1, 2, 3]);
+    assert.deepStrictEqual(counters, [1, 2, 3]);
   });
 });

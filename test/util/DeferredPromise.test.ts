@@ -1,3 +1,5 @@
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { DeferredPromise } from '../../src';
 
 describe('A DeferredPromise', () => {
@@ -6,7 +8,7 @@ describe('A DeferredPromise', () => {
 
     deferred.resolve('test');
 
-    expect(await deferred).toEqual('test');
+    assert.deepStrictEqual(await deferred, 'test');
   });
 
   it('should be resolvable externally later', async () => {
@@ -14,6 +16,6 @@ describe('A DeferredPromise', () => {
 
     setTimeout(() => deferred.resolve('test'), 100);
 
-    expect(await deferred).toEqual('test');
+    assert.deepStrictEqual(await deferred, 'test');
   });
 });

@@ -2,7 +2,10 @@
 
 ## NEXT
 
-- Upgrade dependencies
+- Stop running checks with Node.js 14 and 16
+- Publish using Node.js 18
+- Switch tests to `node:test`
+- Update dependencies
 
 ## 1.9.0
 
@@ -12,7 +15,7 @@
 - Add [audit](https://github.com/graphql/graphql-http) for [GraphQL over HTTP spec](https://graphql.github.io/graphql-over-http/)
 - Fix incorrect Node.js 12 support (was never supported, at least 14 was always required)
 - Add basic benchmarks
-- Update deps
+- Update dependencies
 
 ## 1.8.1
 
@@ -25,7 +28,7 @@
 - Remove implicit dependency on `@types/ws`
 - Allow async `createContext`
 - Add basic GraphiQL HTML
-- Update deps
+- Update dependencies
 
 ## 1.7.1
 
@@ -42,32 +45,32 @@
 - Add `assert()` and `defined()` to browser build
 - Add React example
 - Make nullable fields in generated operation types optional
-- Update deps
+- Update dependencies
 
 ## 1.5.2
 
 - Support `typescript@5` (#5)
 - Improve error coercion in `toError`
-- Update deps
+- Update dependencies
 
 ## 1.5.1
 
 - Improve README and docs
 - Chores in examples and scripts
-- Update deps
+- Update dependencies
 - Fix calling `next` functions for both Koa and Express ([sreedhap](https://github.com/sreedhap))
 
 ## 1.5.0
 
 - Add option to write introspection to local file during code generation
 - Add option to define scalar types without directives in client-side code generation
-- Update deps
+- Update dependencies
 
 ## 1.4.1
 
 - Fix issue where bad requests would result in responses with status code 500
 - Switch all tests to `fetch`
-- Update deps
+- Update dependencies
 
 ## 1.4.0
 
@@ -75,7 +78,7 @@
 - Simplify builds
 - Uplift `__typename` from fragments to simplify generated type system
 - Fix issue where no `__typename` in top-level operations lead to type system difficulties
-- Update deps
+- Update dependencies
 
 ## 1.3.2
 
@@ -90,14 +93,14 @@
 - Add GraphQL stitching support ([emargollo](https://github.com/emargollo))
   - Code generation for directives and resolvers
   - SDL resolvers
-- Update deps
+- Update dependencies
 
 ## 1.2.0
 
 - Include JSON body (if any) in `GraphQLRequestError`
 - Add `errorFilter` to `GraphQLClient` options
 - Improve error messages in `GraphQLClient`
-- Update deps
+- Update dependencies
 
 ## 1.1.1
 
@@ -107,7 +110,7 @@
 
 ## 1.1.0
 
-- Update deps
+- Update dependencies
 - Fall back to `unknown` for unmapped scalars
 - Add `OperationTypings` in client-side code generation for simplified client typing
 - Add `fetch`-based, type-safe `GraphQLClient` for queries and mutations

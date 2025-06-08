@@ -1,4 +1,6 @@
 import { ExecutionResult } from 'graphql';
+import * as assert from 'node:assert';
+import { describe, it } from 'node:test';
 import WebSocket from 'ws';
 import {
   DNewReviews,
@@ -45,7 +47,7 @@ describe('The GraphQLWebSocketClient', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const socket = client.graphqlSocket?.socket as any;
-    expect(socket).toBeDefined();
+    assert.ok(socket);
 
     const messages: Record<string, unknown>[] = [];
     const originalSend = socket.send;
@@ -58,8 +60,8 @@ describe('The GraphQLWebSocketClient', () => {
 
     await complete;
 
-    expect(messages).toEqual([{ type: 'complete', id: '1' }]);
-    expect(results).toEqual([]);
+    assert.deepStrictEqual(messages, [{ type: 'complete', id: '1' }]);
+    assert.deepStrictEqual(results, []);
 
     client.close();
   });
@@ -83,7 +85,7 @@ describe('The GraphQLWebSocketClient', () => {
     const complete = (async () => {
       for await (const result of iterator) {
         results.push(result);
-        expect(result.data?.newReview?.author).toBeDefined();
+        assert.ok(result.data?.newReview?.author);
       }
     })();
 
@@ -91,13 +93,13 @@ describe('The GraphQLWebSocketClient', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const socket = client.graphqlSocket?.socket as any;
-    expect(socket).toBeDefined();
+    assert.ok(socket);
 
     iterator.return();
 
     await complete;
 
-    expect(results).toEqual([]);
+    assert.deepStrictEqual(results, []);
 
     client.close();
   });

@@ -1,4 +1,6 @@
 import { ExecutionResult } from 'graphql';
+import assert from 'node:assert';
+import { before, describe, it } from 'node:test';
 import WebSocket from 'ws';
 import {
   GraphQLReader,
@@ -16,7 +18,7 @@ describe('The example (ws)', () => {
     return new WebSocket(url, protocol) as unknown as WebSocketLike;
   }
 
-  beforeAll(async () => {
+  before(async () => {
     const reader = new GraphQLReader();
     operations = await reader.readDir(
       `${__dirname}/../../examples/client/operations`,
@@ -28,7 +30,7 @@ describe('The example (ws)', () => {
 
     const socket = new WebSocket(url, 'foo-bar-baz');
 
-    expect(await wsClosed(socket)).toEqual([
+    assert.deepStrictEqual(await wsClosed(socket), [
       1002,
       'Unsupported web socket protocol foo-bar-baz',
     ]);
@@ -39,7 +41,7 @@ describe('The example (ws)', () => {
 
     const socket = new WebSocket(url, 'graphql-transport-ws');
 
-    expect(await wsClosed(socket)).toEqual([
+    assert.deepStrictEqual(await wsClosed(socket), [
       4408,
       'Connection initialization timeout',
     ]);
@@ -65,7 +67,7 @@ describe('The example (ws)', () => {
       );
     });
 
-    expect(await wsClosed(socket)).toEqual([
+    assert.deepStrictEqual(await wsClosed(socket), [
       4429,
       'Too many initialization requests',
     ]);
@@ -80,7 +82,7 @@ describe('The example (ws)', () => {
       socket.send(JSON.stringify({ type: 'hello' }));
     });
 
-    expect(await wsClosed(socket)).toEqual([
+    assert.deepStrictEqual(await wsClosed(socket), [
       4400,
       'Invalid message type: hello',
     ]);
@@ -97,8 +99,9 @@ describe('The example (ws)', () => {
       },
     });
 
-    await expect(client.requireConnection()).rejects.toThrowError(
-      'Unauthorized: It appears to be locked',
+    await assert.rejects(
+      client.requireConnection(),
+      new Error('Unauthorized: It appears to be locked'),
     );
 
     client.close();
@@ -115,18 +118,19 @@ describe('The example (ws)', () => {
       },
     });
 
-    await expect(
+    await assert.rejects(
       (async () => {
         for await (const result of client.subscribe({
           query: `subscription DoesNotExist {
             hello
           }`,
         })) {
-          expect(result).toBeDefined();
+          assert.ok(result);
         }
       })(),
-    ).rejects.toThrow(
-      'Subscription error: Cannot query field "hello" on type "Subscription".',
+      new Error(
+        'Subscription error: Cannot query field "hello" on type "Subscription".',
+      ),
     );
 
     client.close();
@@ -204,13 +208,14 @@ describe('The example (ws)', () => {
 
     client.close();
 
-    expect(
+    assert.deepStrictEqual(
       await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket),
-    ).toEqual([1000, 'Normal Closure']);
+      [1000, 'Normal Closure'],
+    );
 
-    expect(results.length).toEqual(2);
+    assert.deepStrictEqual(results.length, 2);
 
-    expect(
+    assert.deepStrictEqual(
       results.map((it) => ({
         ...it,
         data: {
@@ -221,40 +226,41 @@ describe('The example (ws)', () => {
           },
         },
       })),
-    ).toEqual([
-      {
-        data: {
-          newReview: {
-            __typename: 'BossReview',
-            author: 'tester',
-            boss: {
-              id: '1',
-              name: 'Asylum Demon',
+      [
+        {
+          data: {
+            newReview: {
+              __typename: 'BossReview',
+              author: 'tester',
+              boss: {
+                id: '1',
+                name: 'Asylum Demon',
+              },
+              createdAt: 'test',
+              difficulty: 'IMPOSSIBLE',
+              id: 'test',
+              theme: 'ALRIGHT',
             },
-            createdAt: 'test',
-            difficulty: 'IMPOSSIBLE',
-            id: 'test',
-            theme: 'ALRIGHT',
           },
         },
-      },
-      {
-        data: {
-          newReview: {
-            __typename: 'LocationReview',
-            author: 'tester',
-            location: {
-              id: '13',
-              name: 'Undead Parish',
+        {
+          data: {
+            newReview: {
+              __typename: 'LocationReview',
+              author: 'tester',
+              location: {
+                id: '13',
+                name: 'Undead Parish',
+              },
+              createdAt: 'test',
+              difficulty: 'HARD',
+              id: 'test',
+              design: 'STELLAR',
             },
-            createdAt: 'test',
-            difficulty: 'HARD',
-            id: 'test',
-            design: 'STELLAR',
           },
         },
-      },
-    ]);
+      ],
+    );
   });
 
   it('should serve GraphQL subscriptions over web sockets (async w/ callbacks)', async () => {
@@ -332,14 +338,15 @@ describe('The example (ws)', () => {
 
     client.close();
 
-    expect(
+    assert.deepStrictEqual(
       await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket),
-    ).toEqual([1000, 'Normal Closure']);
+      [1000, 'Normal Closure'],
+    );
 
-    expect(errors).toEqual([]);
-    expect(results.length).toEqual(2);
+    assert.deepStrictEqual(errors, []);
+    assert.deepStrictEqual(results.length, 2);
 
-    expect(
+    assert.deepStrictEqual(
       results.map((it) => ({
         ...it,
         newReview: {
@@ -348,36 +355,37 @@ describe('The example (ws)', () => {
           id: 'test',
         },
       })),
-    ).toEqual([
-      {
-        newReview: {
-          __typename: 'BossReview',
-          author: 'tester',
-          boss: {
-            id: '1',
-            name: 'Asylum Demon',
+      [
+        {
+          newReview: {
+            __typename: 'BossReview',
+            author: 'tester',
+            boss: {
+              id: '1',
+              name: 'Asylum Demon',
+            },
+            createdAt: 'test',
+            difficulty: 'IMPOSSIBLE',
+            id: 'test',
+            theme: 'ALRIGHT',
           },
-          createdAt: 'test',
-          difficulty: 'IMPOSSIBLE',
-          id: 'test',
-          theme: 'ALRIGHT',
         },
-      },
-      {
-        newReview: {
-          __typename: 'LocationReview',
-          author: 'tester',
-          location: {
-            id: '13',
-            name: 'Undead Parish',
+        {
+          newReview: {
+            __typename: 'LocationReview',
+            author: 'tester',
+            location: {
+              id: '13',
+              name: 'Undead Parish',
+            },
+            createdAt: 'test',
+            difficulty: 'HARD',
+            id: 'test',
+            design: 'STELLAR',
           },
-          createdAt: 'test',
-          difficulty: 'HARD',
-          id: 'test',
-          design: 'STELLAR',
         },
-      },
-    ]);
+      ],
+    );
   });
 
   it('should reconnect on non-error closures', async () => {
@@ -453,13 +461,14 @@ describe('The example (ws)', () => {
 
     await complete;
 
-    expect(
+    assert.deepStrictEqual(
       await wsClosed(client.graphqlSocket?.socket as unknown as WebSocket),
-    ).toEqual([1000, 'Normal Closure']);
+      [1000, 'Normal Closure'],
+    );
 
-    expect(results.length).toEqual(2);
+    assert.deepStrictEqual(results.length, 2);
 
-    expect(
+    assert.deepStrictEqual(
       results.map((it) => ({
         ...it,
         data: {
@@ -470,39 +479,40 @@ describe('The example (ws)', () => {
           },
         },
       })),
-    ).toEqual([
-      {
-        data: {
-          newReview: {
-            __typename: 'BossReview',
-            author: 'tester',
-            boss: {
-              id: '1',
-              name: 'Asylum Demon',
+      [
+        {
+          data: {
+            newReview: {
+              __typename: 'BossReview',
+              author: 'tester',
+              boss: {
+                id: '1',
+                name: 'Asylum Demon',
+              },
+              createdAt: 'test',
+              difficulty: 'IMPOSSIBLE',
+              id: 'test',
+              theme: 'ALRIGHT',
             },
-            createdAt: 'test',
-            difficulty: 'IMPOSSIBLE',
-            id: 'test',
-            theme: 'ALRIGHT',
           },
         },
-      },
-      {
-        data: {
-          newReview: {
-            __typename: 'LocationReview',
-            author: 'tester',
-            location: {
-              id: '13',
-              name: 'Undead Parish',
+        {
+          data: {
+            newReview: {
+              __typename: 'LocationReview',
+              author: 'tester',
+              location: {
+                id: '13',
+                name: 'Undead Parish',
+              },
+              createdAt: 'test',
+              difficulty: 'HARD',
+              id: 'test',
+              design: 'STELLAR',
             },
-            createdAt: 'test',
-            difficulty: 'HARD',
-            id: 'test',
-            design: 'STELLAR',
           },
         },
-      },
-    ]);
+      ],
+    );
   });
 });

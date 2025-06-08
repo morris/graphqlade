@@ -1,4 +1,6 @@
-import { promises as fs } from 'fs';
+import assert from 'node:assert';
+import { promises as fs } from 'node:fs';
+import { describe, it } from 'node:test';
 import { writeTypeScript } from '../../src';
 
 describe('The writeTypeScript function', () => {
@@ -16,7 +18,8 @@ describe('The writeTypeScript function', () => {
       'utf-8',
     );
 
-    expect(actual).toEqual(
+    assert.strictEqual(
+      actual,
       "const hello = 'world';\nif (true) console.log('bar');\n",
     );
   });

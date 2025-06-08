@@ -1,4 +1,6 @@
 import { execute, GraphQLResolveInfo, parse } from 'graphql';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { CustomResolvers, getProjection, GraphQLServer } from '../../src';
 
 describe('The getProjection function', () => {
@@ -74,7 +76,7 @@ describe('The getProjection function', () => {
         }`),
     });
 
-    expect(projections).toEqual([
+    assert.deepStrictEqual(projections, [
       { id: true, author: true, boss: true },
       { otherName: true, stuff: true },
       { id: true, boss: true },

@@ -1,10 +1,11 @@
 import { visit } from 'graphql';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { format } from 'prettier';
 import {
   ClientCodeGenerator,
   GraphQLReader,
   NamedOperationDefinitionNode,
-  assert,
 } from '../../src';
 
 describe('The ClientCodeGenerator', () => {
@@ -32,11 +33,11 @@ describe('The ClientCodeGenerator', () => {
 
     assert(found);
 
-    expect(
+    assert.deepStrictEqual(
       await format(generator.generateOperationDataType(found), {
         parser: 'typescript',
       }),
-    ).toEqual(`export type DReviews2 = {
+      `export type DReviews2 = {
   reviews?: Maybe<
     Array<
       | ({
@@ -48,7 +49,8 @@ describe('The ClientCodeGenerator', () => {
     >
   >;
 };
-`);
+`,
+    );
   });
 
   it('should uplift __typename from inline fragments', async () => {
@@ -73,11 +75,11 @@ describe('The ClientCodeGenerator', () => {
 
     assert(found);
 
-    expect(
+    assert.deepStrictEqual(
       await format(generator.generateOperationDataType(found), {
         parser: 'typescript',
       }),
-    ).toEqual(`export type DReviews3 = {
+      `export type DReviews3 = {
   reviews?: Maybe<
     Array<
       | ({
@@ -95,7 +97,8 @@ describe('The ClientCodeGenerator', () => {
     >
   >;
 };
-`);
+`,
+    );
   });
 
   it('should not uplift __typename if it is not requested', async () => {
@@ -120,11 +123,11 @@ describe('The ClientCodeGenerator', () => {
 
     assert(found);
 
-    expect(
+    assert.deepStrictEqual(
       await format(generator.generateOperationDataType(found), {
         parser: 'typescript',
       }),
-    ).toEqual(`export type DReviews4 = {
+      `export type DReviews4 = {
   reviews?: Maybe<
     Array<
       | ({} & {
@@ -138,7 +141,8 @@ describe('The ClientCodeGenerator', () => {
     >
   >;
 };
-`);
+`,
+    );
   });
 
   it('should only uplift __typename for possible types where it is requested', async () => {
@@ -163,11 +167,11 @@ describe('The ClientCodeGenerator', () => {
 
     assert(found);
 
-    expect(
+    assert.deepStrictEqual(
       await format(generator.generateOperationDataType(found), {
         parser: 'typescript',
       }),
-    ).toEqual(`export type DReviews5 = {
+      `export type DReviews5 = {
   reviews?: Maybe<
     Array<
       | ({
@@ -183,6 +187,7 @@ describe('The ClientCodeGenerator', () => {
     >
   >;
 };
-`);
+`,
+    );
   });
 });

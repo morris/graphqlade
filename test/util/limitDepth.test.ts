@@ -1,7 +1,9 @@
 import { getIntrospectionQuery, parse } from 'graphql';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { limitDepth } from '../../src';
 
-describe('The getDepth function', () => {
+describe('The limitDepth function', () => {
   const testCases: [string, number][] = [
     ['{ praise }', 0],
     ['{ praise { the sun } }', 1],
@@ -38,35 +40,39 @@ describe('The getDepth function', () => {
 
   it('should limit the depth of GraphQL operations', () => {
     for (const [operation, maxDepth] of testCases) {
-      expect(() => limitDepth(parse(operation), maxDepth)).not.toThrow();
-      expect(() => limitDepth(parse(operation), maxDepth - 1)).toThrow();
+      assert.doesNotThrow(() => limitDepth(parse(operation), maxDepth));
+      assert.throws(() => limitDepth(parse(operation), maxDepth - 1));
     }
   });
 
   it('should throw on circular fragment spreads', () => {
-    expect(() =>
-      limitDepth(
-        parse(`
+    assert.throws(
+      () =>
+        limitDepth(
+          parse(`
           query a { praise ...f }
           fragment f on t { x { y ...f } }
         `),
-        999,
-      ),
-    ).toThrow('Invalid query, contains circular fragment spreads');
+          999,
+        ),
+      new TypeError('Invalid query, contains circular fragment spreads'),
+    );
 
-    expect(() =>
-      limitDepth(
-        parse(`
+    assert.throws(
+      () =>
+        limitDepth(
+          parse(`
           query a { praise ...f }
           fragment f on t { x { y ...g } }
           fragment g on t { x { y ...f } }
         `),
-        999,
-      ),
-    ).toThrow('Invalid query, contains circular fragment spreads');
+          999,
+        ),
+      new TypeError('Invalid query, contains circular fragment spreads'),
+    );
   });
 
   it('should ignore introspection queries', () => {
-    expect(() => limitDepth(parse(getIntrospectionQuery()), 1)).not.toThrow();
+    assert.doesNotThrow(() => limitDepth(parse(getIntrospectionQuery()), 1));
   });
 });

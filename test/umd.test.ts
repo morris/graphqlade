@@ -1,20 +1,22 @@
-import fs from 'fs';
+import * as assert from 'node:assert';
+import * as fs from 'node:fs';
+import { describe, it } from 'node:test';
 
 describe('The UMD build', () => {
   it('should work with require()', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const graphqlade = require('../dist/graphqlade.umd.js');
 
-    expect(typeof graphqlade.GraphQLClientWebSocket).toEqual('function');
-    expect(typeof graphqlade.GraphQLWebSocketClient).toEqual('function');
+    assert.strictEqual(typeof graphqlade.GraphQLClientWebSocket, 'function');
+    assert.strictEqual(typeof graphqlade.GraphQLWebSocketClient, 'function');
   });
 
   it('should work with dynamic import', async () => {
     // @ts-expect-error: No typings
     const graphqlade = await import('../dist/graphqlade.umd.js');
 
-    expect(typeof graphqlade.GraphQLClientWebSocket).toEqual('function');
-    expect(typeof graphqlade.GraphQLWebSocketClient).toEqual('function');
+    assert.strictEqual(typeof graphqlade.GraphQLClientWebSocket, 'function');
+    assert.strictEqual(typeof graphqlade.GraphQLWebSocketClient, 'function');
   });
 
   it('should work as a global script (global self)', async () => {
@@ -32,8 +34,8 @@ describe('The UMD build', () => {
 
     const { graphqlade } = self;
 
-    expect(typeof exports).toEqual('undefined');
-    expect(typeof graphqlade.GraphQLClientWebSocket).toEqual('function');
-    expect(typeof graphqlade.GraphQLWebSocketClient).toEqual('function');
+    assert.strictEqual(typeof exports, 'undefined');
+    assert.strictEqual(typeof graphqlade.GraphQLClientWebSocket, 'function');
+    assert.strictEqual(typeof graphqlade.GraphQLWebSocketClient, 'function');
   });
 });

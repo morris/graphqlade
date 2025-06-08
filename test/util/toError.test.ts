@@ -1,4 +1,5 @@
-import { AssertionError } from 'assert';
+import * as assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { toError } from '../../src';
 
 describe('toError', () => {
@@ -6,16 +7,16 @@ describe('toError', () => {
     const input = [
       new Error('a'),
       new TypeError('b'),
-      new AssertionError({ message: 'c' }),
+      new assert.AssertionError({ message: 'c' }),
     ];
 
-    expect(input.map(toError)).toStrictEqual(input);
+    assert.deepStrictEqual(input.map(toError), input);
   });
 
   it('should wrap non-error values with an Error instance', () => {
     const input = [undefined, null, 'a', 2, { foo: 'bar' }, []];
 
-    expect(input.map(toError)).toEqual([
+    assert.deepStrictEqual(input.map(toError), [
       new Error('Unknown error: undefined'),
       new Error('Unknown error: null'),
       new Error('Unknown error: "a"'),

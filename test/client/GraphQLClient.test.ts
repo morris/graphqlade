@@ -1,3 +1,5 @@
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { typings as exampleTypings } from '../../examples/client/src/generated/operations';
 import { GraphQLClient, GraphQLRequestError } from '../../src';
 import {
@@ -66,8 +68,8 @@ describe('The GraphQLClient', () => {
         cache: 'default',
       },
       async fetch(info, init) {
-        expect(info).toEqual(url);
-        expect(init).toEqual({
+        assert.deepStrictEqual(info, url);
+        assert.deepStrictEqual(init, {
           method: 'POST',
           headers: {
             accept: 'application/json',
@@ -90,7 +92,7 @@ describe('The GraphQLClient', () => {
       { credentials: 'include', headers: { 'x-test': 'lol' } },
     );
 
-    expect(result).toEqual(expectedResult);
+    assert.deepStrictEqual(result, expectedResult);
   });
 
   it('should be reset initial headers', async () => {
@@ -107,8 +109,8 @@ describe('The GraphQLClient', () => {
         },
       },
       async fetch(info, init) {
-        expect(info).toEqual(url);
-        expect(init).toEqual({
+        assert.deepStrictEqual(info, url);
+        assert.deepStrictEqual(init, {
           method: 'POST',
           headers: {
             accept: 'application/json',
@@ -131,7 +133,7 @@ describe('The GraphQLClient', () => {
       { headers: { 'x-test': 'lol' } },
     );
 
-    expect(result).toEqual(expectedResult);
+    assert.deepStrictEqual(result, expectedResult);
   });
 
   it('should be able to send GraphQL requests via POST (untyped)', async () => {
@@ -147,7 +149,7 @@ describe('The GraphQLClient', () => {
 
     const result = await client.postNamed('Query2', { count: 1 });
 
-    expect(result).toEqual(expectedResult);
+    assert.deepStrictEqual(result, expectedResult);
   });
 
   it('should handle responses with GraphQL errors correctly', async () => {
@@ -169,9 +171,9 @@ describe('The GraphQLClient', () => {
       throw new Error('should not succeed');
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.message).toEqual('GraphQL error(s): failure');
-        expect(err.response.ok).toEqual(true);
-        expect(err.result).toEqual(expectedResult);
+        assert.deepStrictEqual(err.message, 'GraphQL error(s): failure');
+        assert.deepStrictEqual(err.response.ok, true);
+        assert.deepStrictEqual(err.result, expectedResult);
       } else {
         throw err;
       }
@@ -201,11 +203,12 @@ describe('The GraphQLClient', () => {
       throw new Error('should not succeed');
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.message).toEqual(
+        assert.deepStrictEqual(
+          err.message,
           'GraphQL error(s): failure; failure2 (400 Bad request)',
         );
-        expect(err.response.ok).toEqual(false);
-        expect(err.result).toEqual(expectedResult);
+        assert.deepStrictEqual(err.response.ok, false);
+        assert.deepStrictEqual(err.result, expectedResult);
       } else {
         throw err;
       }
@@ -236,8 +239,8 @@ describe('The GraphQLClient', () => {
       throw new Error('should not succeed');
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.message).toEqual('GraphQL error(s): failure');
-        expect(err.result).toEqual(expectedResult);
+        assert.deepStrictEqual(err.message, 'GraphQL error(s): failure');
+        assert.deepStrictEqual(err.result, expectedResult);
       } else {
         throw err;
       }
@@ -267,7 +270,7 @@ describe('The GraphQLClient', () => {
         },
       },
     );
-    expect(result).toEqual(expectedResult);
+    assert.deepStrictEqual(result, expectedResult);
   });
 
   it('should handle non-GraphQL JSON responses correctly', async () => {
@@ -284,10 +287,10 @@ describe('The GraphQLClient', () => {
       throw new Error('should not succeed');
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.message).toEqual('Not a GraphQL response');
-        expect(err.response.ok).toEqual(true);
-        expect(err.result).toBeUndefined();
-        expect(err.json).toEqual({ not: 'graphql' });
+        assert.deepStrictEqual(err.message, 'Not a GraphQL response');
+        assert.deepStrictEqual(err.response.ok, true);
+        assert.deepStrictEqual(err.result, undefined);
+        assert.deepStrictEqual(err.json, { not: 'graphql' });
       } else {
         throw err;
       }
@@ -312,11 +315,12 @@ describe('The GraphQLClient', () => {
       throw new Error('should not succeed');
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.message).toEqual(
+        assert.deepStrictEqual(
+          err.message,
           'Not a GraphQL response: Unexpected input <',
         );
-        expect(err.response.ok).toEqual(true);
-        expect(err.result).toBeUndefined();
+        assert.deepStrictEqual(err.response.ok, true);
+        assert.deepStrictEqual(err.result, undefined);
       } else {
         throw err;
       }
@@ -341,9 +345,12 @@ describe('The GraphQLClient', () => {
       throw new Error('should not succeed');
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.message).toEqual('Not a GraphQL response (503 Unavailable)');
-        expect(err.response.ok).toEqual(false);
-        expect(err.result).toBeUndefined();
+        assert.deepStrictEqual(
+          err.message,
+          'Not a GraphQL response (503 Unavailable)',
+        );
+        assert.deepStrictEqual(err.response.ok, false);
+        assert.deepStrictEqual(err.result, undefined);
       } else {
         throw err;
       }
@@ -363,7 +370,7 @@ describe('The GraphQLClient', () => {
       divisor: '2',
     });
 
-    expect(result).toEqual({
+    assert.deepStrictEqual(result, {
       data: {
         divide: 0.5,
       },
@@ -387,7 +394,7 @@ describe('The GraphQLClient', () => {
       throw new Error('should not succeed');
     } catch (err) {
       if (err instanceof GraphQLRequestError) {
-        expect(err.result).toEqual({
+        assert.deepStrictEqual(err.result, {
           errors: [
             {
               locations: [

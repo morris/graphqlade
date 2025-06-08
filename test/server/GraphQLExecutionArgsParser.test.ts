@@ -1,4 +1,6 @@
 import { parse, print } from 'graphql';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { GraphQLExecutionArgsParser } from '../../src';
 
 describe('The GraphQLExecutionArgsParser', () => {
@@ -8,9 +10,9 @@ describe('The GraphQLExecutionArgsParser', () => {
     const query = '{ praise }';
     const args = gqlExecutionArgsParser.parse({ query });
 
-    expect(print(args.document)).toEqual(print(parse(query)));
-    expect(args.operationName).toBeUndefined();
-    expect(args.variableValues).toBeUndefined();
+    assert.deepStrictEqual(print(args.document), print(parse(query)));
+    assert.deepStrictEqual(args.operationName, undefined);
+    assert.deepStrictEqual(args.variableValues, undefined);
   });
 
   it('should be able to parse a query with variables', async () => {
@@ -22,9 +24,9 @@ describe('The GraphQLExecutionArgsParser', () => {
       variables: { baz: 'test' },
     });
 
-    expect(print(args.document)).toEqual(print(parse(query)));
-    expect(args.operationName).toBeUndefined();
-    expect(args.variableValues).toEqual({ baz: 'test' });
+    assert.deepStrictEqual(print(args.document), print(parse(query)));
+    assert.deepStrictEqual(args.operationName, undefined);
+    assert.deepStrictEqual(args.variableValues, { baz: 'test' });
   });
 
   it('should be able to parse a named query with variables', async () => {
@@ -40,9 +42,9 @@ describe('The GraphQLExecutionArgsParser', () => {
       operationName: 'Foo',
     });
 
-    expect(print(args.document)).toEqual(print(parse(query)));
-    expect(args.operationName).toEqual('Foo');
-    expect(args.variableValues).toEqual({ baz: 'test' });
+    assert.deepStrictEqual(print(args.document), print(parse(query)));
+    assert.deepStrictEqual(args.operationName, 'Foo');
+    assert.deepStrictEqual(args.variableValues, { baz: 'test' });
   });
 
   it('should respect maxTokens', async () => {
@@ -52,8 +54,8 @@ describe('The GraphQLExecutionArgsParser', () => {
 
     gqlExecutionArgsParser.parse({ query: '{ praise }' });
 
-    expect(() =>
+    assert.throws(() =>
       gqlExecutionArgsParser.parse({ query: '{ dont praise }' }),
-    ).toThrow();
+    );
   });
 });

@@ -1,10 +1,12 @@
 import { mkdirSync, rmdirSync, writeFileSync } from 'fs';
+import assert from 'node:assert';
+import test from 'node:test';
 import { join, normalize } from 'path';
 import { GraphQLReader, watchRecursive } from '../../src';
 import { TestLogger } from '../util';
 
-describe('The watchRecursive function', () => {
-  beforeAll(() => {
+test.describe('The watchRecursive function', () => {
+  test.before(async () => {
     try {
       rmdirSync(join(__dirname, 'watchRecursive'), { recursive: true });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -15,7 +17,7 @@ describe('The watchRecursive function', () => {
     mkdirSync(join(__dirname, 'watchRecursive'), { recursive: true });
   });
 
-  it('should watch directories recursively', async () => {
+  test('should watch directories recursively', async () => {
     const callbacks: string[] = [];
     const logger = new TestLogger();
 
@@ -57,22 +59,18 @@ describe('The watchRecursive function', () => {
     if (process.env.CI) {
       // watching may work differently in CI
       // only do a basic check
-      return expect(callbacks.length).toBeGreaterThan(10);
+      assert(callbacks.length > 10);
+      return;
     }
 
-    // TODO this used to be a strict array check but it was flaky;
-    // switched to checking unique entries for now
-    expect(
+    assert.deepStrictEqual(
       Array.from(new Set(callbacks))
         .sort()
         .map((it) => normalize(it)),
-    ).toEqual(
       [
         '/watchRecursive/bar',
         '/watchRecursive/foo',
         '/watchRecursive/foo/baz',
-        // this .txt file is fine since on deletion,
-        // we cannot know if a file or directory was deleted
         '/watchRecursive/foo/baz/test.txt',
         '/watchRecursive/foo/test.gql',
         '/watchRecursive/test.graphql',

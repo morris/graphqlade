@@ -1,12 +1,13 @@
-import { GraphQLError } from 'graphql';
+import assert from 'node:assert';
+import { before, describe, it } from 'node:test';
 import { MyContext } from '../../examples/server/src/MyContext';
 import { GraphQLServer } from '../../src';
-import { bootstrapExample } from '../util';
+import { bootstrapExample, formatForAssertion } from '../util';
 
 describe('The GraphQLHttpServer', () => {
   let gqlServer: GraphQLServer<MyContext>;
 
-  beforeAll(async () => {
+  before(async () => {
     gqlServer = await bootstrapExample();
   });
 
@@ -19,7 +20,9 @@ describe('The GraphQLHttpServer', () => {
       },
     });
 
-    expect(response).toEqual({
+    delete response.context;
+
+    assert.deepStrictEqual(formatForAssertion(response), {
       status: 200,
       headers: {},
       body: {
@@ -27,7 +30,6 @@ describe('The GraphQLHttpServer', () => {
           praise: 'the sun!',
         },
       },
-      context: expect.any(MyContext),
     });
   });
 
@@ -49,7 +51,9 @@ describe('The GraphQLHttpServer', () => {
       },
     });
 
-    expect(response).toEqual({
+    delete response.context;
+
+    assert.deepStrictEqual(formatForAssertion(response), {
       status: 200,
       headers: {},
       body: {
@@ -57,7 +61,6 @@ describe('The GraphQLHttpServer', () => {
           praise: 'the sun!',
         },
       },
-      context: expect.any(MyContext),
     });
   });
 
@@ -71,15 +74,11 @@ describe('The GraphQLHttpServer', () => {
       },
     });
 
-    expect(response).toEqual({
+    assert.deepStrictEqual(formatForAssertion(response), {
       status: 405,
       headers: {},
       body: {
-        errors: [
-          {
-            message: 'Unsupported method: PUT',
-          },
-        ],
+        errors: [{ message: 'Unsupported method: PUT' }],
       },
     });
   });
@@ -94,15 +93,11 @@ describe('The GraphQLHttpServer', () => {
       },
     });
 
-    expect(response).toEqual({
+    assert.deepStrictEqual(formatForAssertion(response), {
       status: 400,
       headers: {},
       body: {
-        errors: [
-          {
-            message: 'Mutations are not allowed via GET',
-          },
-        ],
+        errors: [{ message: 'Mutations are not allowed via GET' }],
       },
     });
   });
@@ -116,13 +111,11 @@ describe('The GraphQLHttpServer', () => {
       },
     });
 
-    expect(response).toEqual({
+    assert.deepStrictEqual(formatForAssertion(response), {
       status: 400,
       headers: {},
       body: {
-        errors: [
-          new GraphQLError('Cannot query field "invalid" on type "Query".', {}),
-        ],
+        errors: [{ message: 'Cannot query field "invalid" on type "Query".' }],
       },
     });
   });

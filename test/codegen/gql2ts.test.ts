@@ -1,4 +1,6 @@
-import * as fs from 'fs';
+import assert from 'node:assert';
+import * as fs from 'node:fs';
+import { describe, it } from 'node:test';
 import { gql2ts } from '../../src';
 import { requireExampleServer, TestLogger } from '../util';
 
@@ -24,7 +26,7 @@ describe('The gql2ts function', () => {
       logger,
     });
 
-    expect(logger.errors).toEqual([]);
+    assert.deepStrictEqual(logger.errors, []);
   });
 
   it('should generate client-code for the example client (using node-fetch)', async () => {
@@ -48,8 +50,8 @@ describe('The gql2ts function', () => {
       logger,
     });
 
-    expect(logger.errors).toEqual([]);
-    expect(logger.logs).toEqual(['got headers']);
+    assert.deepStrictEqual(logger.errors, []);
+    assert.deepStrictEqual(logger.logs, ['got headers']);
   });
 
   it('should generate server-side code with stitching directives', async () => {
@@ -63,7 +65,7 @@ describe('The gql2ts function', () => {
       logger,
     });
 
-    expect(logger.errors).toEqual([]);
+    assert.deepStrictEqual(logger.errors, []);
   });
 
   it('should write an introspection fallback file if the file option is set', async () => {
@@ -100,6 +102,6 @@ describe('The gql2ts function', () => {
       logger,
     });
 
-    expect(logger.errors).toEqual([]);
+    assert.deepStrictEqual(logger.errors, []);
   });
 });

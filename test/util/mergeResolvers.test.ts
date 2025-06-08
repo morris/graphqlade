@@ -1,4 +1,6 @@
 import { GraphQLDateTime } from 'graphql-scalars';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { Resolvers } from '../../examples/server/src/generated/schema';
 import { mergeResolvers } from '../../src';
 
@@ -34,7 +36,7 @@ describe('The mergeResolvers function', () => {
       },
     };
 
-    expect(mergeResolvers([a, b])).toEqual({
+    assert.deepStrictEqual(mergeResolvers([a, b]), {
       Query: {
         boss: a.Query?.boss,
         location: b.Query?.location,

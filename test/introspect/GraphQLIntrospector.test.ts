@@ -1,3 +1,5 @@
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { GraphQLIntrospector } from '../../src';
 import { requireExampleServer } from '../util';
 
@@ -13,6 +15,6 @@ describe('The GraphQLIntrospector', () => {
       authorization: 'Bearer of a ring',
     });
 
-    expect(schema.getType('Boss')).toBeDefined();
+    assert.ok(schema.getType('Boss'));
   });
 });

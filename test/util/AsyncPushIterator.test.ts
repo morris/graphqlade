@@ -1,4 +1,6 @@
 import { EventEmitter } from 'events';
+import * as assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { AsyncPushIterator } from '../../src';
 
 describe('An AsyncPushIterator', () => {
@@ -23,8 +25,8 @@ describe('An AsyncPushIterator', () => {
       results.push(i);
     }
 
-    expect(results).toEqual([1, 2, 3, 4, 5]);
-    expect(cleared).toBeTruthy();
+    assert.deepStrictEqual(results, [1, 2, 3, 4, 5]);
+    assert.deepStrictEqual(cleared, true);
   });
 
   it('should be finishable', async () => {
@@ -51,8 +53,8 @@ describe('An AsyncPushIterator', () => {
       results.push(i);
     }
 
-    expect(results).toEqual([1, 2, 3, 4, 5, 6]);
-    expect(cleared).toBeTruthy();
+    assert.deepStrictEqual(results, [1, 2, 3, 4, 5, 6]);
+    assert.deepStrictEqual(cleared, true);
   });
 
   it('should be cancelable', async () => {
@@ -76,8 +78,8 @@ describe('An AsyncPushIterator', () => {
       results.push(i);
     }
 
-    expect(results).toEqual([1, 2, 3, 4, 5]);
-    expect(cleared).toBeTruthy();
+    assert.deepStrictEqual(results, [1, 2, 3, 4, 5]);
+    assert.deepStrictEqual(cleared, true);
   });
 
   it('should allow pushing multiple values', async () => {
@@ -105,8 +107,8 @@ describe('An AsyncPushIterator', () => {
       results.push(i);
     }
 
-    expect(results.length).toEqual(15);
-    expect(cleared).toBeTruthy();
+    assert.deepStrictEqual(results.length, 15);
+    assert.deepStrictEqual(cleared, true);
   });
 
   it('should be cancelable with an error', async () => {
@@ -126,16 +128,17 @@ describe('An AsyncPushIterator', () => {
 
     const results: number[] = [];
 
-    await expect(
+    await assert.rejects(
       (async () => {
         for await (const i of iterator) {
           results.push(i);
         }
       })(),
-    ).rejects.toThrowError('test');
+      new Error('test'),
+    );
 
-    expect(results).toEqual([1, 2, 3, 4, 5]);
-    expect(cleared).toBeTruthy();
+    assert.deepStrictEqual(results, [1, 2, 3, 4, 5]);
+    assert.deepStrictEqual(cleared, true);
   });
 
   it('should handle chaotic iteration', async () => {
@@ -172,8 +175,8 @@ describe('An AsyncPushIterator', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 10));
 
-    expect(results.length).toEqual(30);
-    expect(cleared).toBeTruthy();
+    assert.deepStrictEqual(results.length, 30);
+    assert.deepStrictEqual(cleared, true);
   });
 
   it('should handle chaotic iteration (2)', async () => {
@@ -209,9 +212,9 @@ describe('An AsyncPushIterator', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    expect(results.length).toEqual(30);
-    expect(_done).toBeTruthy();
-    expect(cleared).toBeTruthy();
+    assert.deepStrictEqual(results.length, 30);
+    assert.deepStrictEqual(_done, true);
+    assert.deepStrictEqual(cleared, true);
   });
 
   it('should work with event emitters', async () => {
@@ -237,7 +240,7 @@ describe('An AsyncPushIterator', () => {
       results.push(item);
     }
 
-    expect(results).toEqual(['hello', 'world']);
-    expect(ee.listenerCount('test')).toEqual(0);
+    assert.deepStrictEqual(results, ['hello', 'world']);
+    assert.deepStrictEqual(ee.listenerCount('test'), 0);
   });
 });
