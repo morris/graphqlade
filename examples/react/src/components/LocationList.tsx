@@ -5,7 +5,9 @@ export function LocationList() {
 
   return (
     <ul className="locations">
-      {data?.locations?.map((it) => <li key={it.id}>{it.name}</li>)}
+      {data?.locations?.map((it) => (
+        <li key={it.id}>{it.name}</li>
+      ))}
     </ul>
   );
 }

@@ -102,6 +102,7 @@ export class GraphQLExecutionArgsParser {
       try {
         parsed = JSON.parse(parsed);
       } catch (err) {
+        // eslint-disable-next-line preserve-caught-error
         throw new TypeError(
           `Invalid variables, failed to parse JSON: ${(err as Error).message}`,
         );

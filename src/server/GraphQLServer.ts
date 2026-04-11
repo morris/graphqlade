@@ -32,8 +32,10 @@ export type GraphQLServerOptions<TContext> =
       parserOptions?: GraphQLExecutionArgsParserOptions;
     };
 
-export interface GraphQLServerBootstrapOptions<TContext>
-  extends Omit<GraphQLServerOptions<TContext>, 'schema'> {
+export interface GraphQLServerBootstrapOptions<TContext> extends Omit<
+  GraphQLServerOptions<TContext>,
+  'schema'
+> {
   /**
    * Path to root directory for code generation.
    * It's recommended to use a root relative to __dirname.

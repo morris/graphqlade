@@ -19,7 +19,7 @@ import { parseDirective } from './parseDirective';
 
 export function getDirective<T>(
   node: // ExecutableDirectiveLocation:
-  | OperationDefinitionNode
+    | OperationDefinitionNode
     | FieldNode
     | FragmentDefinitionNode
     | FragmentSpreadNode

@@ -6,8 +6,7 @@ import {
 } from './CodeGenerator';
 
 export interface Gql2TsOptions
-  extends CodeGeneratorOptions,
-    CodeGeneratorCliOptions {
+  extends CodeGeneratorOptions, CodeGeneratorCliOptions {
   /**
    * If true, does not exit the process on error.
    */

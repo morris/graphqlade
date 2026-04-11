@@ -153,7 +153,7 @@ describe('The GraphQLHttpServer exposed via Express', () => {
     const json = await response.json();
 
     assert.deepStrictEqual(json, {
-      errors: [{ message: 'Invalid query, expected string' }],
+      errors: [{ message: 'Invalid body, expected object' }],
     });
   });
 

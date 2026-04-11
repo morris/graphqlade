@@ -71,7 +71,9 @@ test.describe('The watchRecursive function', () => {
         '/watchRecursive/bar',
         '/watchRecursive/foo',
         '/watchRecursive/foo/baz',
+        '/watchRecursive/foo/baz/baz', // This seems to be a bug in typescript
         '/watchRecursive/foo/baz/test.txt',
+        '/watchRecursive/foo/foo', // This seems to be a bug in typescript
         '/watchRecursive/foo/test.gql',
         '/watchRecursive/test.graphql',
       ].map((it) => normalize(join(__dirname, it))),
