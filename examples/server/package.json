@@ -9,7 +9,7 @@
     "gql2ts": "node gql2ts.mjs"
   },
   "dependencies": {
-    "express": "^4",
+    "express": "^5",
     "graphql": "^16",
     "graphql-scalars": "^1",
     "graphqlade": "../..",
