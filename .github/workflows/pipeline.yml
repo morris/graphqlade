@@ -18,6 +18,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run lint
+        if: matrix.node-version != 18
       - run: npm run format-check
       - run: npm run build
       - run: npm run build-examples
