@@ -4,6 +4,8 @@ on: push
 
 jobs:
   check:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,6 +29,8 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
         if: ${{ github.ref == 'refs/heads/main' && matrix.node-version == 24 }}
   publish:
+    permissions:
+      contents: read
     if: github.ref == 'refs/heads/main'
     needs: check
     runs-on: ubuntu-latest
